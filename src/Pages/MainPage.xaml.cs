@@ -26,6 +26,7 @@ namespace YtFlow.App.Pages
             if (Frame.CanGoBack)
             {
                 Frame.GoBack();
+                e.Handled = true;
             }
         }
 
