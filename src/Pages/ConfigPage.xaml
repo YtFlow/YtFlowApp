@@ -116,7 +116,7 @@
         </ContentControl>
     </Grid>
     <Page.BottomAppBar>
-        <CommandBar DefaultLabelPosition="Right" IsOpen="True">
+        <CommandBar DefaultLabelPosition="Right">
             <AppBarButton Icon="Save" Label="Save" Click="SaveButton_Click"/>
             <AppBarButton Icon="Cancel" Label="Cancel" Click="CancelButton_Click"/>
         </CommandBar>

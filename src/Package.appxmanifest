@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities" IgnorableNamespaces="mp uap rescap">
-  <Identity Name="8c6e9a55-8eb2-40dd-874c-f8b0510a0040" Publisher="CN=bdbai" Version="0.0.0.0" />
-  <mp:PhoneIdentity PhoneProductId="8c6e9a55-8eb2-40dd-874c-f8b0510a0040" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
+  <Identity Name="56263bdbai.YtFlow" Publisher="CN=E18F459A-56CA-490C-9E8B-6892A762C635" Version="0.0.1.0" />
+  <mp:PhoneIdentity PhoneProductId="b2a60941-6517-41aa-b7ab-41b4413edd15" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
-    <DisplayName>YtFlowApp</DisplayName>
+    <DisplayName>YtFlow</DisplayName>
     <PublisherDisplayName>bdbai</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
@@ -15,7 +15,7 @@
   </Resources>
   <Applications>
     <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="YtFlowApp.App">
-      <uap:VisualElements DisplayName="YtFlowApp" Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png" Description="YtFlowApp" BackgroundColor="transparent">
+      <uap:VisualElements DisplayName="YtFlow" Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png" Description="A network tunnel" BackgroundColor="transparent">
         <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png">
         </uap:DefaultTile>
         <uap:SplashScreen Image="Assets\SplashScreen.png" />

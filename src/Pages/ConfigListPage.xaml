@@ -35,7 +35,7 @@
         </ListView>
     </Grid>
     <Page.TopAppBar>
-        <CommandBar x:Name="commandBar" DefaultLabelPosition="Right" IsOpen="True">
+        <CommandBar x:Name="commandBar" DefaultLabelPosition="Right">
             <AppBarButton Icon="Add" Label="Create">
                 <AppBarButton.Flyout>
                     <controls:CommandBarFlyout>
