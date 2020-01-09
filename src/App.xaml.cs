@@ -5,6 +5,7 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 using YtFlow.App.Pages;
+using YtFlow.Tunnel;
 
 namespace YtFlow.App
 {
@@ -21,6 +22,17 @@ namespace YtFlow.App
         {
             this.InitializeComponent();
             this.Suspending += OnSuspending;
+            this.UnhandledException += App_UnhandledException;
+        }
+
+        private void App_UnhandledException (object sender, Windows.UI.Xaml.UnhandledExceptionEventArgs e)
+        {
+            DebugLogger.Log("Unhandled fatal application exception: " + e.Message);
+            DebugLogger.Log("Unhandled fatal application exception stack: " + e.Exception.StackTrace);
+            if (e.Exception.InnerException != null)
+            {
+                DebugLogger.Log("Unhandled fatal application exception inner: " + e.Exception.InnerException.ToString());
+            }
         }
 
         /// <summary>
