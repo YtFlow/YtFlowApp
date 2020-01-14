@@ -6,6 +6,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Storage;
+using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -73,6 +74,15 @@ namespace YtFlow.App.Pages
         private void CancelButton_Click (object sender, RoutedEventArgs e)
         {
             Frame.GoBack();
+        }
+
+        private async void MethodComboBox_SelectionChanged (object sender, SelectionChangedEventArgs e)
+        {
+            if (e.AddedItems.Contains("rc4-md5"))
+            {
+                var dialog = new MessageDialog("The chosen cipher has inherent weaknesses. DO NOT USE.", "Warning");
+                await dialog.ShowAsync();
+            }
         }
     }
 }

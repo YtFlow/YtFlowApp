@@ -37,7 +37,8 @@
                                 <TextBlock Grid.Column="0" Grid.Row="3" Text="Port"/>
                                 <TextBox Grid.Column="1" Grid.Row="3" Text="{x:Bind ServerPort, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                                 <TextBlock Grid.Column="0" Grid.Row="4" Text="Method"/>
-                                <ComboBox Grid.Column="1" Grid.Row="4" SelectedValue="{x:Bind Method, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                <ComboBox Grid.Column="1" Grid.Row="4" SelectedValue="{x:Bind Method, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectionChanged="MethodComboBox_SelectionChanged">
+                                    <x:String>rc4-md5</x:String>
                                     <x:String>aes-128-cfb</x:String>
                                     <x:String>aes-192-cfb</x:String>
                                     <x:String>aes-256-cfb</x:String>
