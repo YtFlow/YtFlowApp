@@ -19,7 +19,7 @@
     <WindowsXamlEnableOverview>true</WindowsXamlEnableOverview>
     <PackageCertificateKeyFile>YtFlowApp_StoreKey.pfx</PackageCertificateKeyFile>
     <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
-    <AppxBundlePlatforms>x86|x64</AppxBundlePlatforms>
+    <AppxBundlePlatforms>arm</AppxBundlePlatforms>
     <AppxBundle>Auto</AppxBundle>
     <PackageCertificateThumbprint>38C24C61C2A055F72A632121BB227433DA4367AB</PackageCertificateThumbprint>
     <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
@@ -175,14 +175,6 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Wintun2socks\src\wintun2socks.vcxproj">
-      <Project>{d782a42f-f6fe-41c8-801b-4876e9e493f8}</Project>
-      <Name>wintun2socks</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\YtCrypto\src\YtCrypto.vcxproj">
-      <Project>{0e55791a-e5d5-4b70-9ea6-a1a6c44c3deb}</Project>
-      <Name>YtCrypto</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\YtFlowTunnel\src\YtFlowTunnel.csproj">
       <Project>{1e4fb15b-52af-4b16-9918-46e6a62a3bd6}</Project>
       <Name>YtFlowTunnel</Name>

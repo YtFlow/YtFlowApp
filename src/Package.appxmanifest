@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities" IgnorableNamespaces="mp uap rescap">
-  <Identity Name="56263bdbai.YtFlow" Publisher="CN=E18F459A-56CA-490C-9E8B-6892A762C635" Version="0.0.2.0" />
+  <Identity Name="56263bdbai.YtFlow" Publisher="CN=E18F459A-56CA-490C-9E8B-6892A762C635" Version="0.0.3.0" />
   <mp:PhoneIdentity PhoneProductId="b2a60941-6517-41aa-b7ab-41b4413edd15" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>YtFlow</DisplayName>
@@ -21,7 +21,7 @@
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
       </uap:VisualElements>
       <Extensions>
-        <Extension Category="windows.backgroundTasks" Executable="YtFlowApp.exe" EntryPoint="YtFlow.Tunnel.VpnTask">
+        <Extension Category="windows.backgroundTasks" Executable="$targetnametoken$.exe" EntryPoint="YtFlow.Tunnel.VpnTask"  ResourceGroup="tunnel">
           <BackgroundTasks>
             <uap:Task Type="vpnClient" />
           </BackgroundTasks>
@@ -34,15 +34,5 @@
     <Capability Name="privateNetworkClientServer" />
     <Capability Name="internetClientServer" />
     <rescap:Capability Name="networkingVpnProvider" />
-    <rescap:Capability Name="extendedBackgroundTaskTime"/>
   </Capabilities>
-  <!-- Extensions>
-    <Extension Category="windows.activatableClass.inProcessServer">
-      <InProcessServer>
-        <Path>YtFlowTunnel.dll</Path>
-        <ActivatableClass ActivatableClassId="YtFlowTunnel.Main" ThreadingModel="both" />
-        <ActivatableClass ActivatableClassId="YtFlowTunnel.Tunnel" ThreadingModel="both" />
-      </InProcessServer>
-    </Extension>
-  </Extensions -->
 </Package>
