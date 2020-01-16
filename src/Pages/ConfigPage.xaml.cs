@@ -84,5 +84,15 @@ namespace YtFlow.App.Pages
                 await dialog.ShowAsync();
             }
         }
+
+        private void PasswordBox_GotFocus (object sender, RoutedEventArgs e)
+        {
+            ((PasswordBox)sender).PasswordRevealMode = PasswordRevealMode.Visible;
+        }
+
+        private void PasswordBox_LostFocus (object sender, RoutedEventArgs e)
+        {
+            ((PasswordBox)sender).PasswordRevealMode = PasswordRevealMode.Hidden;
+        }
     }
 }

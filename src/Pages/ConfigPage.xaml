@@ -51,7 +51,7 @@
                                     <x:String>chacha20-ietf</x:String>
                                 </ComboBox>
                                 <TextBlock Grid.Column="0" Grid.Row="5" Text="Password"/>
-                                <PasswordBox Grid.Column="1" Grid.Row="5" Password="{x:Bind Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <PasswordBox Grid.Column="1" Grid.Row="5" Password="{x:Bind Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PasswordRevealMode="Hidden" GotFocus="PasswordBox_GotFocus" LostFocus="PasswordBox_LostFocus"/>
                             </Grid>
                         </DataTemplate>
                     </selectors:AdapterConfigTypeSelector.ShadowsocksTemplate>
