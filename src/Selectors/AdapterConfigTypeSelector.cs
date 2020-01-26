@@ -13,11 +13,11 @@ namespace YtFlow.App.Selectors
         {
             switch (item)
             {
-                case ShadowsocksConfig ss:
+                case ShadowsocksConfig _:
                     return ShadowsocksTemplate;
-                case HttpConfig ht:
+                case HttpConfig _:
                     return HttpTemplate;
-                case TrojanConfig tj:
+                case TrojanConfig _:
                     return TrojanTemplate;
             }
             return base.SelectTemplateCore(item);

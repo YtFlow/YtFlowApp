@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -60,7 +59,7 @@ namespace YtFlow.App.Pages
         {
             var btn = (MenuFlyoutItem)sender;
             var config = (IAdapterConfig)btn.DataContext;
-            var (secondaryAsClose, result) = await Utils.NotifyUser("Remove this config?", primaryCommandText: "Yes");
+            var (_, result) = await Utils.NotifyUser("Remove this config?", primaryCommandText: "Yes");
             if (result != ContentDialogResult.Primary)
             {
                 return;
@@ -69,9 +68,9 @@ namespace YtFlow.App.Pages
             {
                 File.Delete(config.Path);
                 adapterConfigs.Remove(config);
-                if (config.Path == AdapterConfig.GetDefaultConfigFilePath() && adapterConfigs.Count > 0)
+                if (config.Path == AdapterConfig.GetDefaultConfigFilePath())
                 {
-                    AdapterConfig.SetDefaultConfigFilePath(adapterConfigs[0].Path);
+                    AdapterConfig.ClearDefaultConfigFilePath();
                 }
             }
             catch (Exception ex)

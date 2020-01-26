@@ -18,7 +18,7 @@ namespace YtFlow.App
         /// 初始化单一实例应用程序对象。这是执行的创作代码的第一行，
         /// 已执行，逻辑上等同于 main() 或 WinMain()。
         /// </summary>
-        public App()
+        public App ()
         {
             this.InitializeComponent();
             this.Suspending += OnSuspending;
@@ -27,11 +27,11 @@ namespace YtFlow.App
 
         private void App_UnhandledException (object sender, Windows.UI.Xaml.UnhandledExceptionEventArgs e)
         {
-            DebugLogger.Log("Unhandled fatal application exception: " + e.Message);
+            DebugLogger.Log("Unhandled fatal application exception: " + e.ToString());
             DebugLogger.Log("Unhandled fatal application exception stack: " + e.Exception.StackTrace);
             if (e.Exception.InnerException != null)
             {
-                DebugLogger.Log("Unhandled fatal application exception inner: " + e.Exception.InnerException.ToString());
+                DebugLogger.Log("Unhandled fatal application inner exception: " + e.Exception.InnerException.ToString());
             }
         }
 
@@ -40,8 +40,13 @@ namespace YtFlow.App
         /// 将在启动应用程序以打开特定文件等情况下使用。
         /// </summary>
         /// <param name="e">有关启动请求和过程的详细信息。</param>
-        protected override void OnLaunched(LaunchActivatedEventArgs e)
+        protected override void OnLaunched (LaunchActivatedEventArgs e)
         {
+            try
+            {
+                /* await */ DebugLogger.InitDebugSocket().AsTask();
+            }
+            catch (Exception) { }
             Frame rootFrame = Window.Current.Content as Frame;
 
             // 不要在窗口已包含内容时重复应用程序初始化，
@@ -81,7 +86,7 @@ namespace YtFlow.App
         /// </summary>
         ///<param name="sender">导航失败的框架</param>
         ///<param name="e">有关导航失败的详细信息</param>
-        void OnNavigationFailed(object sender, NavigationFailedEventArgs e)
+        void OnNavigationFailed (object sender, NavigationFailedEventArgs e)
         {
             throw new Exception("Failed to load Page " + e.SourcePageType.FullName);
         }
@@ -93,7 +98,7 @@ namespace YtFlow.App
         /// </summary>
         /// <param name="sender">挂起的请求的源。</param>
         /// <param name="e">有关挂起请求的详细信息。</param>
-        private void OnSuspending(object sender, SuspendingEventArgs e)
+        private void OnSuspending (object sender, SuspendingEventArgs e)
         {
             var deferral = e.SuspendingOperation.GetDeferral();
             //TODO: 保存应用程序状态并停止任何后台活动
