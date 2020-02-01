@@ -98,6 +98,7 @@
                                     <RowDefinition/>
                                     <RowDefinition/>
                                     <RowDefinition/>
+                                    <RowDefinition/>
                                 </Grid.RowDefinitions>
                                 <TextBlock Grid.Column="0" Grid.Row="0" Text="Type"/>
                                 <TextBlock Grid.Column="1" Grid.Row="0" Text="Trojan"/>
@@ -109,6 +110,8 @@
                                 <TextBox Grid.Column="1" Grid.Row="3" InputScope="Number" Text="{x:Bind ServerPort, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                                 <TextBlock Grid.Column="0" Grid.Row="4" Text="Password"/>
                                 <PasswordBox Grid.Column="1" Grid.Row="4" Password="{x:Bind Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <TextBlock Grid.Column="0" Grid.Row="5" Text="Allow Insecure"/>
+                                <CheckBox Grid.Column="1" Grid.Row="5" IsChecked="{x:Bind AllowInsecure, Mode=TwoWay}"/>
                             </Grid>
                         </DataTemplate>
                     </selectors:AdapterConfigTypeSelector.TrojanTemplate>

@@ -42,7 +42,7 @@
                         <controls:CommandBarFlyout.SecondaryCommands>
                             <AppBarButton Label="Shadowsocks" Click="CreateShadowsocksButton_Click"/>
                             <AppBarButton Label="HTTP" Click="CreateHttpButton_Click"/>
-                            <AppBarButton Label="Trojan" Click="CreateTrojanButton_Click" IsEnabled="False" ToolTipService.ToolTip="Not fully implemented"/>
+                            <AppBarButton Label="Trojan" Click="CreateTrojanButton_Click"/>
                         </controls:CommandBarFlyout.SecondaryCommands>
                     </controls:CommandBarFlyout>
                 </AppBarButton.Flyout>

@@ -27,8 +27,7 @@ namespace YtFlow.App
 
         private void App_UnhandledException (object sender, Windows.UI.Xaml.UnhandledExceptionEventArgs e)
         {
-            DebugLogger.Log("Unhandled fatal application exception: " + e.ToString());
-            DebugLogger.Log("Unhandled fatal application exception stack: " + e.Exception.StackTrace);
+            DebugLogger.Log("Unhandled fatal application exception: " + e.Exception.ToString());
             if (e.Exception.InnerException != null)
             {
                 DebugLogger.Log("Unhandled fatal application inner exception: " + e.Exception.InnerException.ToString());
@@ -44,7 +43,8 @@ namespace YtFlow.App
         {
             try
             {
-                /* await */ DebugLogger.InitDebugSocket().AsTask();
+                /* await */
+                DebugLogger.InitDebugSocket().AsTask();
             }
             catch (Exception) { }
             Frame rootFrame = Window.Current.Content as Frame;

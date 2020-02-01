@@ -21,7 +21,7 @@
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
       </uap:VisualElements>
       <Extensions>
-        <Extension Category="windows.backgroundTasks" Executable="$targetnametoken$.exe" EntryPoint="YtFlow.Tunnel.VpnTask"   ResourceGroup="tunnel">
+        <Extension Category="windows.backgroundTasks" Executable="$targetnametoken$.exe" EntryPoint="YtFlow.Tunnel.VpnTask" ResourceGroup="tunnel">
           <BackgroundTasks>
             <uap:Task Type="vpnClient" />
           </BackgroundTasks>
