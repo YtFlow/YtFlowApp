@@ -81,7 +81,7 @@
                                 <TextBlock Grid.Column="0" Grid.Row="4" Text="UserName"/>
                                 <TextBox Grid.Column="1" Grid.Row="4" Text="{x:Bind UserName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False" ToolTipService.ToolTip="Not implemented"/>
                                 <TextBlock Grid.Column="0" Grid.Row="5" Text="Password"/>
-                                <PasswordBox Grid.Column="1" Grid.Row="5" Password="{x:Bind Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False" ToolTipService.ToolTip="Not implemented"/>
+                                <PasswordBox Grid.Column="1" Grid.Row="5" Password="{x:Bind Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False" ToolTipService.ToolTip="Not implemented" PasswordRevealMode="Hidden" GotFocus="PasswordBox_GotFocus" LostFocus="PasswordBox_LostFocus"/>
                             </Grid>
                         </DataTemplate>
                     </selectors:AdapterConfigTypeSelector.HttpTemplate>
@@ -109,7 +109,7 @@
                                 <TextBlock Grid.Column="0" Grid.Row="3" Text="Port"/>
                                 <TextBox Grid.Column="1" Grid.Row="3" InputScope="Number" Text="{x:Bind ServerPort, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                                 <TextBlock Grid.Column="0" Grid.Row="4" Text="Password"/>
-                                <PasswordBox Grid.Column="1" Grid.Row="4" Password="{x:Bind Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <PasswordBox Grid.Column="1" Grid.Row="4" Password="{x:Bind Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PasswordRevealMode="Hidden" GotFocus="PasswordBox_GotFocus" LostFocus="PasswordBox_LostFocus"/>
                                 <TextBlock Grid.Column="0" Grid.Row="5" Text="Allow Insecure"/>
                                 <CheckBox Grid.Column="1" Grid.Row="5" IsChecked="{x:Bind AllowInsecure, Mode=TwoWay}"/>
                             </Grid>
