@@ -35,7 +35,7 @@
                                 <TextBlock Grid.Column="0" Grid.Row="2" Text="Server"/>
                                 <TextBox Grid.Column="1" Grid.Row="2" Text="{x:Bind ServerHost, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                                 <TextBlock Grid.Column="0" Grid.Row="3" Text="Port"/>
-                                <TextBox Grid.Column="1" Grid.Row="3" InputScope="Number" Text="{x:Bind ServerPort, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <TextBox Grid.Column="1" Grid.Row="3" InputScope="Number" MaxLength="5" Text="{x:Bind ServerPort, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                                 <TextBlock Grid.Column="0" Grid.Row="4" Text="Method"/>
                                 <ComboBox Grid.Column="1" Grid.Row="4" SelectedValue="{x:Bind Method, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectionChanged="MethodComboBox_SelectionChanged">
                                     <x:String>rc4-md5</x:String>
@@ -45,10 +45,14 @@
                                     <x:String>aes-128-ctr</x:String>
                                     <x:String>aes-192-ctr</x:String>
                                     <x:String>aes-256-ctr</x:String>
+                                    <x:String>aes-128-gcm</x:String>
+                                    <x:String>aes-192-gcm</x:String>
+                                    <x:String>aes-256-gcm</x:String>
                                     <x:String>camellia-128-cfb</x:String>
                                     <x:String>camellia-192-cfb</x:String>
                                     <x:String>camellia-256-cfb</x:String>
                                     <x:String>chacha20-ietf</x:String>
+                                    <x:String>chacha20-ietf-poly1305</x:String>
                                 </ComboBox>
                                 <TextBlock Grid.Column="0" Grid.Row="5" Text="Password"/>
                                 <PasswordBox Grid.Column="1" Grid.Row="5" Password="{x:Bind Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PasswordRevealMode="Hidden" GotFocus="PasswordBox_GotFocus" LostFocus="PasswordBox_LostFocus"/>
@@ -77,7 +81,7 @@
                                 <TextBlock Grid.Column="0" Grid.Row="2" Text="Server"/>
                                 <TextBox Grid.Column="1" Grid.Row="2" Text="{x:Bind ServerHost, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                                 <TextBlock Grid.Column="0" Grid.Row="3" Text="Port"/>
-                                <TextBox Grid.Column="1" Grid.Row="3" InputScope="Number" Text="{x:Bind ServerPort, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <TextBox Grid.Column="1" Grid.Row="3" InputScope="Number" MaxLength="5" Text="{x:Bind ServerPort, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                                 <TextBlock Grid.Column="0" Grid.Row="4" Text="UserName"/>
                                 <TextBox Grid.Column="1" Grid.Row="4" Text="{x:Bind UserName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False" ToolTipService.ToolTip="Not implemented"/>
                                 <TextBlock Grid.Column="0" Grid.Row="5" Text="Password"/>
@@ -107,7 +111,7 @@
                                 <TextBlock Grid.Column="0" Grid.Row="2" Text="Server"/>
                                 <TextBox Grid.Column="1" Grid.Row="2" Text="{x:Bind ServerHost, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                                 <TextBlock Grid.Column="0" Grid.Row="3" Text="Port"/>
-                                <TextBox Grid.Column="1" Grid.Row="3" InputScope="Number" Text="{x:Bind ServerPort, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <TextBox Grid.Column="1" Grid.Row="3" InputScope="Number" MaxLength="5" Text="{x:Bind ServerPort, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                                 <TextBlock Grid.Column="0" Grid.Row="4" Text="Password"/>
                                 <PasswordBox Grid.Column="1" Grid.Row="4" Password="{x:Bind Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PasswordRevealMode="Hidden" GotFocus="PasswordBox_GotFocus" LostFocus="PasswordBox_LostFocus"/>
                                 <TextBlock Grid.Column="0" Grid.Row="5" Text="Allow Insecure"/>
