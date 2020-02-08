@@ -1,6 +1,8 @@
 ﻿using System;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
+using Windows.ApplicationModel.ExtendedExecution;
+using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
@@ -14,6 +16,8 @@ namespace YtFlow.App
     /// </summary>
     sealed partial class App : Application
     {
+        public const string LAST_ERROR_KEY = "lastError";
+
         /// <summary>
         /// 初始化单一实例应用程序对象。这是执行的创作代码的第一行，
         /// 已执行，逻辑上等同于 main() 或 WinMain()。
@@ -28,10 +32,22 @@ namespace YtFlow.App
         private void App_UnhandledException (object sender, Windows.UI.Xaml.UnhandledExceptionEventArgs e)
         {
             DebugLogger.Log("Unhandled fatal application exception: " + e.Exception.ToString());
+            var localSettings = ApplicationData.Current.LocalSettings.Values;
+            var exStr = e.Exception.ToString();
+            if (localSettings.TryGetValue(LAST_ERROR_KEY, out var lastErr) && lastErr is string lastErrStr)
+            {
+                lastErrStr += "\r\n" + exStr;
+            }
+            else
+            {
+                lastErrStr = exStr;
+            }
+            localSettings[LAST_ERROR_KEY] = lastErrStr;
             if (e.Exception.InnerException != null)
             {
                 DebugLogger.Log("Unhandled fatal application inner exception: " + e.Exception.InnerException.ToString());
             }
+            e.Handled = true;
         }
 
         /// <summary>
@@ -47,11 +63,10 @@ namespace YtFlow.App
                 DebugLogger.InitDebugSocket().AsTask();
             }
             catch (Exception) { }
-            Frame rootFrame = Window.Current.Content as Frame;
 
             // 不要在窗口已包含内容时重复应用程序初始化，
             // 只需确保窗口处于活动状态
-            if (rootFrame == null)
+            if (!(Window.Current.Content is Frame rootFrame))
             {
                 // 创建要充当导航上下文的框架，并导航到第一页
                 rootFrame = new Frame();

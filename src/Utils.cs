@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Metadata;
@@ -15,7 +16,24 @@ namespace YtFlow.App
             return ApplicationData.Current.RoamingFolder.CreateFolderAsync("configs", CreationCollisionOption.OpenIfExists);
         }
 
+        private static SemaphoreSlim msgboxLock = new SemaphoreSlim(1, 1);
         public static async Task<(bool SecondaryAsClose, ContentDialogResult Result)> NotifyUser (
+            string content,
+            string title = null,
+            string primaryCommandText = null,
+            string secondaryCommandText = null)
+        {
+            await msgboxLock.WaitAsync();
+            try
+            {
+                return await RealNotifyUser(content, title, primaryCommandText, secondaryCommandText);
+            }
+            finally
+            {
+                msgboxLock.Release();
+            }
+        }
+        private static async Task<(bool SecondaryAsClose, ContentDialogResult Result)> RealNotifyUser (
             string content,
             string title = null,
             string primaryCommandText = null,

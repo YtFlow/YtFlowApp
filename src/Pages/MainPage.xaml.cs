@@ -7,6 +7,7 @@ using Windows.ApplicationModel;
 using Windows.Foundation.Metadata;
 using Windows.Networking;
 using Windows.Networking.Vpn;
+using Windows.Storage;
 using Windows.System;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
@@ -57,6 +58,8 @@ namespace YtFlow.App.Pages
         private async Task CheckTunnelConnectionStatus ()
         {
             var (_, profile) = await GetInstalledVpnProfile();
+            switchToggleBtn.Checked -= OnButton_Click;
+            switchToggleBtn.Unchecked -= OffButton_Click;
             if (profile is VpnPlugInProfile pluginProfile)
             {
                 try
@@ -73,6 +76,8 @@ namespace YtFlow.App.Pages
             {
                 TunnelConnectionStatus = TunnelConnectionStatus.Disconnected;
             }
+            switchToggleBtn.Checked += OnButton_Click;
+            switchToggleBtn.Unchecked += OffButton_Click;
         }
 
         private async Task<VpnManagementErrorStatus> CreateAndConnectVpn ()
@@ -176,9 +181,15 @@ namespace YtFlow.App.Pages
 
         private async void StartPollingTunnelConnectionStatus ()
         {
+            var localSettings = ApplicationData.Current.LocalSettings.Values;
             while (pageDisplaying)
             {
                 await CheckTunnelConnectionStatus();
+                if (localSettings.TryGetValue(App.LAST_ERROR_KEY, out var lastErr) && lastErr is string lastErrStr)
+                {
+                    await Utils.NotifyUser("An exception occurred during last session. Detail:\r\n\r\n" + lastErrStr, "Unexpected error");
+                    localSettings.Remove("lastError");
+                }
                 await Task.Delay(1000);
             }
         }

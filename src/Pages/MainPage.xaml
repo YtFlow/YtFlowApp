@@ -50,6 +50,7 @@
                 Height="100"
                 HorizontalAlignment="Stretch">
                 <ToggleButton
+                    x:Name="switchToggleBtn"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     Content="{x:Bind TunnelConnectionStatus, Mode=OneWay}"
