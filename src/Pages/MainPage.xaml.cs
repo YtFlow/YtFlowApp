@@ -185,7 +185,7 @@ namespace YtFlow.App.Pages
             while (pageDisplaying)
             {
                 await CheckTunnelConnectionStatus();
-                if (localSettings.TryGetValue(App.LAST_ERROR_KEY, out var lastErr) && lastErr is string lastErrStr)
+                if (localSettings.TryGetValue("lastError", out var lastErr) && lastErr is string lastErrStr)
                 {
                     await Utils.NotifyUser("An exception occurred during last session. Detail:\r\n\r\n" + lastErrStr, "Unexpected error");
                     localSettings.Remove("lastError");

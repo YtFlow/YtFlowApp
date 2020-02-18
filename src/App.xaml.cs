@@ -16,8 +16,6 @@ namespace YtFlow.App
     /// </summary>
     sealed partial class App : Application
     {
-        public const string LAST_ERROR_KEY = "lastError";
-
         /// <summary>
         /// 初始化单一实例应用程序对象。这是执行的创作代码的第一行，
         /// 已执行，逻辑上等同于 main() 或 WinMain()。
@@ -33,8 +31,8 @@ namespace YtFlow.App
         {
             DebugLogger.Log("Unhandled fatal application exception: " + e.Exception.ToString());
             var localSettings = ApplicationData.Current.LocalSettings.Values;
-            var exStr = e.Exception.ToString();
-            if (localSettings.TryGetValue(LAST_ERROR_KEY, out var lastErr) && lastErr is string lastErrStr)
+            var exStr = e.Exception.ToString() + "\r\n" + e.Exception.StackTrace;
+            if (localSettings.TryGetValue("lastError", out var lastErr) && lastErr is string lastErrStr)
             {
                 lastErrStr += "\r\n" + exStr;
             }
@@ -42,7 +40,7 @@ namespace YtFlow.App
             {
                 lastErrStr = exStr;
             }
-            localSettings[LAST_ERROR_KEY] = lastErrStr;
+            localSettings["lastError"] = lastErrStr;
             if (e.Exception.InnerException != null)
             {
                 DebugLogger.Log("Unhandled fatal application inner exception: " + e.Exception.InnerException.ToString());
