@@ -167,6 +167,7 @@ namespace YtFlow.App.Pages
             {
                 await Utils.NotifyUser("Cannot disconnect from VPN profile: " + res.ToString());
             }
+            /*
             if (!newWindowsBuild)
             {
                 return;
@@ -176,6 +177,7 @@ namespace YtFlow.App.Pages
             {
                 await Utils.NotifyUser("Cannot remove VPN profile: " + res.ToString());
             }
+            */
             await DebugLogger.ResetLoggers();
         }
 
