@@ -1,0 +1,132 @@
+﻿<Page
+    x:Class="YtFlow.App.Pages.ConfigPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:selectors="using:YtFlow.App.Selectors"
+    xmlns:config="using:YtFlow.Tunnel.Config"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid>
+        <ContentControl Content="{x:Bind config}">
+            <ContentControl.ContentTemplateSelector>
+                <selectors:AdapterConfigTypeSelector>
+                    <selectors:AdapterConfigTypeSelector.ShadowsocksTemplate>
+                        <DataTemplate x:DataType="config:ShadowsocksConfig">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="3*"/>
+                                    <ColumnDefinition Width="7*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Grid.Column="0" Grid.Row="0" Text="Type"/>
+                                <TextBlock Grid.Column="1" Grid.Row="0" Text="Shadowsocks"/>
+                                <TextBlock Grid.Column="0" Grid.Row="1" Text="Name"/>
+                                <TextBox Grid.Column="1" Grid.Row="1" Text="{x:Bind Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <TextBlock Grid.Column="0" Grid.Row="2" Text="Server"/>
+                                <TextBox Grid.Column="1" Grid.Row="2" Text="{x:Bind ServerHost, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <TextBlock Grid.Column="0" Grid.Row="3" Text="Port"/>
+                                <TextBox Grid.Column="1" Grid.Row="3" InputScope="Number" MaxLength="5" Text="{x:Bind ServerPort, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <TextBlock Grid.Column="0" Grid.Row="4" Text="Method"/>
+                                <ComboBox Grid.Column="1" Grid.Row="4" SelectedValue="{x:Bind Method, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectionChanged="MethodComboBox_SelectionChanged">
+                                    <x:String>rc4-md5</x:String>
+                                    <x:String>aes-128-cfb</x:String>
+                                    <x:String>aes-192-cfb</x:String>
+                                    <x:String>aes-256-cfb</x:String>
+                                    <x:String>aes-128-ctr</x:String>
+                                    <x:String>aes-192-ctr</x:String>
+                                    <x:String>aes-256-ctr</x:String>
+                                    <x:String>aes-128-gcm</x:String>
+                                    <x:String>aes-192-gcm</x:String>
+                                    <x:String>aes-256-gcm</x:String>
+                                    <x:String>camellia-128-cfb</x:String>
+                                    <x:String>camellia-192-cfb</x:String>
+                                    <x:String>camellia-256-cfb</x:String>
+                                    <x:String>chacha20-ietf</x:String>
+                                    <x:String>chacha20-ietf-poly1305</x:String>
+                                </ComboBox>
+                                <TextBlock Grid.Column="0" Grid.Row="5" Text="Password"/>
+                                <PasswordBox Grid.Column="1" Grid.Row="5" Password="{x:Bind Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PasswordRevealMode="Hidden" GotFocus="PasswordBox_GotFocus" LostFocus="PasswordBox_LostFocus"/>
+                            </Grid>
+                        </DataTemplate>
+                    </selectors:AdapterConfigTypeSelector.ShadowsocksTemplate>
+                    <selectors:AdapterConfigTypeSelector.HttpTemplate>
+                        <DataTemplate x:DataType="config:HttpConfig">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="3*"/>
+                                    <ColumnDefinition Width="7*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Grid.Column="0" Grid.Row="0" Text="Type"/>
+                                <TextBlock Grid.Column="1" Grid.Row="0" Text="HTTP"/>
+                                <TextBlock Grid.Column="0" Grid.Row="1" Text="Name"/>
+                                <TextBox Grid.Column="1" Grid.Row="1" Text="{x:Bind Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <TextBlock Grid.Column="0" Grid.Row="2" Text="Server"/>
+                                <TextBox Grid.Column="1" Grid.Row="2" Text="{x:Bind ServerHost, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <TextBlock Grid.Column="0" Grid.Row="3" Text="Port"/>
+                                <TextBox Grid.Column="1" Grid.Row="3" InputScope="Number" MaxLength="5" Text="{x:Bind ServerPort, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <TextBlock Grid.Column="0" Grid.Row="4" Text="UserName"/>
+                                <TextBox Grid.Column="1" Grid.Row="4" Text="{x:Bind UserName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False" ToolTipService.ToolTip="Not implemented"/>
+                                <TextBlock Grid.Column="0" Grid.Row="5" Text="Password"/>
+                                <PasswordBox Grid.Column="1" Grid.Row="5" Password="{x:Bind Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False" ToolTipService.ToolTip="Not implemented" PasswordRevealMode="Hidden" GotFocus="PasswordBox_GotFocus" LostFocus="PasswordBox_LostFocus"/>
+                            </Grid>
+                        </DataTemplate>
+                    </selectors:AdapterConfigTypeSelector.HttpTemplate>
+                    <selectors:AdapterConfigTypeSelector.TrojanTemplate>
+                        <DataTemplate x:DataType="config:TrojanConfig">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="3*"/>
+                                    <ColumnDefinition Width="7*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Grid.Column="0" Grid.Row="0" Text="Type"/>
+                                <TextBlock Grid.Column="1" Grid.Row="0" Text="Trojan"/>
+                                <TextBlock Grid.Column="0" Grid.Row="1" Text="Name"/>
+                                <TextBox Grid.Column="1" Grid.Row="1" Text="{x:Bind Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <TextBlock Grid.Column="0" Grid.Row="2" Text="Server"/>
+                                <TextBox Grid.Column="1" Grid.Row="2" Text="{x:Bind ServerHost, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <TextBlock Grid.Column="0" Grid.Row="3" Text="Port"/>
+                                <TextBox Grid.Column="1" Grid.Row="3" InputScope="Number" MaxLength="5" Text="{x:Bind ServerPort, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <TextBlock Grid.Column="0" Grid.Row="4" Text="Password"/>
+                                <PasswordBox Grid.Column="1" Grid.Row="4" Password="{x:Bind Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PasswordRevealMode="Hidden" GotFocus="PasswordBox_GotFocus" LostFocus="PasswordBox_LostFocus"/>
+                                <TextBlock Grid.Column="0" Grid.Row="5" Text="Allow Insecure"/>
+                                <CheckBox Grid.Column="1" Grid.Row="5" IsChecked="{x:Bind AllowInsecure, Mode=TwoWay}"/>
+                            </Grid>
+                        </DataTemplate>
+                    </selectors:AdapterConfigTypeSelector.TrojanTemplate>
+                </selectors:AdapterConfigTypeSelector>
+            </ContentControl.ContentTemplateSelector>
+        </ContentControl>
+    </Grid>
+    <Page.BottomAppBar>
+        <CommandBar DefaultLabelPosition="Right">
+            <AppBarButton Icon="Save" Label="Save" Click="SaveButton_Click"/>
+            <AppBarButton Icon="Cancel" Label="Cancel" Click="CancelButton_Click"/>
+        </CommandBar>
+    </Page.BottomAppBar>
+</Page>

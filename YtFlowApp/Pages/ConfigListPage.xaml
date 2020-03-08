@@ -1,0 +1,52 @@
+﻿<Page
+    x:Class="YtFlow.App.Pages.ConfigListPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:controls="using:Microsoft.UI.Xaml.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:converter="using:YtFlow.App.Converters"
+    xmlns:config="using:YtFlow.Tunnel.Config"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Page.Resources>
+        <ResourceDictionary>
+            <converter:CurrentConfigToFontWeightConverter x:Key="CurrentConfigToFont"/>
+            <converter:AdapterTypeToDisplayNameConverter x:Key="InitialUpper"/>
+        </ResourceDictionary>
+    </Page.Resources>
+
+    <Grid>
+        <ListView ItemsSource="{x:Bind adapterConfigs, Mode=OneWay}" ItemClick="AdapterListView_ItemClick" SelectionMode="None" IsItemClickEnabled="True">
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="config:IAdapterConfig">
+                    <StackPanel>
+                        <StackPanel.ContextFlyout>
+                            <MenuFlyout>
+                                <MenuFlyoutItem Text="Set as default" Icon="Favorite" Click="SetDefaultButton_Click"/>
+                                <MenuFlyoutItem Text="Remove" Icon="Delete" Click="RemoveButton_Click"/>
+                            </MenuFlyout>
+                        </StackPanel.ContextFlyout>
+                        <TextBlock Text="{x:Bind Name}" Style="{ThemeResource BodyTextBlockStyle}" FontWeight="{x:Bind Path=Path, Converter={StaticResource CurrentConfigToFont}}"/>
+                        <TextBlock Text="{x:Bind AdapterType, Converter={StaticResource InitialUpper}}" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </Grid>
+    <Page.TopAppBar>
+        <CommandBar x:Name="commandBar" DefaultLabelPosition="Right">
+            <AppBarButton Icon="Add" Label="Create">
+                <AppBarButton.Flyout>
+                    <controls:CommandBarFlyout>
+                        <controls:CommandBarFlyout.SecondaryCommands>
+                            <AppBarButton Label="Shadowsocks" Click="CreateShadowsocksButton_Click"/>
+                            <AppBarButton Label="HTTP" Click="CreateHttpButton_Click"/>
+                            <AppBarButton Label="Trojan" Click="CreateTrojanButton_Click"/>
+                        </controls:CommandBarFlyout.SecondaryCommands>
+                    </controls:CommandBarFlyout>
+                </AppBarButton.Flyout>
+            </AppBarButton>
+        </CommandBar>
+    </Page.TopAppBar>
+</Page>
