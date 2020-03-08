@@ -20,7 +20,7 @@
         <ListView ItemsSource="{x:Bind adapterConfigs, Mode=OneWay}" ItemClick="AdapterListView_ItemClick" SelectionMode="None" IsItemClickEnabled="True">
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="config:IAdapterConfig">
-                    <StackPanel>
+                    <StackPanel HorizontalAlignment="Stretch">
                         <StackPanel.ContextFlyout>
                             <MenuFlyout>
                                 <MenuFlyoutItem Text="Set as default" Icon="Favorite" Click="SetDefaultButton_Click"/>
@@ -32,6 +32,11 @@
                     </StackPanel>
                 </DataTemplate>
             </ListView.ItemTemplate>
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                </Style>
+            </ListView.ItemContainerStyle>
         </ListView>
     </Grid>
     <Page.TopAppBar>
