@@ -18,7 +18,7 @@
                 HorizontalAlignment="Center"
                 VerticalAlignment="Bottom"
                 Foreground="White"
-                Text="Take QR Code In The Perview" />
+                Text="Take QR Code In The Preview" />
         </Grid>
     </Grid>
     <Page.TopAppBar>

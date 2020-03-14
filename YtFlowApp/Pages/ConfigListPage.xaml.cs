@@ -27,7 +27,7 @@ namespace YtFlow.App.Pages
 
         private async Task LoadAdapterConfigs ()
         {
-            var directory = await Utils.Utils.GetAdapterConfigDirectory();
+            var directory = await Utils.ConfigUtils.GetAdapterConfigDirectory();
             var files = await directory.GetFilesAsync();
             adapterConfigs.Clear();
             foreach (var config in files.Select(f => AdapterConfig.GetConfigFromFilePath(f.Path)))
@@ -60,7 +60,7 @@ namespace YtFlow.App.Pages
         {
             var btn = (MenuFlyoutItem)sender;
             var config = (IAdapterConfig)btn.DataContext;
-            var (_, result) = await Utils.Utils.NotifyUser("Remove this config?", primaryCommandText: "Yes");
+            var (_, result) = await Utils.UiUtils.NotifyUser("Remove this config?", primaryCommandText: "Yes");
             if (result != ContentDialogResult.Primary)
             {
                 return;
@@ -76,7 +76,7 @@ namespace YtFlow.App.Pages
             }
             catch (Exception ex)
             {
-                await Utils.Utils.NotifyUser("Error while deleting config file: " + ex.Message);
+                await Utils.UiUtils.NotifyUser("Error while deleting config file: " + ex.Message);
             }
         }
 
@@ -123,14 +123,14 @@ namespace YtFlow.App.Pages
             if (content.Contains(StandardDataFormats.Text))
             {
                 var text = await content.GetTextAsync();
-                var servers = Utils.ShadowsocksUtils.GetServers(text);
-                await Utils.ShadowsocksUtils.SaveServersAsync(servers);
+                var servers = Utils.ConfigUtils.GetServers(text);
+                await Utils.ConfigUtils.SaveServersAsync(servers);
                 await LoadAdapterConfigs();
-                await Utils.Utils.NotifyUser($"Add {servers.Count} Shadowsocks config in total", "Complete", "OK");
+                await Utils.UiUtils.NotifyUser($"Add {servers.Count} Shadowsocks config in total", "Complete", "OK");
             } 
             else
             {
-                await Utils.Utils.NotifyUser($"No text in Clipboard");
+                await Utils.UiUtils.NotifyUser($"No text in Clipboard");
             }
         }
     }

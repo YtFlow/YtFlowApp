@@ -1,23 +1,17 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Windows.Foundation;
 using Windows.Foundation.Metadata;
-using Windows.Storage;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 
 namespace YtFlow.App.Utils
 {
-    static class Utils
+    internal static class UiUtils
     {
-        public static IAsyncOperation<StorageFolder> GetAdapterConfigDirectory ()
-        {
-            return ApplicationData.Current.RoamingFolder.CreateFolderAsync("configs", CreationCollisionOption.OpenIfExists);
-        }
-
         private static SemaphoreSlim msgboxLock = new SemaphoreSlim(1, 1);
-        public static async Task<(bool SecondaryAsClose, ContentDialogResult Result)> NotifyUser (
+
+        public static async Task<(bool SecondaryAsClose, ContentDialogResult Result)> NotifyUser(
             string content,
             string title = null,
             string primaryCommandText = null,
@@ -33,7 +27,8 @@ namespace YtFlow.App.Utils
                 msgboxLock.Release();
             }
         }
-        private static async Task<(bool SecondaryAsClose, ContentDialogResult Result)> RealNotifyUser (
+
+        private static async Task<(bool SecondaryAsClose, ContentDialogResult Result)> RealNotifyUser(
             string content,
             string title = null,
             string primaryCommandText = null,
@@ -70,6 +65,5 @@ namespace YtFlow.App.Utils
             }
             return (secondaryAsClose, await dialog.ShowAsync());
         }
-
     }
 }

@@ -29,7 +29,10 @@ namespace YtFlow.App.Pages
     {
         private Result result;
         private readonly MediaCapture mediaCapture = new MediaCapture();
-        private DispatcherTimer timer;
+        private readonly DispatcherTimer timer = new DispatcherTimer
+        {
+            Interval = TimeSpan.FromSeconds(3)
+        };
         private bool isBusy;
 
         public QrCodePage()
@@ -46,6 +49,7 @@ namespace YtFlow.App.Pages
         protected async override void OnNavigatedFrom(NavigationEventArgs e)
         {
             timer.Stop();
+            timer.Tick -= Timer_Tick;
             if (isBusy)
             {
                 await mediaCapture.StopPreviewAsync();
@@ -55,8 +59,6 @@ namespace YtFlow.App.Pages
 
         private void InitVideoTimer()
         {
-            timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromSeconds(3);
             timer.Tick += Timer_Tick;
             timer.Start();
         }
@@ -68,10 +70,12 @@ namespace YtFlow.App.Pages
                 if (!isBusy)
                 {
                     isBusy = true;
-                    var stream = new InMemoryRandomAccessStream();
-                    await mediaCapture.CapturePhotoToStreamAsync(ImageEncodingProperties.CreateJpeg(), stream);
-                    var writeableBmp = await ReadBitmap(stream, ".jpg");
-                    await Task.Factory.StartNew(async () => { await ScanBitmap(writeableBmp); });
+                    using (var stream = new InMemoryRandomAccessStream())
+                    {
+                        await mediaCapture.CapturePhotoToStreamAsync(ImageEncodingProperties.CreateJpeg(), stream);
+                        var writeableBmp = await ReadBitmap(stream, ".jpg");
+                        await Task.Factory.StartNew(async () => { await ScanBitmap(writeableBmp); });
+                    }
                 }
                 isBusy = false;
                 await Task.Delay(100);
@@ -152,16 +156,23 @@ namespace YtFlow.App.Pages
             };
             await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
             {
-                result = barcodeReader.Decode(writeableBmp);
-                if (result != null)
+                try
                 {
-                    var text = result.Text;
-                    var servers = Utils.ShadowsocksUtils.GetServers(text);
-                    if (servers.Count > 0)
+                    result = barcodeReader.Decode(writeableBmp);
+                    if (result != null)
                     {
-                        await Utils.ShadowsocksUtils.SaveServersAsync(servers);
-                        Frame.GoBack();
+                        var text = result.Text;
+                        var servers = Utils.ConfigUtils.GetServers(text);
+                        if (servers.Count > 0)
+                        {
+                            await Utils.ConfigUtils.SaveServersAsync(servers);
+                            Frame.GoBack();
+                        }
                     }
+                } 
+                catch
+                {
+                    //Ignored Zxing Inner Exception
                 }
             });
         }
@@ -171,7 +182,7 @@ namespace YtFlow.App.Pages
             var cameraDevice = await FindCameraDeviceByPanelAsync(Windows.Devices.Enumeration.Panel.Back);
             if (cameraDevice == null)
             {
-                await new MessageDialog("No camera device found!").ShowAsync();
+                await Utils.UiUtils.NotifyUser("No camera device found!");
                 return;
             }
 
@@ -189,7 +200,7 @@ namespace YtFlow.App.Pages
             }
             catch (UnauthorizedAccessException)
             {
-                await Utils.Utils.NotifyUser("Please turn on the camera permission of the app to ensure scan QR code normaly.");
+                await Utils.UiUtils.NotifyUser("Please turn on the camera permission of the app to ensure scan QR code normaly.");
                 return;
             }
 
@@ -232,7 +243,7 @@ namespace YtFlow.App.Pages
             {
                 ViewMode = Windows.Storage.Pickers.PickerViewMode.Thumbnail,
                 SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.PicturesLibrary,
-                FileTypeFilter = { ".jpg", ".jpeg", ".png" }
+                FileTypeFilter = { ".jpg", ".jpeg", ".png", ".bmp" }
             };
             var file = await picker.PickSingleFileAsync();
             if (file != null)

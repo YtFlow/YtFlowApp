@@ -4,24 +4,20 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using Windows.Storage;
 using YtFlow.Tunnel.Config;
 
-namespace YtFlow.App.Utils
+namespace YtFlow.App.ConfigEncoding
 {
-    internal class ShadowsocksUtils
+    internal class ShadowsocksConfigDecoder : IConfigDecoder
     {
-        private static readonly Regex SchemeMatch =
-    new Regex(@"ss://(?<base64>[A-Za-z0-9+-/=_]+)(?:#(?<tag>\S+))?", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private static readonly Regex SchemeMatch = new Regex(@"ss://(?<base64>[A-Za-z0-9+-/=_]+)(?:#(?<tag>\S+))?", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-        private static readonly Regex InfoMatch =
-            new Regex(@"^((?<method>.+?):(?<password>.*)@(?<host>.+?):(?<port>\d+?))$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private static readonly Regex InfoMatch = new Regex(@"^((?<method>.+?):(?<password>.*)@(?<host>.+?):(?<port>\d+?))$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-        public static List<ShadowsocksConfig> GetServers(string ssUri)
+        public List<IAdapterConfig> Decode(string data)
         {
-            var uris = ssUri.Split(new[] { '\r', '\n', ' ' }, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim());
-            var servers = new List<ShadowsocksConfig>();
+            var uris = data.Split(new[] { '\r', '\n', ' ' }, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim());
+            var servers = new List<IAdapterConfig>();
             foreach (var uri in uris)
             {
                 var config = DecodeUriToConfig(uri);
@@ -31,41 +27,6 @@ namespace YtFlow.App.Utils
                 }
             }
             return servers;
-        }
-
-        public static async Task SaveServersAsync(List<ShadowsocksConfig> configs)
-        {
-            var lastConfig = "";
-            foreach (var config in configs)
-            {
-                if (string.IsNullOrEmpty(config.Path))
-                {
-                    var dir = await Utils.GetAdapterConfigDirectory();
-                    var file = await dir.CreateFileAsync(Guid.NewGuid().ToString() + ".json", CreationCollisionOption.GenerateUniqueName);
-                    config.Path = file.Path;
-                }
-                config.SaveToFile(config.Path);
-                lastConfig = config.Path;
-            }
-            if (!string.IsNullOrEmpty(lastConfig))
-            {
-                AdapterConfig.SetDefaultConfigFilePath(lastConfig);
-            }
-        }
-
-        public static string EncodeConfigToUri(ShadowsocksConfig config)
-        {
-            string tag = string.Empty;
-            var parts = $"{config.Method}:{config.Password}";
-            var base64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(parts));
-            var websafeBase64 = base64.Replace('+', '-').Replace('/', '_').TrimEnd('=');
-            var plugin = "";
-            var url = $"{websafeBase64}@{config.ServerHost}:{config.ServerPort}/?plugin={WebUtility.UrlEncode(plugin)}";
-            if (!string.IsNullOrEmpty(config.Name))
-            {
-                tag = $"#{WebUtility.UrlEncode(config.Name)}";
-            }
-            return $"ss://{url}{tag}";
         }
 
         private static ShadowsocksConfig DecodeOldUrl(string url)
