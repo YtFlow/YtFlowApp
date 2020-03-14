@@ -7,7 +7,7 @@ using Windows.Storage;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 
-namespace YtFlow.App
+namespace YtFlow.App.Utils
 {
     static class Utils
     {

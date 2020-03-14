@@ -41,7 +41,7 @@ namespace YtFlow.App.Pages
             {
                 if (string.IsNullOrEmpty(config.Path))
                 {
-                    var dir = await Utils.GetAdapterConfigDirectory();
+                    var dir = await Utils.Utils.GetAdapterConfigDirectory();
                     var file = await dir.CreateFileAsync(Guid.NewGuid().ToString() + ".json", CreationCollisionOption.GenerateUniqueName);
                     config.Path = file.Path;
                 }
@@ -53,7 +53,7 @@ namespace YtFlow.App.Pages
             }
             catch (Exception ex)
             {
-                await Utils.NotifyUser("Cannot save config: " + ex.Message);
+                await Utils.Utils.NotifyUser("Cannot save config: " + ex.Message);
             }
             finally
             {

@@ -1,0 +1,32 @@
+﻿<Page
+    x:Class="YtFlow.App.Pages.QrCodePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:YtFlow.App.Pages"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    mc:Ignorable="d">
+
+    <Grid Background="Black">
+        <Grid x:Name="ContentPanel">
+            <!--  Perview  -->
+            <CaptureElement x:Name="VideoCapture" Stretch="Uniform" />
+            <!--  Tips  -->
+            <TextBlock
+                Margin="36"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Bottom"
+                Foreground="White"
+                Text="Take QR Code In The Perview" />
+        </Grid>
+    </Grid>
+    <Page.TopAppBar>
+        <CommandBar DefaultLabelPosition="Right">
+            <AppBarButton
+                Click="FromPictureButton_Click"
+                Icon="Add"
+                Label="Picture" />
+        </CommandBar>
+    </Page.TopAppBar>
+</Page>
