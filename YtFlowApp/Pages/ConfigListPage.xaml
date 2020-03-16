@@ -48,6 +48,9 @@
                             <AppBarButton Label="Shadowsocks" Click="CreateShadowsocksButton_Click"/>
                             <AppBarButton Label="HTTP" Click="CreateHttpButton_Click"/>
                             <AppBarButton Label="Trojan" Click="CreateTrojanButton_Click"/>
+                            <AppBarSeparator/>
+                            <AppBarButton Label="Scan QR Code" Click="QrCodeShadowsocksButton_Click"/>
+                            <AppBarButton Label="Copy From Clipboard" Click="ClipboardShadowsocksButton_Click"/>
                         </controls:CommandBarFlyout.SecondaryCommands>
                     </controls:CommandBarFlyout>
                 </AppBarButton.Flyout>

@@ -85,7 +85,7 @@ namespace YtFlow.App.Pages
             var configFilePath = AdapterConfig.GetDefaultConfigFilePath();
             if (configFilePath == null)
             {
-                await Utils.NotifyUser("Please set up a server configuration first.");
+                await Utils.UiUtils.NotifyUser("Please set up a server configuration first.");
                 Frame.Navigate(typeof(ConfigListPage));
                 return VpnManagementErrorStatus.Other;
             }
@@ -95,7 +95,7 @@ namespace YtFlow.App.Pages
             }
             catch (Exception ex)
             {
-                await Utils.NotifyUser("Cannot load the server configuration. Reason: " + ex.ToString());
+                await Utils.UiUtils.NotifyUser("Cannot load the server configuration. Reason: " + ex.ToString());
                 return VpnManagementErrorStatus.Other;
             }
             var (agent, profile) = await GetInstalledVpnProfile();
@@ -125,7 +125,7 @@ namespace YtFlow.App.Pages
                     var addResult = await agent.AddProfileFromObjectAsync(newProfile);
                     if (addResult != VpnManagementErrorStatus.Ok)
                     {
-                        await Utils.NotifyUser("Failed to add new profile: " + addResult.ToString());
+                        await Utils.UiUtils.NotifyUser("Failed to add new profile: " + addResult.ToString());
                         return VpnManagementErrorStatus.Other;
                     }
                     // profile = (await agent.GetProfilesAsync()).First(p => p.ProfileName == PROFILE_NAME);
@@ -135,7 +135,7 @@ namespace YtFlow.App.Pages
                 {
                     // On 15063, Creaing VPN profile programmatically exhibits weird behavior.
                     // Ask users to create manually
-                    var (_, msgRes) = await Utils.NotifyUser("VPN profile “YtFlow Auto” could not be found.\n" +
+                    var (_, msgRes) = await Utils.UiUtils.NotifyUser("VPN profile “YtFlow Auto” could not be found.\n" +
                         "Please go to Settings - Network & wireless - VPN and create a new profile with the following configuration:\n\n" +
                         "VPN Provider: " + Package.Current.DisplayName +
                         "\nConnection name: " + PROFILE_NAME +
@@ -150,7 +150,7 @@ namespace YtFlow.App.Pages
             var res = await agent.ConnectProfileAsync(profile);
             if (res != VpnManagementErrorStatus.Ok)
             {
-                await Utils.NotifyUser("Failed to connect VPN profile: " + res.ToString());
+                await Utils.UiUtils.NotifyUser("Failed to connect VPN profile: " + res.ToString());
             }
             return res;
         }
@@ -165,7 +165,7 @@ namespace YtFlow.App.Pages
             var res = await agent.DisconnectProfileAsync(profile);
             if (res != VpnManagementErrorStatus.Ok)
             {
-                await Utils.NotifyUser("Cannot disconnect from VPN profile: " + res.ToString());
+                await Utils.UiUtils.NotifyUser("Cannot disconnect from VPN profile: " + res.ToString());
             }
             /*
             if (!newWindowsBuild)
@@ -189,7 +189,7 @@ namespace YtFlow.App.Pages
                 await CheckTunnelConnectionStatus();
                 if (localSettings.TryGetValue("lastError", out var lastErr) && lastErr is string lastErrStr)
                 {
-                    await Utils.NotifyUser("An exception occurred during last session. Detail:\r\n\r\n" + lastErrStr, "Unexpected error");
+                    await Utils.UiUtils.NotifyUser("An exception occurred during last session. Detail:\r\n\r\n" + lastErrStr, "Unexpected error");
                     localSettings.Remove("lastError");
                 }
                 await Task.Delay(1000);
@@ -315,12 +315,12 @@ namespace YtFlow.App.Pages
                 }
                 if (!isValidHost || !IPAddress.TryParse(host, out var _))
                 {
-                    await Utils.NotifyUser("Debug host must be a valid IP address.");
+                    await Utils.UiUtils.NotifyUser("Debug host must be a valid IP address.");
                     break;
                 }
                 if (!ushort.TryParse(port, out var portNum) || portNum == 0)
                 {
-                    await Utils.NotifyUser("Debug port must be a valid port number.");
+                    await Utils.UiUtils.NotifyUser("Debug port must be a valid port number.");
                     break;
                 }
                 await DebugLogger.SetDebugSocketAddr(host, port);

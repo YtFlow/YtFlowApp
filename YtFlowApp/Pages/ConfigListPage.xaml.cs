@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.DataTransfer;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
@@ -26,7 +27,7 @@ namespace YtFlow.App.Pages
 
         private async Task LoadAdapterConfigs ()
         {
-            var directory = await Utils.GetAdapterConfigDirectory();
+            var directory = await Utils.ConfigUtils.GetAdapterConfigDirectory();
             var files = await directory.GetFilesAsync();
             adapterConfigs.Clear();
             foreach (var config in files.Select(f => AdapterConfig.GetConfigFromFilePath(f.Path)))
@@ -59,7 +60,7 @@ namespace YtFlow.App.Pages
         {
             var btn = (MenuFlyoutItem)sender;
             var config = (IAdapterConfig)btn.DataContext;
-            var (_, result) = await Utils.NotifyUser("Remove this config?", primaryCommandText: "Yes");
+            var (_, result) = await Utils.UiUtils.NotifyUser("Remove this config?", primaryCommandText: "Yes");
             if (result != ContentDialogResult.Primary)
             {
                 return;
@@ -75,7 +76,7 @@ namespace YtFlow.App.Pages
             }
             catch (Exception ex)
             {
-                await Utils.NotifyUser("Error while deleting config file: " + ex.Message);
+                await Utils.UiUtils.NotifyUser("Error while deleting config file: " + ex.Message);
             }
         }
 
@@ -109,6 +110,28 @@ namespace YtFlow.App.Pages
                 ServerPort = 443,
                 Name = "Connection " + (adapterConfigs.Count + 1)
             });
+        }
+
+        private void QrCodeShadowsocksButton_Click(object sender, RoutedEventArgs e)
+        {
+            Frame.Navigate(typeof(QrCodePage));
+        }
+
+        private async void ClipboardShadowsocksButton_Click(object sender, RoutedEventArgs e)
+        {
+            var content = Clipboard.GetContent();
+            if (content.Contains(StandardDataFormats.Text))
+            {
+                var text = await content.GetTextAsync();
+                var servers = Utils.ConfigUtils.GetServers(text);
+                await Utils.ConfigUtils.SaveServersAsync(servers);
+                await LoadAdapterConfigs();
+                await Utils.UiUtils.NotifyUser($"Add {servers.Count} Shadowsocks config in total", "Complete", "OK");
+            } 
+            else
+            {
+                await Utils.UiUtils.NotifyUser($"No text in Clipboard");
+            }
         }
     }
 }
