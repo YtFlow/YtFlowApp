@@ -45,7 +45,7 @@
         VerticalScrollMode="Auto"
         VerticalScrollBarVisibility="Auto">
         <StackPanel>
-            <TextBlock Style="{ThemeResource TitleTextBlockStyle}" Margin="16" Text="Proxy"/>
+            <TextBlock Style="{ThemeResource TitleTextBlockStyle}" Margin="16" x:Uid="Proxy"/>
             <Border
                 Height="100"
                 HorizontalAlignment="Stretch">
