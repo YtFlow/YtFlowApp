@@ -13,6 +13,8 @@ namespace YtFlow.App.ConfigEncoding
             {
                 case ShadowsocksConfig shadowsocksConfig:
                     return ShadowsocksConfigEncoder(shadowsocksConfig);
+                case TrojanConfig trojanConfig:
+                    return TrojanConfigEncoder(trojanConfig);
             }
             return "";
         }
@@ -30,6 +32,11 @@ namespace YtFlow.App.ConfigEncoding
                 tag = $"#{WebUtility.UrlEncode(config.Name)}";
             }
             return $"ss://{url}{tag}";
+        }
+
+        private static string TrojanConfigEncoder(TrojanConfig config)
+        {
+            return $"trojan://{config.Password}@{config.ServerHost}:{config.ServerPort}";
         }
     }
 }
