@@ -113,8 +113,12 @@
                                     <x:String>camellia-128-cfb</x:String>
                                     <x:String>camellia-192-cfb</x:String>
                                     <x:String>camellia-256-cfb</x:String>
+                                    <x:String>salsa20</x:String>
                                     <x:String>chacha20-ietf</x:String>
+                                    <x:String>chacha20</x:String>
                                     <x:String>chacha20-ietf-poly1305</x:String>
+                                    <x:String>chacha20-poly1305</x:String>
+                                    <x:String>xchacha20-ietf-poly1305</x:String>
                                 </ComboBox>
                                 <TextBlock
                                     Grid.Row="5"
