@@ -36,7 +36,7 @@ namespace YtFlow.App.ConfigEncoding
 
         private static string TrojanConfigEncoder(TrojanConfig config)
         {
-            return $"trojan://{config.Password}@{config.ServerHost}:{config.ServerPort}";
+            return Uri.EscapeUriString($"trojan://{config.Password}@{config.ServerHost}:{config.ServerPort}");
         }
     }
 }
