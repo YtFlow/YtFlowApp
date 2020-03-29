@@ -5,17 +5,18 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.Devices.Enumeration;
 using Windows.Foundation;
+using Windows.Graphics.Display;
 using Windows.Graphics.Imaging;
 using Windows.Media.Capture;
 using Windows.Media.Devices;
 using Windows.Media.MediaProperties;
 using Windows.Storage.Streams;
 using Windows.UI.Core;
-using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
+using YtFlow.App.Utils;
 using ZXing;
 
 // https://go.microsoft.com/fwlink/?LinkId=234238 上介绍了“空白页”项模板
@@ -34,6 +35,7 @@ namespace YtFlow.App.Pages
             Interval = TimeSpan.FromSeconds(3)
         };
         private bool isBusy;
+        private DisplayOrientations originalPerferredOrientation;
 
         public QrCodePage()
         {
@@ -42,18 +44,20 @@ namespace YtFlow.App.Pages
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
+            // Set device orientation to stick with the native one
+            originalPerferredOrientation = DisplayInformation.AutoRotationPreferences;
+            DisplayInformation.AutoRotationPreferences = DisplayInformation.GetForCurrentView().NativeOrientation;
             InitVideoCapture();
             InitVideoTimer();
         }
 
         protected async override void OnNavigatedFrom(NavigationEventArgs e)
         {
+            // Unlock device orientation
+            DisplayInformation.AutoRotationPreferences = originalPerferredOrientation;
             timer.Stop();
             timer.Tick -= Timer_Tick;
-            if (isBusy)
-            {
-                await mediaCapture.StopPreviewAsync();
-            }
+            await mediaCapture.StopPreviewAsync();
             isBusy = false;
         }
 
@@ -218,7 +222,20 @@ namespace YtFlow.App.Pages
             }
             VideoCapture.Source = mediaCapture;
             VideoCapture.FlowDirection = FlowDirection.LeftToRight;
+            // Fix preview mirroring for front webcam
+            if (cameraDevice.EnclosureLocation?.Panel == Windows.Devices.Enumeration.Panel.Front)
+            {
+                VideoCapture.FlowDirection = FlowDirection.RightToLeft;
+            }
             await mediaCapture.StartPreviewAsync();
+            // Fix preview orientation for portrait-first devices (such as Windows Phone)
+            if (DisplayInformation.GetForCurrentView().NativeOrientation == DisplayOrientations.Portrait)
+            {
+                var props = mediaCapture.VideoDeviceController.GetMediaStreamProperties(MediaStreamType.VideoPreview);
+                Guid RotationKey = new Guid("C380465D-2271-428C-9B83-ECEA3B4A85C1");
+                props.Properties.Add(RotationKey, 90);
+                await mediaCapture.SetEncodingPropertiesAsync(MediaStreamType.VideoPreview, props, null);
+            }
             if (mediaCapture.VideoDeviceController.FlashControl.Supported)
             {
                 mediaCapture.VideoDeviceController.FlashControl.Enabled = false;
