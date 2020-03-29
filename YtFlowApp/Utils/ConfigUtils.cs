@@ -37,11 +37,14 @@ namespace YtFlow.App.Utils
 
         public static List<IAdapterConfig> GetServers(string data)
         {
-            var decoders = new List<IConfigDecoder> { new ShadowsocksConfigDecoder() };
-            foreach(var decoder in decoders)
+            var decoders = new List<IConfigDecoder> { new ShadowsocksConfigDecoder(), new TrojanConfigDecoder() };
+            foreach (var decoder in decoders)
             {
-                var config = decoder.Decode(data);
-                if (config != null && config.Count > 0) return config;
+                var configs = decoder.Decode(data);
+                if (configs != null && configs.Count > 0)
+                {
+                    return configs;
+                }
             }
             return new List<IAdapterConfig>();
         }
