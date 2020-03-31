@@ -38,7 +38,7 @@ steps:
     platform: 'x86'
     solution: '$(solution)'
     configuration: '$(buildConfiguration)'
-    msbuildArgs: '/p:AppxBundlePlatforms="$(buildPlatform)" /p:AppxPackageDir="$(appxPackageDir)" /p:AppxBundle=Never /p:PackageCertificateKeyFile="$(secureKeyFile.secureFilePath)" /p:UapAppxPackageBuildMode=SideloadOnly /p:PlatformToolset=v142'
+    msbuildArgs: '/p:AppxBundlePlatforms="$(buildPlatform)" /p:AppxPackageDir="$(appxPackageDir)" /p:AppxBundle=Never /p:PackageCertificateKeyFile="$(secureKeyFile.secureFilePath)" /p:PackageCertificateThumbprint="" /p:UapAppxPackageBuildMode=SideloadOnly /p:PlatformToolset=v142'
 
 - task: PublishPipelineArtifact@1
   inputs:
