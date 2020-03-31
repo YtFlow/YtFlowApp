@@ -28,6 +28,7 @@ steps:
     restoreSolution: '$(solution)'
 
 - task: DownloadSecureFile@1
+  name: secureKeyFile
   inputs:
     secureFile: '$(keyFile)'
     retryCount: '2'
@@ -37,7 +38,7 @@ steps:
     platform: 'x86'
     solution: '$(solution)'
     configuration: '$(buildConfiguration)'
-    msbuildArgs: '/p:AppxBundlePlatforms="$(buildPlatform)" /p:AppxPackageDir="$(appxPackageDir)" /p:AppxBundle=Never /p:PackageCertificateKeyFile="$(keyFile)" /p:UapAppxPackageBuildMode=SideloadOnly'
+    msbuildArgs: '/p:AppxBundlePlatforms="$(buildPlatform)" /p:AppxPackageDir="$(appxPackageDir)" /p:AppxBundle=Never /p:PackageCertificateKeyFile="$(secureKeyFile.secureFilePath)" /p:UapAppxPackageBuildMode=SideloadOnly /p:PlatformToolset=v142'
 
 - task: PublishPipelineArtifact@1
   inputs:
