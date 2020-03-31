@@ -51,7 +51,7 @@ steps:
     solution: '$(solution)'
     platform: x86
     configuration: '$(buildConfiguration)'
-    msbuildArgs: '/p:UseSubFolderForOutputDirDuringMultiPlatformBuild=false /p:AppxBundlePlatforms="$(buildPlatform)" /p:AppxPackageDir="$(appxPackageDir)" /p:AppxBundle=Always /p:PackageCertificateKeyFile="$(secureKeyFile.secureFilePath)" /p:PackageCertificateThumbprint="" /p:UapAppxPackageBuildMode=SideloadOnly /p:PlatformToolset=v142'
+    msbuildArgs: '/t:restore /p:UseSubFolderForOutputDirDuringMultiPlatformBuild=false /p:AppxBundlePlatforms="$(buildPlatform)" /p:AppxPackageDir="$(appxPackageDir)" /p:AppxBundle=Always /p:PackageCertificateKeyFile="$(secureKeyFile.secureFilePath)" /p:PackageCertificateThumbprint="" /p:UapAppxPackageBuildMode=SideloadOnly /p:PlatformToolset=v142'
 
 - task: VSBuild@1
   displayName: Build (15063,ARM)
@@ -59,7 +59,7 @@ steps:
     solution: '$(solution)'
     platform: x86
     configuration: '$(buildConfiguration)'
-    msbuildArgs: '/p:AppxBundlePlatforms="ARM" /p:WindowsTargetPlatformVersion=10.0.15063.0 /p:AppxPackageDir="$(appxPackageDir)" /p:AppxBundle=Never /p:PackageCertificateKeyFile="$(secureKeyFile.secureFilePath)" /p:PackageCertificateThumbprint="" /p:UapAppxPackageBuildMode=SideloadOnly /p:PlatformToolset=v142'
+    msbuildArgs: '/t:restore /p:AppxBundlePlatforms="ARM" /p:WindowsTargetPlatformVersion=10.0.15063.0 /p:AppxPackageDir="$(appxPackageDir)" /p:AppxBundle=Never /p:PackageCertificateKeyFile="$(secureKeyFile.secureFilePath)" /p:PackageCertificateThumbprint="" /p:UapAppxPackageBuildMode=SideloadOnly /p:PlatformToolset=v142'
 
 - task: PublishPipelineArtifact@1
   inputs:
