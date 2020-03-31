@@ -51,6 +51,7 @@ steps:
     solution: '$(solution)'
     platform: x86
     configuration: '$(buildConfiguration)'
+    clean: true
     msbuildArgs: '/p:UseSubFolderForOutputDirDuringMultiPlatformBuild=false /p:AppxBundlePlatforms="$(buildPlatform)" /p:AppxPackageDir="$(appxPackageDir)" /p:AppxBundle=Always /p:PackageCertificateKeyFile="$(secureKeyFile.secureFilePath)" /p:PackageCertificateThumbprint="" /p:UapAppxPackageBuildMode=SideloadOnly /p:PlatformToolset=v142 /restore'
 
 - task: VSBuild@1
@@ -59,6 +60,7 @@ steps:
     solution: '$(solution)'
     platform: x86
     configuration: '$(buildConfiguration)'
+    clean: true
     msbuildArgs: '/p:AppxBundlePlatforms="ARM" /p:WindowsTargetPlatformVersion=10.0.15063.0 /p:AppxPackageDir="$(appxPackageDir)" /p:AppxBundle=Never /p:PackageCertificateKeyFile="$(secureKeyFile.secureFilePath)" /p:PackageCertificateThumbprint="" /p:UapAppxPackageBuildMode=SideloadOnly /p:PlatformToolset=v142 /restore'
 
 - task: PublishPipelineArtifact@1
