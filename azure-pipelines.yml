@@ -28,9 +28,9 @@ steps:
 - task: Cache@2
   condition: not('$(cleanBuild)')
   inputs:
-    key: 'nuget | "$(Agent.OS)"'
+    key: 'nuget | "$(Agent.OS)" | **/*.csproj | **/*.vcxproj'
     restoreKeys: |
-      nuget | "$(Agent.OS)"
+      nuget | "$(Agent.OS)“ | **/*.csproj | **/*.vcxproj
       nuget
     path: $(NUGET_PACKAGES)
   displayName: Cache NuGet packages
@@ -48,7 +48,7 @@ steps:
 - task: VSBuild@1
   displayName: Build x64
   inputs:
-    platform: 'x86'
+    platform: 'x64'
     solution: '$(solution)'
     configuration: '$(buildConfiguration)'
     msbuildArgs: '/p:AppxBundlePlatforms="x64" /p:AppxPackageDir="$(appxPackageDir)" /p:AppxBundle=Never /p:PackageCertificateKeyFile="$(secureKeyFile.secureFilePath)" /p:PackageCertificateThumbprint="" /p:UapAppxPackageBuildMode=SideloadOnly /p:PlatformToolset=v142'
@@ -56,7 +56,7 @@ steps:
 - task: VSBuild@1
   displayName: Build ARM
   inputs:
-    platform: 'x86'
+    platform: 'ARM'
     solution: '$(solution)'
     configuration: '$(buildConfiguration)'
     msbuildArgs: '/p:AppxBundlePlatforms="ARM" /p:AppxPackageDir="$(appxPackageDir)" /p:AppxBundle=Never /p:PackageCertificateKeyFile="$(secureKeyFile.secureFilePath)" /p:PackageCertificateThumbprint="" /p:UapAppxPackageBuildMode=SideloadOnly /p:PlatformToolset=v142'
