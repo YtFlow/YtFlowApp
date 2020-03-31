@@ -47,13 +47,15 @@ steps:
   displayName: Build (16299+)
   inputs:
     solution: '$(solution)'
+    platform: x64
     configuration: '$(buildConfiguration)'
-    msbuildArgs: '/p:AppxBundlePlatforms="$(buildPlatform)" /p:AppxPackageDir="$(appxPackageDir)" /p:AppxBundle=Always /p:PackageCertificateKeyFile="$(secureKeyFile.secureFilePath)" /p:PackageCertificateThumbprint="" /p:UapAppxPackageBuildMode=SideloadOnly /p:PlatformToolset=v142'
+    msbuildArgs: '/p:UseSubFolderForOutputDirDuringMultiPlatformBuild=false /p:AppxBundlePlatforms="$(buildPlatform)" /p:AppxPackageDir="$(appxPackageDir)" /p:AppxBundle=Always /p:PackageCertificateKeyFile="$(secureKeyFile.secureFilePath)" /p:PackageCertificateThumbprint="" /p:UapAppxPackageBuildMode=SideloadOnly /p:PlatformToolset=v142'
 
 - task: VSBuild@1
   displayName: Build (15063,ARM)
   inputs:
     solution: '$(solution)'
+    platform: ARM
     configuration: '$(buildConfiguration)'
     msbuildArgs: '/p:AppxBundlePlatforms="ARM" /p:WindowsTargetPlatformVersion=10.0.15063.0 /p:AppxPackageDir="$(appxPackageDir)" /p:AppxBundle=Never /p:PackageCertificateKeyFile="$(secureKeyFile.secureFilePath)" /p:PackageCertificateThumbprint="" /p:UapAppxPackageBuildMode=SideloadOnly /p:PlatformToolset=v142'
 
