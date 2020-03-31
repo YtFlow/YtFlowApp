@@ -18,6 +18,9 @@ variables:
   keyFile: 'YtFlowApp_TemporaryKey.pfx'
 
 steps:
+- checkout: self
+  submodules: recursive
+
 - task: NuGetToolInstaller@1
 
 - task: NuGetCommand@2
