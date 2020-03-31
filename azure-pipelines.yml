@@ -26,7 +26,7 @@ steps:
 - task: NuGetToolInstaller@1
 
 - task: Cache@2
-  condition: $(cleanBuild)
+  condition: eq($(cleanBuild), false)
   inputs:
     key: 'nuget | "$(Agent.OS)"'
     restoreKeys: |
