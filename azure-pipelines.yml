@@ -1,4 +1,5 @@
 # Universal Windows Platform
+
 # Build a Universal Windows Platform project using Visual Studio.
 # Add steps that test and distribute an app, save build artifacts, and more:
 # https://aka.ms/yaml
@@ -14,6 +15,7 @@ variables:
   buildPlatform: 'x86|x64|ARM'
   buildConfiguration: 'Release'
   appxPackageDir: '$(build.artifactStagingDirectory)\AppxPackages\\'
+  keyFile: 'YtFlowApp_TemporaryKey.pfx'
 
 steps:
 - task: NuGetToolInstaller@1
@@ -22,9 +24,20 @@ steps:
   inputs:
     restoreSolution: '$(solution)'
 
+- task: DownloadSecureFile@1
+  inputs:
+    secureFile: '$(keyFile)'
+    retryCount: '2'
+
 - task: VSBuild@1
   inputs:
     platform: 'x86'
     solution: '$(solution)'
     configuration: '$(buildConfiguration)'
-    msbuildArgs: '/p:AppxBundlePlatforms="$(buildPlatform)" /p:AppxPackageDir="$(appxPackageDir)" /p:AppxBundle=Always /p:UapAppxPackageBuildMode=StoreUpload'
+    msbuildArgs: '/p:AppxBundlePlatforms="$(buildPlatform)" /p:AppxPackageDir="$(appxPackageDir)" /p:AppxBundle=Never /p:PackageCertificateKeyFile="$(keyFile)" /p:UapAppxPackageBuildMode=SideloadOnly'
+
+- task: PublishPipelineArtifact@1
+  inputs:
+    targetPath: '$(build.artifactStagingDirectory)\AppxPackages\'
+    artifact: 'AppxPackages'
+    publishLocation: 'pipeline'
