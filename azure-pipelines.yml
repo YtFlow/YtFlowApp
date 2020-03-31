@@ -17,6 +17,7 @@ variables:
   appxPackageDir: '$(build.artifactStagingDirectory)\AppxPackages\\'
   keyFile: 'YtFlowApp_StoreKey.pfx'
   NUGET_PACKAGES: $(Pipeline.Workspace)/.nuget/packages
+  cleanBuild: false
 
 steps:
 - checkout: self
@@ -25,6 +26,7 @@ steps:
 - task: NuGetToolInstaller@1
 
 - task: Cache@2
+  condition: $(cleanBuild)
   inputs:
     key: 'nuget | "$(Agent.OS)"'
     restoreKeys: |
