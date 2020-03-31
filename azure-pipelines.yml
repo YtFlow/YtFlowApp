@@ -15,7 +15,7 @@ variables:
   buildPlatform: 'x86|x64|ARM'
   buildConfiguration: 'Release'
   appxPackageDir: '$(build.artifactStagingDirectory)\AppxPackages\\'
-  keyFile: 'YtFlowApp_TemporaryKey.pfx'
+  keyFile: 'YtFlowApp_StoreKey.pfx'
 
 steps:
 - checkout: self
