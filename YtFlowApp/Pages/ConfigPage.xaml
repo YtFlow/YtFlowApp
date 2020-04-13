@@ -9,12 +9,8 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     mc:Ignorable="d">
 
-    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <Grid.BackgroundTransition>
-            <BrushTransition />
-        </Grid.BackgroundTransition>
-
-        <ContentControl HorizontalContentAlignment="Center" VerticalAlignment="Center" Content="{x:Bind config}">
+    <Grid>
+        <ContentControl HorizontalContentAlignment="Stretch" Content="{x:Bind config}">
             <ContentControl.ContentTemplateSelector>
                 <selectors:AdapterConfigTypeSelector>
                     <selectors:AdapterConfigTypeSelector.ShadowsocksTemplate>
@@ -38,7 +34,7 @@
                                     Margin="4,0,0,0"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Center"
-                                    x:Uid="Ctype"/>
+                                    Text="Type" />
                                 <TextBlock
                                     Grid.Row="0"
                                     Grid.Column="1"
@@ -51,7 +47,7 @@
                                     Margin="4,0,0,0"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Center"
-                                    x:Uid="Cname"/>
+                                    Text="Name" />
                                 <TextBox
                                     Grid.Row="1"
                                     Grid.Column="1"
@@ -65,7 +61,7 @@
                                     Margin="4,0,0,0"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Center"
-                                    x:Uid="Cip"/>
+                                    Text="Server" />
                                 <TextBox
                                     Grid.Row="2"
                                     Grid.Column="1"
@@ -79,7 +75,7 @@
                                     Margin="4,0,0,0"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Center"
-                                    x:Uid="Cport"/>
+                                    Text="Port" />
                                 <TextBox
                                     Grid.Row="3"
                                     Grid.Column="1"
@@ -95,7 +91,7 @@
                                     Margin="4,0,0,0"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Center"
-                                    x:Uid="Cmethod"/>
+                                    Text="Method" />
                                 <ComboBox
                                     Grid.Row="4"
                                     Grid.Column="1"
@@ -130,7 +126,7 @@
                                     Margin="4,0,0,0"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Center"
-                                    x:Uid="Cpassword"/>
+                                    Text="Password" />
                                 <PasswordBox
                                     Grid.Row="5"
                                     Grid.Column="1"
@@ -165,7 +161,7 @@
                                     Margin="4,0,0,0"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Center"
-                                    x:Uid="Ctype"/>
+                                    Text="Type" />
                                 <TextBlock
                                     Grid.Row="0"
                                     Grid.Column="1"
@@ -177,7 +173,7 @@
                                     Margin="4,0,0,0"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Center"
-                                    x:Uid="Cname"/>
+                                    Text="Name" />
                                 <TextBox
                                     Grid.Row="1"
                                     Grid.Column="1"
@@ -191,7 +187,7 @@
                                     Margin="4,0,0,0"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Center"
-                                    x:Uid="Cip"/>
+                                    Text="Server" />
                                 <TextBox
                                     Grid.Row="2"
                                     Grid.Column="1"
@@ -205,7 +201,7 @@
                                     Margin="4,0,0,0"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Center"
-                                    x:Uid="Cport"/>
+                                    Text="Port" />
                                 <TextBox
                                     Grid.Row="3"
                                     Grid.Column="1"
@@ -221,7 +217,7 @@
                                     Margin="4,0,0,0"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Center"
-                                    x:Uid="Cusername"/>
+                                    Text="UserName" />
                                 <TextBox
                                     Grid.Row="4"
                                     Grid.Column="1"
@@ -237,7 +233,7 @@
                                     Margin="4,0,0,0"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Center"
-                                    x:Uid="Cpassword"/>
+                                    Text="Password" />
                                 <PasswordBox
                                     Grid.Row="5"
                                     Grid.Column="1"
@@ -274,7 +270,7 @@
                                     Margin="4,0,0,0"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Center"
-                                    x:Uid="Ctype"/>
+                                    Text="Type" />
                                 <TextBlock
                                     Grid.Row="0"
                                     Grid.Column="1"
@@ -286,7 +282,7 @@
                                     Margin="4,0,0,0"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Center"
-                                    x:Uid="Cname"/>
+                                    Text="Name" />
                                 <TextBox
                                     Grid.Row="1"
                                     Grid.Column="1"
@@ -300,7 +296,7 @@
                                     Margin="4,0,0,0"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Center"
-                                    x:Uid="Cip"/>
+                                    Text="Server" />
                                 <TextBox
                                     Grid.Row="2"
                                     Grid.Column="1"
@@ -314,7 +310,7 @@
                                     Margin="4,0,0,0"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Center"
-                                    x:Uid="Cport"/>
+                                    Text="Port" />
                                 <TextBox
                                     Grid.Row="3"
                                     Grid.Column="1"
@@ -330,7 +326,7 @@
                                     Margin="4,0,0,0"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Center"
-                                    x:Uid="Cpassword"/>
+                                    Text="Password" />
                                 <PasswordBox
                                     Grid.Row="4"
                                     Grid.Column="1"
@@ -347,7 +343,7 @@
                                     Margin="4,0,0,0"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Center"
-                                    x:Uid="Cinsecure"/>
+                                    Text="Allow Insecure" />
                                 <CheckBox
                                     Grid.Row="5"
                                     Grid.Column="1"
@@ -359,17 +355,16 @@
             </ContentControl.ContentTemplateSelector>
         </ContentControl>
     </Grid>
-
     <Page.BottomAppBar>
-        <CommandBar DefaultLabelPosition="Right" Background="{StaticResource BackgroundColor}">
+        <CommandBar DefaultLabelPosition="Right">
             <AppBarButton
                 Click="SaveButton_Click"
                 Icon="Save"
-                x:Uid="Ccb1"/>
+                Label="Save" />
             <AppBarButton
                 Click="CancelButton_Click"
                 Icon="Cancel"
-                x:Uid="Ccb2"/>
+                Label="Cancel" />
         </CommandBar>
     </Page.BottomAppBar>
 </Page>
