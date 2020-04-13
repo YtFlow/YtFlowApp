@@ -126,7 +126,7 @@ namespace YtFlow.App.Pages
                 var servers = Utils.ConfigUtils.GetServers(text);
                 await Utils.ConfigUtils.SaveServersAsync(servers);
                 await LoadAdapterConfigs();
-                await Utils.UiUtils.NotifyUser($"Add {servers.Count} Shadowsocks config in total", "Complete", "OK");
+                await Utils.UiUtils.NotifyUser($"Add {servers.Count} config in total", "OK");
             } 
             else
             {

@@ -125,6 +125,7 @@
     <Compile Include="ConfigEncoding\ConfigEncoder.cs" />
     <Compile Include="ConfigEncoding\IConfigDecoder.cs" />
     <Compile Include="ConfigEncoding\ShadowsocksConfigDecoder.cs" />
+    <Compile Include="ConfigEncoding\TrojanConfigDecoder.cs" />
     <Compile Include="Converters\AdapterTypeToDisplayNameConverter.cs" />
     <Compile Include="Converters\ConnectionStatusToIsEnabledConverter.cs" />
     <Compile Include="Converters\ConnectionStatusToIsCheckedConverter.cs" />

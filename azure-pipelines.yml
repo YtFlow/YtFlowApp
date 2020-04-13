@@ -1,0 +1,68 @@
+# Universal Windows Platform
+
+# Build a Universal Windows Platform project using Visual Studio.
+# Add steps that test and distribute an app, save build artifacts, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  solution: 'YtFlow.sln'
+  buildPlatform: 'x86|x64|ARM'
+  buildConfiguration: 'Release'
+  appxPackageDir: '$(build.artifactStagingDirectory)\AppxPackages\\'
+  keyFile: 'YtFlowApp_StoreKey.pfx'
+  NUGET_PACKAGES: $(Pipeline.Workspace)/.nuget/packages
+  cleanBuild: false
+
+steps:
+- checkout: self
+  submodules: recursive
+
+- task: NuGetToolInstaller@1
+
+- task: Cache@2
+  condition: not('$(cleanBuild)')
+  inputs:
+    key: 'nuget | "$(Agent.OS)" | **/*.csproj | **/*.vcxproj'
+    restoreKeys: |
+      nuget | "$(Agent.OS)“ | **/*.csproj | **/*.vcxproj
+      nuget
+    path: $(NUGET_PACKAGES)
+  displayName: Cache NuGet packages
+
+- task: NuGetCommand@2
+  inputs:
+    restoreSolution: '$(solution)'
+
+- task: DownloadSecureFile@1
+  name: secureKeyFile
+  inputs:
+    secureFile: '$(keyFile)'
+    retryCount: '2'
+
+- task: VSBuild@1
+  displayName: Build x64
+  inputs:
+    platform: 'x64'
+    solution: '$(solution)'
+    configuration: '$(buildConfiguration)'
+    msbuildArgs: '/p:AppxBundlePlatforms="x64" /p:AppxPackageDir="$(appxPackageDir)" /p:AppxBundle=Never /p:PackageCertificateKeyFile="$(secureKeyFile.secureFilePath)" /p:PackageCertificateThumbprint="" /p:UapAppxPackageBuildMode=SideloadOnly /p:PlatformToolset=v142'
+
+- task: VSBuild@1
+  displayName: Build ARM
+  inputs:
+    platform: 'ARM'
+    solution: '$(solution)'
+    configuration: '$(buildConfiguration)'
+    msbuildArgs: '/restore /p:AppxBundlePlatforms="ARM" /p:AppxPackageDir="$(appxPackageDir)" /p:AppxBundle=Never /p:PackageCertificateKeyFile="$(secureKeyFile.secureFilePath)" /p:PackageCertificateThumbprint="" /p:UapAppxPackageBuildMode=SideloadOnly /p:PlatformToolset=v142'
+
+- task: PublishPipelineArtifact@1
+  inputs:
+    targetPath: '$(build.artifactStagingDirectory)\AppxPackages\'
+    artifact: 'AppxPackages'
+    publishLocation: 'pipeline'
