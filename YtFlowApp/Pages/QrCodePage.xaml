@@ -16,17 +16,17 @@
             <TextBlock
                 Margin="36"
                 HorizontalAlignment="Center"
-                VerticalAlignment="Bottom"
+                VerticalAlignment="Top"
                 Foreground="White"
                 Text="Take QR Code In The Preview" />
         </Grid>
     </Grid>
-    <Page.TopAppBar>
-        <CommandBar DefaultLabelPosition="Right">
+    <Page.BottomAppBar>
+        <CommandBar DefaultLabelPosition="Right" Background="{StaticResource BackgroundColor}" >
             <AppBarButton
                 Click="FromPictureButton_Click"
                 Icon="Add"
                 Label="Picture" />
         </CommandBar>
-    </Page.TopAppBar>
+    </Page.BottomAppBar>
 </Page>

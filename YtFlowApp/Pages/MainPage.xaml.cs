@@ -41,7 +41,7 @@ namespace YtFlow.App.Pages
         public MainPage ()
         {
             TunnelConnectionStatus = TunnelConnectionStatus.Disconnecting;
-
+            //ContentFrame.Navigate(typeof(ConfigListPage));
             this.InitializeComponent();
         }
 
@@ -340,5 +340,25 @@ namespace YtFlow.App.Pages
             await DebugLogger.SetDebugSocketAddr(null, null);
         }
         #endregion
+
+        private void about_Click(object sender, RoutedEventArgs e)
+        {
+            this.Frame.Navigate(typeof(AboutPage));
+        }
+
+        private void debug_Click(object sender, RoutedEventArgs e)
+        {
+            debug.Opacity = debug.Opacity == 0 ? 1 : 0;
+        }
+
+        private async void faq_Click(object sender, RoutedEventArgs e)
+        {
+            var a = await Launcher.LaunchUriAsync(new Uri("https://github.com/YtFlow/YtFlowApp/wiki/Remote-debug"));
+        }
+
+        private void rule_Click(object sender, RoutedEventArgs e)
+        {
+            this.Frame.Navigate(typeof(ConfigListPage));
+        }
     }
 }

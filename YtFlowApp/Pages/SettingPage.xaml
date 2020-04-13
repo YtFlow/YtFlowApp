@@ -8,7 +8,9 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <Grid>
-
+    <Grid x:Name="grid" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid.BackgroundTransition>
+            <BrushTransition />
+        </Grid.BackgroundTransition>
     </Grid>
 </Page>

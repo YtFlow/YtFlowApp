@@ -13,7 +13,7 @@
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
     <TargetPlatformVersion Condition=" '$(TargetPlatformVersion)' == '' ">10.0.18362.0</TargetPlatformVersion>
     <TargetPlatformMinVersion Condition="'$(Platform)' == 'ARM'">10.0.15063.0</TargetPlatformMinVersion>
-    <TargetPlatformMinVersion Condition="'$(Platform)' != 'ARM'">10.0.16299.0</TargetPlatformMinVersion>
+    <TargetPlatformMinVersion Condition="'$(Platform)' != 'ARM'">10.0.15063.0</TargetPlatformMinVersion>
     <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -36,7 +36,7 @@
     <DefineConstants>DEBUG;TRACE;NETFX_CORE;WINDOWS_UWP</DefineConstants>
     <NoWarn>;2008</NoWarn>
     <DebugType>full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <ErrorReport>prompt</ErrorReport>
     <Prefer32Bit>true</Prefer32Bit>
@@ -270,6 +270,15 @@
       <Version>0.16.5</Version>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <SDKReference Include="Microsoft.UniversalCRT.Debug, Version=10.0.18362.0">
+      <Name>Microsoft Universal CRT Debug Runtime</Name>
+    </SDKReference>
+    <SDKReference Include="Microsoft.VCLibs, Version=14.0">
+      <Name>Visual C++ 2015 Runtime for Universal Windows Platform Apps</Name>
+    </SDKReference>
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\YtFlowTunnel\YtFlowTunnel\YtFlowTunnel.csproj">
       <Project>{1e4fb15b-52af-4b16-9918-46e6a62a3bd6}</Project>
@@ -277,9 +286,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <SDKReference Include="Microsoft.VCLibs, Version=14.0">
-      <Name>Visual C++ 2015 Runtime for Universal Windows Platform Apps</Name>
-    </SDKReference>
+    <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

@@ -10,8 +10,12 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     Loaded="Page_Loaded">
 
-    <Grid>
-        <controls:NavigationView x:Name="navView" SelectionChanged="navView_SelectionChanged">
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid.BackgroundTransition>
+            <BrushTransition />
+        </Grid.BackgroundTransition>
+
+        <controls:NavigationView x:Name="navView" SelectionChanged="navView_SelectionChanged" PaneTitle="YtFlow">
             <controls:NavigationView.MenuItems>
                 <controls:NavigationViewItem Icon="Home" Content="Home"/>
                 <controls:NavigationViewItem Content="About">
@@ -20,7 +24,16 @@
                     </controls:NavigationViewItem.Icon>
                 </controls:NavigationViewItem>
             </controls:NavigationView.MenuItems>
-            <Frame x:Name="navFrame"></Frame>
+            
+            <controls:NavigationView.AutoSuggestBox>
+                <!-- See AutoSuggestBox documentation for
+                 more info about how to implement search. -->
+                <AutoSuggestBox x:Name="NavViewSearchBox" QueryIcon="Find" PlaceholderText="Search"/>
+            </controls:NavigationView.AutoSuggestBox>
+            
+            <ScrollViewer>
+                <Frame x:Name="navFrame" IsTabStop="True"/>
+            </ScrollViewer>
         </controls:NavigationView>
     </Grid>
 </Page>
