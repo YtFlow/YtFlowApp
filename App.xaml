@@ -1,0 +1,76 @@
+﻿<Application
+    x:Class="YtFlow.App.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    
+ >
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls"/>
+                <ResourceDictionary>
+                    <Style TargetType="SymbolIcon">
+                        <Style.Setters>
+                            <Setter Property="Margin" Value="0,0,6,0"/>
+                        </Style.Setters>
+                    </Style>
+                    <Style TargetType="FontIcon">
+                        <Style.Setters>
+                            <Setter Property="Margin" Value="0,0,6,0"/>
+                        </Style.Setters>
+                    </Style>
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+            
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Default">
+
+                </ResourceDictionary>
+                <!--Get new Style.xaml, bind new color.-->
+                <ResourceDictionary x:Key="Light">
+                    <!--<Color x:Key="SystemAccentColor">#10223C</Color>-->
+                    <!--<Color x:Key="OrangeBarBackground">#FF9966</Color>
+                    <Color x:Key="RedBarBackground">#FF6666</Color>
+                    <Color x:Key="PinkBarBackground">#FFCCCC</Color>-->
+                    <Color x:Key="BackgroundColor">#FFFFFF</Color>
+
+                    <AcrylicBrush x:Key="NavigationViewDefaultPaneBackground"
+                                   BackgroundSource="Backdrop"
+                                   TintColor="White"    
+                                   TintOpacity=".4"/>
+                    <AcrylicBrush x:Key="NavigationViewTopPaneBackground"
+                                   BackgroundSource="HostBackdrop"
+                                   TintColor="White" 
+                                   TintOpacity=".4"/>
+                    <AcrylicBrush x:Key="NavigationViewExpandedPaneBackground" 
+                                          BackgroundSource="HostBackdrop" 
+                                          TintColor="White" 
+                                          TintOpacity=".4"/>
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Dark">
+                    <!--<Color x:Key="SystemAccentColor">#10223C</Color>-->
+                    <!--<Color x:Key="OrangeBarBackground">#000000</Color>
+                    <Color x:Key="RedBarBackground">#000000</Color>
+                    <Color x:Key="PinkBarBackground">#000000</Color>-->
+                    <Color x:Key="BackgroundColor">#000000</Color>
+
+                    <AcrylicBrush x:Key="NavigationViewDefaultPaneBackground"
+                                   BackgroundSource="Backdrop"
+                                   TintColor="Black"
+                                   TintOpacity=".6"/>
+                    <AcrylicBrush x:Key="NavigationViewTopPaneBackground"
+                                   BackgroundSource="HostBackdrop"
+                                   TintColor="Black" 
+                                   TintOpacity=".6"/>
+                    <AcrylicBrush x:Key="NavigationViewExpandedPaneBackground" 
+                                          BackgroundSource="HostBackdrop" 
+                                          TintColor="Black" 
+                                          TintOpacity=".6"/>
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="HighContrast">
+                    
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

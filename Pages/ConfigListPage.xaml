@@ -1,0 +1,70 @@
+﻿<Page
+    x:Class="YtFlow.App.Pages.ConfigListPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:controls="using:Microsoft.UI.Xaml.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:converter="using:YtFlow.App.Converters"
+    xmlns:config="using:YtFlow.Tunnel.Config"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Page.Resources>
+        <ResourceDictionary>
+            <converter:CurrentConfigToFontWeightConverter x:Key="CurrentConfigToFont"/>
+            <converter:AdapterTypeToDisplayNameConverter x:Key="InitialUpper"/>
+        </ResourceDictionary>
+    </Page.Resources>
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid.BackgroundTransition>
+            <BrushTransition/>
+        </Grid.BackgroundTransition>
+        <StackPanel>
+            <TextBlock Margin="16" Style="{ThemeResource TitleTextBlockStyle}" HorizontalAlignment="Center" x:Uid="CLheader"/>
+            <ListView ItemsSource="{x:Bind adapterConfigs, Mode=OneWay}" ItemClick="AdapterListView_ItemClick" SelectionMode="None" IsItemClickEnabled="True">
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="config:IAdapterConfig">
+                        <StackPanel HorizontalAlignment="Stretch">
+                            <StackPanel.ContextFlyout>
+                                <MenuFlyout>
+                                    <MenuFlyoutItem x:Uid="CLlf1" Icon="Favorite" Click="SetDefaultButton_Click"/>
+                                    <MenuFlyoutItem x:Uid="CLlf2" Icon="Delete" Click="RemoveButton_Click"/>
+                                </MenuFlyout>
+                            </StackPanel.ContextFlyout>
+                            <TextBlock Text="{x:Bind Name}" Style="{ThemeResource BodyTextBlockStyle}" FontWeight="{x:Bind Path=Path, Converter={StaticResource CurrentConfigToFont}}"/>
+                            <TextBlock Text="{x:Bind AdapterType, Converter={StaticResource InitialUpper}}" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                    </Style>
+                </ListView.ItemContainerStyle>
+            </ListView>
+        </StackPanel>
+    </Grid>
+    <Page.BottomAppBar>
+        <CommandBar VerticalAlignment="Bottom" Background="{StaticResource BackgroundColor}">
+            <AppBarButton x:Uid="CLcb1" Icon="Paste" Click="ClipboardShadowsocksButton_Click"/>
+            <AppBarButton x:Uid="CLcb2" Icon="Camera" Click="QrCodeShadowsocksButton_Click"/>
+            <AppBarButton x:Uid="CLcb3" Icon="Add">
+                <AppBarButton.Flyout>
+                    <controls:CommandBarFlyout>
+                        <controls:CommandBarFlyout.SecondaryCommands>
+                            <AppBarButton x:Uid="CLcb3a" Click="CreateShadowsocksButton_Click"/>
+                            <AppBarButton x:Uid="CLcb3b" Click="CreateHttpButton_Click"/>
+                            <AppBarButton x:Uid="CLcb3c" Click="CreateTrojanButton_Click"/>
+                        </controls:CommandBarFlyout.SecondaryCommands>
+                    </controls:CommandBarFlyout>
+                    <!--<MenuFlyout>
+                        <MenuFlyoutItem x:Uid="CLcb3a" Click="CreateShadowsocksButton_Click"/>
+                        <MenuFlyoutItem x:Uid="CLcb3b" Click="CreateHttpButton_Click"/>
+                        <MenuFlyoutItem x:Uid="CLcb3c" Click="CreateTrojanButton_Click"/>
+                    </MenuFlyout>-->
+                </AppBarButton.Flyout>
+            </AppBarButton>
+        </CommandBar>
+    </Page.BottomAppBar>
+</Page>

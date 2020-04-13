@@ -1,0 +1,91 @@
+﻿<Page
+    x:Class="YtFlow.App.Pages.AboutPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:local="using:YtFlow.App.Pages"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Loaded="Page_Loaded">
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid.BackgroundTransition>
+            <BrushTransition />
+        </Grid.BackgroundTransition>
+
+        <ScrollViewer ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Margin="16" Grid.Row="0" Grid.ColumnSpan="2" Style="{ThemeResource TitleTextBlockStyle}" HorizontalAlignment="Center" x:Uid="Aheader"/>
+                <TextBlock Margin="8" Grid.Row="1" Grid.Column="0" FontWeight="Bold" x:Uid="Aversion"/>
+                <TextBlock x:Name="versionTxt" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Text="Version" Opacity="0.8"/>
+                <TextBlock Margin="8" Grid.Row="2" Grid.Column="0" FontWeight="Bold" x:Uid="Abuild"/>
+                <TextBlock x:Name="buildTxt" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" Text="Development Mode" Opacity="0.8"/>
+                <!--<TextBlock Margin="8" Grid.Row="3" Grid.Column="0" FontWeight="Bold" x:Uid="Arelease"/>
+                <HyperlinkButton Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" Content="13/04/2020"/>-->
+                <TextBlock Margin="8" Grid.Row="4" Grid.Column="0" FontWeight="Bold" VerticalAlignment="Center" x:Uid="Asource"/>
+                <HyperlinkButton Grid.Row="4" Grid.Column="1" VerticalAlignment="Center" NavigateUri="https://github.com/YtFlow/">
+                    <TextBlock TextDecorations="Underline" TextWrapping="WrapWholeWords">https://github.com/YtFlow</TextBlock>
+                </HyperlinkButton>
+                <TextBlock Margin="8" Grid.Row="5" Grid.Column="0" FontWeight="Bold" x:Uid="Atelegram"/>
+                <HyperlinkButton Grid.Row="5" Grid.Column="1" VerticalAlignment="Center" NavigateUri="https://t.me/YtFlow" Content="YtFlow α"/>
+
+                <StackPanel Grid.Row="6" Grid.ColumnSpan="2" Margin="0,12,0,0">
+                    <controls:Expander Header="lwIP 2.1.2" Background="{StaticResource BackgroundColor}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="4*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock xml:space="preserve" TextWrapping="WrapWholeWords" x:Uid="Alwip"/>
+                        </Grid>
+                    </controls:Expander>
+
+                    <controls:Expander Header="mbed TLS 2.16.2" Background="{StaticResource BackgroundColor}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="4*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock xml:space="preserve" TextWrapping="WrapWholeWords" x:Uid="Atls"/>
+                        </Grid>
+                    </controls:Expander>
+
+                    <controls:Expander Header="Sodium" Background="{StaticResource BackgroundColor}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="4*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock xml:space="preserve" TextWrapping="WrapWholeWords" x:Uid="Asodium"/>
+                        </Grid>
+                    </controls:Expander>
+
+                    <Image Source="/Assets/Square44x44Logo.scale-400.png" Height="50" Width="50" VerticalAlignment="Center" Margin="0,20,0,0"/>
+                    <TextBlock TextAlignment="Center" HorizontalAlignment="Center" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}">
+                    <LineBreak/>Logo by @annoymous-hentai<LineBreak/><LineBreak/>
+                    <LineBreak/> Special thanks to: <LineBreak/><LineBreak/>
+                    @clowwindy, @GreaterFire, <LineBreak/>
+                    the maintainers of Shadowsocks and Trojan, <LineBreak/>
+                    and YtFlow α group members. <LineBreak/>
+                    </TextBlock>
+                </StackPanel>
+            </Grid>
+        </ScrollViewer>
+    </Grid>
+
+</Page>
