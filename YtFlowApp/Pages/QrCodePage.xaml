@@ -13,20 +13,26 @@
             <!--  Perview  -->
             <CaptureElement x:Name="VideoCapture" Stretch="Uniform" />
             <!--  Tips  -->
-            <TextBlock
-                Margin="36"
+            <Grid  Margin="30"
                 HorizontalAlignment="Center"
-                VerticalAlignment="Bottom"
-                Foreground="White"
-                Text="Take QR Code In The Preview" />
+                VerticalAlignment="Top">
+                <Grid.Background>
+                    <SolidColorBrush Opacity="0.5" Color="Black"/>
+                </Grid.Background>
+                <TextBlock
+                        Margin="6"
+                        Style="{ThemeResource SubtitleTextBlockStyle}"
+                        x:Uid="Qr"/>
+            </Grid>
+            
         </Grid>
     </Grid>
-    <Page.TopAppBar>
-        <CommandBar DefaultLabelPosition="Right">
+    <Page.BottomAppBar>
+        <CommandBar DefaultLabelPosition="Right" Background="{ThemeResource BackgroundColor}" >
             <AppBarButton
                 Click="FromPictureButton_Click"
-                Icon="Add"
-                Label="Picture" />
+                Icon="OpenLocal"
+                x:Uid="Qcb1"/>
         </CommandBar>
-    </Page.TopAppBar>
+    </Page.BottomAppBar>
 </Page>

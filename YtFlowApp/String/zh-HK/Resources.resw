@@ -1,0 +1,273 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Ccb1.Label" xml:space="preserve">
+    <value>繼續</value>
+  </data>
+  <data name="Ccb2.Label" xml:space="preserve">
+    <value>撤銷</value>
+  </data>
+  <data name="Cinsecure.Text" xml:space="preserve">
+    <value>允許不安全</value>
+  </data>
+  <data name="Cip.Text" xml:space="preserve">
+    <value>伺服器地址</value>
+  </data>
+  <data name="CLcb1.Label" xml:space="preserve">
+    <value>從 URI 導入</value>
+  </data>
+  <data name="CLcb2.Label" xml:space="preserve">
+    <value>掃描 QR Code 導入</value>
+  </data>
+  <data name="CLcb3.Label" xml:space="preserve">
+    <value>手動增添</value>
+  </data>
+  <data name="CLcb3a.Label" xml:space="preserve">
+    <value>Shadowsocks</value>
+  </data>
+  <data name="CLcb3b.Label" xml:space="preserve">
+    <value>HTTP</value>
+  </data>
+  <data name="CLcb3c.Label" xml:space="preserve">
+    <value>Trojan</value>
+  </data>
+  <data name="CLlf1.Text" xml:space="preserve">
+    <value>排到頭位</value>
+  </data>
+  <data name="CLlf2.Text" xml:space="preserve">
+    <value>移除</value>
+  </data>
+  <data name="Cmethod.Text" xml:space="preserve">
+    <value>加密方式</value>
+  </data>
+  <data name="Cname.Text" xml:space="preserve">
+    <value>伺服器名稱</value>
+  </data>
+  <data name="Cpassword.Text" xml:space="preserve">
+    <value>密碼</value>
+  </data>
+  <data name="Cport.Text" xml:space="preserve">
+    <value>伺服器端口</value>
+  </data>
+  <data name="Ctype.Text" xml:space="preserve">
+    <value>代理協議</value>
+  </data>
+  <data name="Cusername.Text" xml:space="preserve">
+    <value>用戶名稱</value>
+  </data>
+  <data name="Ma.Label" xml:space="preserve">
+    <value>關於</value>
+  </data>
+  <data name="Ma.ToolTipService.ToolTip" xml:space="preserve">
+    <value>關於</value>
+  </data>
+  <data name="Mc1.Text" xml:space="preserve">
+    <value>連綫</value>
+  </data>
+  <data name="Mc2.Text" xml:space="preserve">
+    <value>連綫中</value>
+  </data>
+  <data name="Md.Label" xml:space="preserve">
+    <value>調試</value>
+  </data>
+  <data name="Md.ToolTipService.ToolTip" xml:space="preserve">
+    <value>遠程調試</value>
+  </data>
+  <data name="Md1.Text" xml:space="preserve">
+    <value>斷綫</value>
+  </data>
+  <data name="Md2.Text" xml:space="preserve">
+    <value>斷綫中</value>
+  </data>
+  <data name="Mdb.Content" xml:space="preserve">
+    <value>啓用</value>
+  </data>
+  <data name="Mdf.Text" xml:space="preserve">
+    <value>常見問題</value>
+  </data>
+  <data name="Mdf.ToolTipService.ToolTip" xml:space="preserve">
+    <value>不會用？</value>
+  </data>
+  <data name="Mdh.PlaceholderText" xml:space="preserve">
+    <value>Debug UDP Host</value>
+  </data>
+  <data name="Mdp.PlaceholderText" xml:space="preserve">
+    <value>Port</value>
+  </data>
+  <data name="Mdsr.Text" xml:space="preserve">
+    <value>調試設定將會在重連代理后生效。</value>
+  </data>
+  <data name="Mp.Text" xml:space="preserve">
+    <value>代理</value>
+  </data>
+  <data name="Mr.Label" xml:space="preserve">
+    <value>管理</value>
+  </data>
+  <data name="Mr.ToolTipService.ToolTip" xml:space="preserve">
+    <value>伺服器列表</value>
+  </data>
+  <data name="Ms.Label" xml:space="preserve">
+    <value>設定</value>
+  </data>
+  <data name="Ms.ToolTipService.ToolTip" xml:space="preserve">
+    <value>設定</value>
+  </data>
+  <data name="Msa.Text" xml:space="preserve">
+    <value>關於</value>
+  </data>
+  <data name="Mscl.Text" xml:space="preserve">
+    <value>伺服器配置</value>
+  </data>
+  <data name="Abuild.Text" xml:space="preserve">
+    <value>版本型號</value>
+  </data>
+  <data name="Aheader.Text" xml:space="preserve">
+    <value>關於 YtFlow</value>
+  </data>
+  <data name="Arelease.Text" xml:space="preserve">
+    <value>更新日志</value>
+  </data>
+  <data name="Asource.Text" xml:space="preserve">
+    <value>開源</value>
+  </data>
+  <data name="Atelegram.Text" xml:space="preserve">
+    <value>Telegram 群組</value>
+  </data>
+  <data name="Aversion.Text" xml:space="preserve">
+    <value>版本號數</value>
+  </data>
+  <data name="CLheader.Text" xml:space="preserve">
+    <value>伺服器列表</value>
+  </data>
+  <data name="CLcb1.ToolTipService.ToolTip" xml:space="preserve">
+    <value>從剪貼板處增添</value>
+  </data>
+  <data name="Mheader.Text" xml:space="preserve">
+    <value>主頁</value>
+  </data>
+  <data name="CLcb2.ToolTipService.ToolTip" xml:space="preserve">
+    <value>掃描二維碼導入</value>
+  </data>
+  <data name="Qcb1.Label" xml:space="preserve">
+    <value>相片</value>
+  </data>
+  <data name="Qr.Text" xml:space="preserve">
+    <value>請對好掃描 QR Code（嘗鮮）</value>
+  </data>
+</root>

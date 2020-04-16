@@ -16,45 +16,55 @@
         </ResourceDictionary>
     </Page.Resources>
 
-    <Grid>
-        <ListView ItemsSource="{x:Bind adapterConfigs, Mode=OneWay}" ItemClick="AdapterListView_ItemClick" SelectionMode="None" IsItemClickEnabled="True">
-            <ListView.ItemTemplate>
-                <DataTemplate x:DataType="config:IAdapterConfig">
-                    <StackPanel HorizontalAlignment="Stretch">
-                        <StackPanel.ContextFlyout>
-                            <MenuFlyout>
-                                <MenuFlyoutItem Text="Set as default" Icon="Favorite" Click="SetDefaultButton_Click"/>
-                                <MenuFlyoutItem Text="Remove" Icon="Delete" Click="RemoveButton_Click"/>
-                            </MenuFlyout>
-                        </StackPanel.ContextFlyout>
-                        <TextBlock Text="{x:Bind Name}" Style="{ThemeResource BodyTextBlockStyle}" FontWeight="{x:Bind Path=Path, Converter={StaticResource CurrentConfigToFont}}"/>
-                        <TextBlock Text="{x:Bind AdapterType, Converter={StaticResource InitialUpper}}" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"/>
-                    </StackPanel>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-            <ListView.ItemContainerStyle>
-                <Style TargetType="ListViewItem">
-                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                </Style>
-            </ListView.ItemContainerStyle>
-        </ListView>
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid.BackgroundTransition>
+            <BrushTransition/>
+        </Grid.BackgroundTransition>
+        <StackPanel>
+            <TextBlock Margin="16" Style="{ThemeResource SubtitleTextBlockStyle}" HorizontalAlignment="Center" x:Uid="CLheader"/>
+            <ListView ItemsSource="{x:Bind adapterConfigs, Mode=OneWay}" ItemClick="AdapterListView_ItemClick" SelectionMode="None" IsItemClickEnabled="True">
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="config:IAdapterConfig">
+                        <StackPanel HorizontalAlignment="Stretch">
+                            <StackPanel.ContextFlyout>
+                                <MenuFlyout>
+                                    <MenuFlyoutItem x:Uid="CLlf1" Icon="Favorite" Click="SetDefaultButton_Click"/>
+                                    <MenuFlyoutItem x:Uid="CLlf2" Icon="Delete" Click="RemoveButton_Click"/>
+                                </MenuFlyout>
+                            </StackPanel.ContextFlyout>
+                            <TextBlock Text="{x:Bind Name}" Style="{ThemeResource BodyTextBlockStyle}" FontWeight="{x:Bind Path=Path, Converter={StaticResource CurrentConfigToFont}}"/>
+                            <TextBlock Text="{x:Bind AdapterType, Converter={StaticResource InitialUpper}}" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                    </Style>
+                </ListView.ItemContainerStyle>
+            </ListView>
+        </StackPanel>
     </Grid>
-    <Page.TopAppBar>
-        <CommandBar x:Name="commandBar" DefaultLabelPosition="Right">
-            <AppBarButton Icon="Add" Label="Create">
+    <Page.BottomAppBar>
+        <CommandBar VerticalAlignment="Bottom" Background="{ThemeResource BackgroundColor}">
+            <AppBarButton x:Uid="CLcb1" Icon="Paste" Click="ClipboardShadowsocksButton_Click"/>
+            <AppBarButton x:Uid="CLcb2" Icon="Camera" Click="QrCodeShadowsocksButton_Click"/>
+            <AppBarButton x:Uid="CLcb3" Icon="Add">
                 <AppBarButton.Flyout>
                     <controls:CommandBarFlyout>
                         <controls:CommandBarFlyout.SecondaryCommands>
-                            <AppBarButton Label="Shadowsocks" Click="CreateShadowsocksButton_Click"/>
-                            <AppBarButton Label="HTTP" Click="CreateHttpButton_Click"/>
-                            <AppBarButton Label="Trojan" Click="CreateTrojanButton_Click"/>
-                            <AppBarSeparator/>
-                            <AppBarButton Label="Scan QR Code" Click="QrCodeShadowsocksButton_Click"/>
-                            <AppBarButton Label="Copy From Clipboard" Click="ClipboardShadowsocksButton_Click"/>
+                            <AppBarButton x:Uid="CLcb3a" Click="CreateShadowsocksButton_Click"/>
+                            <AppBarButton x:Uid="CLcb3b" Click="CreateHttpButton_Click"/>
+                            <AppBarButton x:Uid="CLcb3c" Click="CreateTrojanButton_Click"/>
                         </controls:CommandBarFlyout.SecondaryCommands>
                     </controls:CommandBarFlyout>
+                    <!--<MenuFlyout>
+                        <MenuFlyoutItem x:Uid="CLcb3a" Click="CreateShadowsocksButton_Click"/>
+                        <MenuFlyoutItem x:Uid="CLcb3b" Click="CreateHttpButton_Click"/>
+                        <MenuFlyoutItem x:Uid="CLcb3c" Click="CreateTrojanButton_Click"/>
+                    </MenuFlyout>-->
                 </AppBarButton.Flyout>
             </AppBarButton>
         </CommandBar>
-    </Page.TopAppBar>
+    </Page.BottomAppBar>
 </Page>
