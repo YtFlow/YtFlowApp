@@ -268,6 +268,6 @@
     <value>相片</value>
   </data>
   <data name="Qr.Text" xml:space="preserve">
-    <value>請對好掃描 QR Code（嘗鮮）</value>
+    <value>請對好掃描 QR Code（嘗鮮功能）</value>
   </data>
 </root>

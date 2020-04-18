@@ -18,7 +18,7 @@
 
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="58"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
@@ -30,7 +30,6 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Margin="16" Grid.Row="0" Grid.ColumnSpan="2" Style="{ThemeResource SubtitleTextBlockStyle}" HorizontalAlignment="Center" x:Uid="Aheader"/>
                 <TextBlock Margin="8" Grid.Row="1" Grid.Column="0" FontWeight="Bold" x:Uid="Aversion"/>
                 <TextBlock x:Name="versionTxt" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Text="Version" Opacity="0.8"/>
                 <TextBlock Margin="8" Grid.Row="2" Grid.Column="0" FontWeight="Bold" x:Uid="Abuild"/>
@@ -45,7 +44,7 @@
                 <HyperlinkButton Grid.Row="5" Grid.Column="1" VerticalAlignment="Center" NavigateUri="https://t.me/YtFlow" Content="YtFlow α"/>
 
                 <StackPanel Grid.Row="6" Grid.ColumnSpan="2" Margin="0,12,0,0">
-                    <controls:Expander Header="lwIP 2.1.2" Background="{ThemeResource BackgroundColor}">
+                    <controls:Expander Header="lwIP 2.1.2" Background="{ThemeResource PinkBarBackground}">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="4*"/>
@@ -65,7 +64,7 @@
                         </Grid>
                     </controls:Expander>
 
-                    <controls:Expander Header="Sodium" Background="{ThemeResource BackgroundColor}">
+                    <controls:Expander Header="Sodium" Background="{ThemeResource PinkBarBackground }">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="4*"/>
@@ -86,5 +85,9 @@
                 </StackPanel>
             </Grid>
         </ScrollViewer>
+        
+        <Grid VerticalAlignment="Top" HorizontalAlignment="Stretch" Background="{ThemeResource PinkBarBackground}">
+            <TextBlock Margin="16" Style="{ThemeResource SubtitleTextBlockStyle}" HorizontalAlignment="Center" x:Uid="Aheader"/>
+        </Grid>
     </Grid>
 </Page>

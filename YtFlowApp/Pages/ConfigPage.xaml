@@ -19,9 +19,9 @@
                 <selectors:AdapterConfigTypeSelector>
                     <selectors:AdapterConfigTypeSelector.ShadowsocksTemplate>
                         <DataTemplate x:DataType="config:ShadowsocksConfig">
-                            <Grid>
+                            <Grid Margin="15,0,15,0">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="100" />
+                                    <ColumnDefinition Width="100"/>
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
                                 <Grid.RowDefinitions>
@@ -35,10 +35,11 @@
                                 <TextBlock
                                     Grid.Row="0"
                                     Grid.Column="0"
-                                    Margin="4,0,0,0"
+                                    Margin="0,0,10,0"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Center"
-                                    x:Uid="Ctype"/>
+                                    x:Uid="Ctype" 
+                                    TextAlignment="Right"/>
                                 <TextBlock
                                     Grid.Row="0"
                                     Grid.Column="1"
@@ -48,10 +49,11 @@
                                 <TextBlock
                                     Grid.Row="1"
                                     Grid.Column="0"
-                                    Margin="4,0,0,0"
+                                    Margin="0,0,10,0"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Center"
-                                    x:Uid="Cname"/>
+                                    x:Uid="Cname"
+                                    TextAlignment="Right"/>
                                 <TextBox
                                     Grid.Row="1"
                                     Grid.Column="1"
@@ -62,10 +64,11 @@
                                 <TextBlock
                                     Grid.Row="2"
                                     Grid.Column="0"
-                                    Margin="4,0,0,0"
+                                    Margin="0,0,10,0"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Center"
-                                    x:Uid="Cip"/>
+                                    x:Uid="Cip"
+                                    TextAlignment="Right"/>
                                 <TextBox
                                     Grid.Row="2"
                                     Grid.Column="1"
@@ -76,10 +79,11 @@
                                 <TextBlock
                                     Grid.Row="3"
                                     Grid.Column="0"
-                                    Margin="4,0,0,0"
+                                    Margin="0,0,10,0"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Center"
-                                    x:Uid="Cport"/>
+                                    x:Uid="Cport"
+                                    TextAlignment="Right"/>
                                 <TextBox
                                     Grid.Row="3"
                                     Grid.Column="1"
@@ -92,10 +96,11 @@
                                 <TextBlock
                                     Grid.Row="4"
                                     Grid.Column="0"
-                                    Margin="4,0,0,0"
+                                    Margin="0,0,10,0"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Center"
-                                    x:Uid="Cmethod"/>
+                                    x:Uid="Cmethod"
+                                    TextAlignment="Right"/>
                                 <ComboBox
                                     Grid.Row="4"
                                     Grid.Column="1"
@@ -127,10 +132,11 @@
                                 <TextBlock
                                     Grid.Row="5"
                                     Grid.Column="0"
-                                    Margin="4,0,0,0"
+                                    Margin="0,0,10,0"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Center"
-                                    x:Uid="Cpassword"/>
+                                    x:Uid="Cpassword"
+                                    TextAlignment="Right"/>
                                 <PasswordBox
                                     Grid.Row="5"
                                     Grid.Column="1"
@@ -162,10 +168,11 @@
                                 <TextBlock
                                     Grid.Row="0"
                                     Grid.Column="0"
-                                    Margin="4,0,0,0"
+                                    Margin="0,0,10,0"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Center"
-                                    x:Uid="Ctype"/>
+                                    x:Uid="Ctype"
+                                    TextAlignment="Right"/>
                                 <TextBlock
                                     Grid.Row="0"
                                     Grid.Column="1"
@@ -174,10 +181,11 @@
                                 <TextBlock
                                     Grid.Row="1"
                                     Grid.Column="0"
-                                    Margin="4,0,0,0"
+                                    Margin="0,0,10,0"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Center"
-                                    x:Uid="Cname"/>
+                                    x:Uid="Cname"
+                                    TextAlignment="Right"/>
                                 <TextBox
                                     Grid.Row="1"
                                     Grid.Column="1"
@@ -188,10 +196,11 @@
                                 <TextBlock
                                     Grid.Row="2"
                                     Grid.Column="0"
-                                    Margin="4,0,0,0"
+                                    Margin="0,0,10,0"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Center"
-                                    x:Uid="Cip"/>
+                                    x:Uid="Cip"
+                                    TextAlignment="Right"/>
                                 <TextBox
                                     Grid.Row="2"
                                     Grid.Column="1"
@@ -202,10 +211,11 @@
                                 <TextBlock
                                     Grid.Row="3"
                                     Grid.Column="0"
-                                    Margin="4,0,0,0"
+                                    Margin="0,0,10,0"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Center"
-                                    x:Uid="Cport"/>
+                                    x:Uid="Cport"
+                                    TextAlignment="Right"/>
                                 <TextBox
                                     Grid.Row="3"
                                     Grid.Column="1"
@@ -218,10 +228,11 @@
                                 <TextBlock
                                     Grid.Row="4"
                                     Grid.Column="0"
-                                    Margin="4,0,0,0"
+                                    Margin="0,0,10,0"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Center"
-                                    x:Uid="Cusername"/>
+                                    x:Uid="Cusername"
+                                    TextAlignment="Right"/>
                                 <TextBox
                                     Grid.Row="4"
                                     Grid.Column="1"
@@ -234,10 +245,11 @@
                                 <TextBlock
                                     Grid.Row="5"
                                     Grid.Column="0"
-                                    Margin="4,0,0,0"
+                                    Margin="0,0,10,0"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Center"
-                                    x:Uid="Cpassword"/>
+                                    x:Uid="Cpassword"
+                                    TextAlignment="Right"/>
                                 <PasswordBox
                                     Grid.Row="5"
                                     Grid.Column="1"
@@ -271,10 +283,11 @@
                                 <TextBlock
                                     Grid.Row="0"
                                     Grid.Column="0"
-                                    Margin="4,0,0,0"
+                                    Margin="0,0,10,0"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Center"
-                                    x:Uid="Ctype"/>
+                                    x:Uid="Ctype"
+                                    TextAlignment="Right"/>
                                 <TextBlock
                                     Grid.Row="0"
                                     Grid.Column="1"
@@ -283,10 +296,11 @@
                                 <TextBlock
                                     Grid.Row="1"
                                     Grid.Column="0"
-                                    Margin="4,0,0,0"
+                                    Margin="0,0,10,0"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Center"
-                                    x:Uid="Cname"/>
+                                    x:Uid="Cname"
+                                    TextAlignment="Right"/>
                                 <TextBox
                                     Grid.Row="1"
                                     Grid.Column="1"
@@ -297,10 +311,11 @@
                                 <TextBlock
                                     Grid.Row="2"
                                     Grid.Column="0"
-                                    Margin="4,0,0,0"
+                                    Margin="0,0,10,0"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Center"
-                                    x:Uid="Cip"/>
+                                    x:Uid="Cip"
+                                    TextAlignment="Right"/>
                                 <TextBox
                                     Grid.Row="2"
                                     Grid.Column="1"
@@ -311,10 +326,11 @@
                                 <TextBlock
                                     Grid.Row="3"
                                     Grid.Column="0"
-                                    Margin="4,0,0,0"
+                                    Margin="0,0,10,0"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Center"
-                                    x:Uid="Cport"/>
+                                    x:Uid="Cport"
+                                    TextAlignment="Right"/>
                                 <TextBox
                                     Grid.Row="3"
                                     Grid.Column="1"
@@ -327,10 +343,11 @@
                                 <TextBlock
                                     Grid.Row="4"
                                     Grid.Column="0"
-                                    Margin="4,0,0,0"
+                                    Margin="0,0,10,0"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Center"
-                                    x:Uid="Cpassword"/>
+                                    x:Uid="Cpassword"
+                                    TextAlignment="Right"/>
                                 <PasswordBox
                                     Grid.Row="4"
                                     Grid.Column="1"
@@ -344,10 +361,11 @@
                                 <TextBlock
                                     Grid.Row="5"
                                     Grid.Column="0"
-                                    Margin="4,0,0,0"
+                                    Margin="0,0,10,0"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Center"
-                                    x:Uid="Cinsecure"/>
+                                    x:Uid="Cinsecure"
+                                    TextAlignment="Right"/>
                                 <CheckBox
                                     Grid.Row="5"
                                     Grid.Column="1"

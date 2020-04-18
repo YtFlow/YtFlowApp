@@ -265,6 +265,6 @@
     <value>图片</value>
   </data>
   <data name="Qr.Text" xml:space="preserve">
-    <value>请对准二维码扫描（预览）</value>
+    <value>请对准二维码扫描（预览功能）</value>
   </data>
 </root>

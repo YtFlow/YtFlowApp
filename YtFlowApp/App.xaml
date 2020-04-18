@@ -23,14 +23,15 @@
 
             <ResourceDictionary.ThemeDictionaries>
                 <ResourceDictionary x:Key="Default">
-                    <!--<SolidColorBrush x:Key="HalfBackground" Opacity="0.6" Color="{ThemeResource BackgroundColor}"/>-->
+
                 </ResourceDictionary>
                 <!--Get new Style.xaml, bind new color.-->
                 <ResourceDictionary x:Key="Light">
-                    <!--<Color x:Key="SystemAccentColor">#10223C</Color>-->
+                    <Color x:Key="SystemAccentColor">Pink</Color>
                     <!--<Color x:Key="OrangeBarBackground">#FF9966</Color>
-                    <Color x:Key="RedBarBackground">#FF6666</Color>
-                    <Color x:Key="PinkBarBackground">#FFCCCC</Color>-->
+                    <Color x:Key="RedBarBackground">#FF6666</Color>-->
+                    <Color x:Key="BlueBarBackground">#0075FF</Color>
+                    <Color x:Key="PinkBarBackground">#FFCCCC</Color>
                     <Color x:Key="BackgroundColor">#FFFFFF</Color>
 
                     <AcrylicBrush x:Key="NavigationViewDefaultPaneBackground"
@@ -47,10 +48,11 @@
                                           TintOpacity=".4"/>
                 </ResourceDictionary>
                 <ResourceDictionary x:Key="Dark">
-                    <!--<Color x:Key="SystemAccentColor">#10223C</Color>-->
+                    <Color x:Key="SystemAccentColor">Pink</Color>
                     <!--<Color x:Key="OrangeBarBackground">#000000</Color>
-                    <Color x:Key="RedBarBackground">#000000</Color>
-                    <Color x:Key="PinkBarBackground">#000000</Color>-->
+                    <Color x:Key="RedBarBackground">#000000</Color>-->
+                    <Color x:Key="BlueBarBackground">#000000</Color>
+                    <Color x:Key="PinkBarBackground">#000000</Color>
                     <Color x:Key="BackgroundColor">#000000</Color>
                     
                     <AcrylicBrush x:Key="NavigationViewDefaultPaneBackground"
@@ -70,6 +72,7 @@
 
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
+         
         </ResourceDictionary>
     </Application.Resources>
 </Application>

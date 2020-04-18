@@ -48,60 +48,57 @@
                 HorizontalScrollBarVisibility="Disabled"
                 VerticalScrollMode="Auto"
                 VerticalScrollBarVisibility="Auto">
-            <!--<Grid>
-                <Grid.RowDefinitions>
-                <RowDefinition Height="32"/>
-                <RowDefinition Height="auto"/>
-                </Grid.RowDefinitions>-->
 
-            <!--标头-->
-            <!--<Grid Grid.Row="0" Background="Transparent" HorizontalAlignment="Stretch" Margin="0,0,0,0" VerticalAlignment="Stretch">
-                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Style="{ThemeResource TitleTextBlockStyle}">YTFLOW</TextBlock>
-                </Grid>-->
 
             <!--从这里开始添加内容-->
             <!--旧-->
-            <!--
-                <StackPanel Grid.Row="1" HorizontalAlignment="Stretch" Margin="0,0,0,0" Grid.RowSpan="2" VerticalAlignment="Stretch">
-                    
-                    <TextBlock Style="{ThemeResource TitleTextBlockStyle}" Margin="16" x:Uid="Ms" FontWeight="Bold"/>
-                    <ListView SelectionMode="None" ScrollViewer.VerticalScrollMode="Disabled" ScrollViewer.HorizontalScrollMode="Disabled" IsItemClickEnabled="True" ItemClick="ListView_ItemClick">
-                        <ListView.ItemContainerStyle>
-                            <Style TargetType="ListViewItem">
-                                <Setter Property="Margin" Value="4,0,4,0"/>
-                                <Setter Property="Opacity" Value="0.8"/>
-                            </Style>
-                        </ListView.ItemContainerStyle>
-                        <ListView.Items>
-                            <StackPanel DataContext="configList" Orientation="Horizontal">
-                                <SymbolIcon Symbol="List"/>
-                                <TextBlock x:Uid="Mscl"/>
-                            </StackPanel>
-                            <StackPanel DataContext="about" Orientation="Horizontal">
-                                <FontIcon Glyph="&#xE946;"/>
-                                <TextBlock x:Uid="Msa"/>
-                            </StackPanel>
-                            -->
-            <!--<StackPanel DataContext="Proxy" Orientation="Horizontal">
-                                <SymbolIcon Symbol="Go"/>
-                                <TextBlock x:Uid="Msa"/>
-                            </StackPanel>-->
-            <!--
-                        </ListView.Items>
-                    </ListView>                  
-                </StackPanel>
-            </Grid>-->
+            <!--<StackPanel Grid.Row="1" HorizontalAlignment="Stretch" Margin="0,0,0,0" Grid.RowSpan="2" VerticalAlignment="Stretch">
+                <TextBlock Style="{ThemeResource TitleTextBlockStyle}" Margin="16" x:Uid="Ms" FontWeight="Bold"/>
+                <ListView SelectionMode="None" ScrollViewer.VerticalScrollMode="Disabled" ScrollViewer.HorizontalScrollMode="Disabled" IsItemClickEnabled="True" ItemClick="ListView_ItemClick">
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="Margin" Value="4,0,4,0"/>
+                            <Setter Property="Opacity" Value="0.8"/>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                    <ListView.Items>
+                        <StackPanel DataContext="configList" Orientation="Horizontal">
+                            <SymbolIcon Symbol="List"/>
+                            <TextBlock x:Uid="Mscl"/>
+                        </StackPanel>
+                        <StackPanel DataContext="about" Orientation="Horizontal">
+                            <FontIcon Glyph="&#xE946;"/>
+                            <TextBlock x:Uid="Msa"/>
+                        </StackPanel>
+                    </ListView.Items>
+                </ListView>
+            </StackPanel>-->
+            
             <!--新-->
             <Grid>
                 <!--<Frame x:Name="ContentFrame" IsTabStop="True"/>-->
-                <TextBlock Margin="16" Style="{ThemeResource SubtitleTextBlockStyle}" HorizontalAlignment="Center" x:Uid="Mheader"/>
+                <ToggleButton  Height="100" Width="100"
+                        Background="Pink"
+                    x:Name="switchToggleBtn"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Content="{x:Bind TunnelConnectionStatus, Mode=OneWay}"
+                    ContentTemplateSelector="{StaticResource ConnectButtonTemplateSelector}"
+                    IsChecked="{x:Bind TunnelConnectionStatus, Converter={StaticResource ConnectionStatusToIsChecked}, Mode=OneWay}"
+                    IsEnabled="{x:Bind TunnelConnectionStatus, Converter={StaticResource ConnectionStatusToIsEnabled}, Mode=OneWay}"
+                    AllowFocusWhenDisabled="True"
+                    Checked="OnButton_Click"
+                    Unchecked="OffButton_Click">
+                    <ToggleButton.Resources>
+                        <CornerRadius x:Key="ControlCornerRadius">50</CornerRadius>
+                    </ToggleButton.Resources>
+                </ToggleButton>
             </Grid>
         </ScrollViewer>
 
         <!--导航栏-->
-        <!--按钮维持底部-->
-        <!--建议关闭背景颜色，防止手机屏幕烧屏 {StaticResource SystemAccentColor}-->
-        <Grid Name="debug" Margin="14,0,14,64" Opacity="0" VerticalAlignment="Bottom">
+        <!--方案一高度是 64，方案二是 5-->
+        <Grid Name="debug" Margin="14,0,14,5" Opacity="0" VerticalAlignment="Bottom">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
@@ -117,9 +114,10 @@
             <TextBlock x:Name="debugSocketRestartTxt" Grid.Row="1" Grid.ColumnSpan="3" Visibility="Collapsed" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="OrangeRed" TextWrapping="WrapWholeWords" x:Uid="Mdsr"/>
         </Grid>
 
+        <!--方案一 让出主页-->
         <!--<TextBlock Style="{ThemeResource TitleTextBlockStyle}" Margin="16,16,16,42" x:Uid="Mp" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" FontWeight="Bold"/>-->
-        <ToggleButton
-                Height="55" Style="{StaticResource ToggleButtonRevealStyle}"
+        <!--<ToggleButton 
+                Height="55"             
                         Background="Transparent"
                     x:Name="switchToggleBtn"
                     HorizontalAlignment="Stretch"
@@ -130,21 +128,8 @@
                     IsEnabled="{x:Bind TunnelConnectionStatus, Converter={StaticResource ConnectionStatusToIsEnabled}, Mode=OneWay}"
                     AllowFocusWhenDisabled="True"
                     Checked="OnButton_Click"
-                    Unchecked="OffButton_Click"/>
-
-        <RelativePanel VerticalAlignment="Bottom" HorizontalAlignment="Left">
-            <!--<AppBarButton x:Name="left" Icon="Add" Label="Create &gt;" Style="{StaticResource AppBarButtonRevealStyle}">
-                    <AppBarButton.Flyout>
-                        <MenuFlyout>
-                            <MenuFlyoutItem x:Name="rankLow" Text="Shadowsocks" />
-                            <MenuFlyoutItem x:Name="rankHigh" Text="HTTP" />
-                            <MenuFlyoutItem x:Name="heightLow" Text="Trojan" />
-                            <MenuFlyoutSeparator />
-                            <MenuFlyoutItem x:Name="heightHigh" Text="Scan QR Code" />
-                            <MenuFlyoutItem x:Name="clearFilter" Text="Copy From Clipboard" />
-                        </MenuFlyout>
-                    </AppBarButton.Flyout>
-                </AppBarButton>-->
+                    Unchecked="OffButton_Click"/>-->
+        <!--<RelativePanel VerticalAlignment="Bottom" HorizontalAlignment="Left">
             <AppBarButton x:Name="left1" Icon="List" x:Uid="Mr" Style="{StaticResource AppBarButtonRevealStyle}" Click="rule_Click"/>
             <AppBarButton x:Name="left2" Icon="Go" RelativePanel.RightOf="left1" x:Uid="Md" Style="{StaticResource AppBarButtonRevealStyle}" Click="debug_Click">
                 <AppBarButton.Flyout>
@@ -156,7 +141,27 @@
         </RelativePanel>
         <RelativePanel VerticalAlignment="Bottom" HorizontalAlignment="Right">
             <AppBarButton x:Name="right1" Icon="Account"  x:Uid="Ma" Style="{StaticResource AppBarButtonRevealStyle}" Click="about_Click"/>
-            <!--<AppBarButton x:Name="right2" Icon="Setting" x:Uid="Ms" RelativePanel.RightOf="right1" Style="{StaticResource AppBarButtonRevealStyle}"/>-->
-        </RelativePanel>
+            <AppBarButton x:Name="right2" Icon="Setting" x:Uid="Ms" RelativePanel.RightOf="right1" Style="{StaticResource AppBarButtonRevealStyle}" Click="settings_Click"/>
+        </RelativePanel>-->
+        
+        <Grid VerticalAlignment="Top" HorizontalAlignment="Stretch" Background="{ThemeResource PinkBarBackground}">
+            <TextBlock Margin="16" Style="{ThemeResource SubtitleTextBlockStyle}" HorizontalAlignment="Center" x:Uid="Mheader"/>
+        </Grid>
     </Grid>
+    
+    <!--方案二 连接按钮居中-->
+    <Page.BottomAppBar>
+        <CommandBar VerticalAlignment="Bottom" Background="{ThemeResource BackgroundColor}">
+            <AppBarButton x:Name="left1" Icon="List" x:Uid="Mr" Style="{StaticResource AppBarButtonRevealStyle}" Click="rule_Click"/>
+            <AppBarButton x:Name="right1" Icon="Account"  x:Uid="Ma" Style="{StaticResource AppBarButtonRevealStyle}" Click="about_Click"/>
+            <AppBarButton x:Name="left2" Icon="Go" x:Uid="Md" Style="{StaticResource AppBarButtonRevealStyle}" Click="debug_Click">
+                <AppBarButton.Flyout>
+                    <MenuFlyout>
+                        <MenuFlyoutItem x:Name="faq" x:Uid="Mdf" Click="faq_Click"/>
+                    </MenuFlyout>
+                </AppBarButton.Flyout>
+            </AppBarButton>
+            <!--<AppBarButton x:Name="right2" Icon="Setting" x:Uid="Ms" Style="{StaticResource AppBarButtonRevealStyle}" Click="settings_Click"/>-->
+        </CommandBar>
+    </Page.BottomAppBar>
 </Page>

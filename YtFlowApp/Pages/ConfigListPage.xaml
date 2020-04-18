@@ -20,9 +20,8 @@
         <Grid.BackgroundTransition>
             <BrushTransition/>
         </Grid.BackgroundTransition>
-        <StackPanel>
-            <TextBlock Margin="16" Style="{ThemeResource SubtitleTextBlockStyle}" HorizontalAlignment="Center" x:Uid="CLheader"/>
-            <ListView ItemsSource="{x:Bind adapterConfigs, Mode=OneWay}" ItemClick="AdapterListView_ItemClick" SelectionMode="None" IsItemClickEnabled="True">
+
+            <ListView ItemsSource="{x:Bind adapterConfigs, Mode=OneWay}" ItemClick="AdapterListView_ItemClick" SelectionMode="None" IsItemClickEnabled="True" Margin="0,59,0,0">
                 <ListView.ItemTemplate>
                     <DataTemplate x:DataType="config:IAdapterConfig">
                         <StackPanel HorizontalAlignment="Stretch">
@@ -43,7 +42,10 @@
                     </Style>
                 </ListView.ItemContainerStyle>
             </ListView>
-        </StackPanel>
+
+        <Grid VerticalAlignment="Top" HorizontalAlignment="Stretch" Background="{ThemeResource PinkBarBackground}">
+            <TextBlock Margin="16" Style="{ThemeResource SubtitleTextBlockStyle}" HorizontalAlignment="Center" x:Uid="CLheader"/>
+        </Grid>
     </Grid>
     <Page.BottomAppBar>
         <CommandBar VerticalAlignment="Bottom" Background="{ThemeResource BackgroundColor}">

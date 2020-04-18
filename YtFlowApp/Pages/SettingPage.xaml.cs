@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -25,6 +26,62 @@ namespace YtFlow.App.Pages
         public SettingPage ()
         {
             this.InitializeComponent();
+        }
+
+        private void ColorComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            // Add "using Windows.UI;" for Color and Colors.
+            string colorName = e.AddedItems[0].ToString();
+            Color color;
+            switch (colorName)
+            {
+                case "Yellow":
+                    color = Colors.Yellow;
+                    break;
+                case "Green":
+                    color = Colors.Green;
+                    break;
+                case "Blue":
+                    color = Colors.Blue;
+                    break;
+                case "Red":
+                    color = Colors.Red;
+                    break;
+            }
+        }
+
+        //private void OptionRadioButton_Checked(object sender, RoutedEventArgs e)
+        //{
+
+        //}
+
+        //private void Option1RadioButton_Checked(object sender, RoutedEventArgs e)
+        //{
+            
+        //}
+
+        //private void Option2RadioButton_Checked(object sender, RoutedEventArgs e)
+        //{
+
+        //}
+
+        private void RadioButtons_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            // Add "using Windows.UI;" for Color and Colors.
+            string colorName = e.AddedItems[0].ToString();
+            Color color;
+            switch (colorName)
+            {              
+                case "defalut":
+                    color = default;
+                    break;
+                case "blue":
+                    color = Colors.Blue;
+                    break;
+                case "pink":
+                    color = Colors.Pink;
+                    break;
+            }
         }
     }
 }

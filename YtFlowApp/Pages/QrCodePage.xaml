@@ -6,9 +6,10 @@
     xmlns:local="using:YtFlow.App.Pages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
-    mc:Ignorable="d">
+    mc:Ignorable="d"
+    RequestedTheme="Dark">
 
-    <Grid Background="Black">
+    <Grid x:Name="grid">
         <Grid x:Name="ContentPanel">
             <!--  Perview  -->
             <CaptureElement x:Name="VideoCapture" Stretch="Uniform" />
@@ -28,7 +29,7 @@
         </Grid>
     </Grid>
     <Page.BottomAppBar>
-        <CommandBar DefaultLabelPosition="Right" Background="{ThemeResource BackgroundColor}" >
+        <CommandBar x:Name="commandbar" DefaultLabelPosition="Right" Background="{ThemeResource PinkBarBackground}">
             <AppBarButton
                 Click="FromPictureButton_Click"
                 Icon="OpenLocal"

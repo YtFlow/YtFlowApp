@@ -360,5 +360,10 @@ namespace YtFlow.App.Pages
         {
             this.Frame.Navigate(typeof(ConfigListPage));
         }
+
+        private void settings_Click(object sender, RoutedEventArgs e)
+        {
+            this.Frame.Navigate(typeof(SettingPage));
+        }
     }
 }

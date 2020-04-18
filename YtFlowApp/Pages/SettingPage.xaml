@@ -4,13 +4,35 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:YtFlow.App.Pages"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:controls="using:Microsoft.UI.Xaml.Controls"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid x:Name="grid" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <Grid.BackgroundTransition>
-            <BrushTransition />
+    <Grid.BackgroundTransition>
+            <BrushTransition/>
         </Grid.BackgroundTransition>
+        <StackPanel Margin="15,0,15,0">
+            <TextBlock Margin="0,68,0,10" Style="{ThemeResource SubtitleTextBlockStyle}"  Text="Themes"/>
+            <ToggleSwitch Header="Default" IsOn="True" Margin="0,0,0,5"/>
+            <controls:RadioButtons x:Name="radio" Header="Options" SelectionChanged="RadioButtons_SelectionChanged">
+                <x:String>default</x:String>
+                <x:String>blue</x:String>
+                <x:String>pink</x:String>
+            </controls:RadioButtons>
+            <!--<TextBlock Text="{Binding ElementName=radio, Path=SelectedItem}"/>-->
+            <ComboBox x:Name="colorComboBox" Width="200" Margin="0,5,0,0"
+              Header="Colors" PlaceholderText="Pick a color"
+              SelectionChanged="ColorComboBox_SelectionChanged">
+                <x:String>Blue</x:String>
+                <x:String>Green</x:String>
+                <x:String>Red</x:String>
+                <x:String>Yellow</x:String>
+            </ComboBox>
+        </StackPanel>
+
+        <Grid VerticalAlignment="Top" HorizontalAlignment="Stretch" Background="{ThemeResource PinkBarBackground}">
+            <TextBlock Margin="16" Style="{ThemeResource SubtitleTextBlockStyle}" HorizontalAlignment="Center" x:Uid="Sheader" Text="Settings"/>
+        </Grid>
     </Grid>
 </Page>
