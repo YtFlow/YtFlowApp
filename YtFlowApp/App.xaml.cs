@@ -31,7 +31,7 @@ namespace YtFlow.App
         {
             DebugLogger.Log("Unhandled fatal application exception: " + e.Exception.ToString());
             var localSettings = ApplicationData.Current.LocalSettings.Values;
-            var exStr = e.Exception.ToString() + "\r\n" + e.Exception.StackTrace;
+            var exStr = e.Exception.ToString() + "\r\n" + e.Message + "\r\n" + e.Exception.StackTrace;
             if (localSettings.TryGetValue("lastError", out var lastErr) && lastErr is string lastErrStr)
             {
                 lastErrStr += "\r\n" + exStr;

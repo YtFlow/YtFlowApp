@@ -8,7 +8,6 @@ YtFlow is a network debug tool running on Universal Windows Platform that forwar
   - stream ciphers (rc4-md5, aes-128-cfb, aes-192-cfb, aes-256-cfb, aes-128-ctr, aes-192-ctr, aes-256-ctr, camellia-128-cfb, camellia-192-cfb, camellia-256-cfb, salsa20, chacha20, chacha20-ietf)
   - AEAD ciphers (aes-128-gcm, aes-192-gcm, aes-256-gcm, chacha20-poly1305, chacha20-ietf-poly1305, xchacha20-ietf-poly1305)
 - Trojan
-  - Domain names as hosts
   - Opt-out of certificate check
 - HTTP
   - `CONNECT`-based proxy
@@ -33,7 +32,7 @@ A UDP client is built in for debug purposes. Refer to  [wiki documentation](http
 Note that packet capture is **not** enabled for the released packages due to high performance downgrading. To enable packet capture, please manually append `YTLOG_VERBOSE` to conditional compilation symbols of `YtFlowTunnel` and rebuild.
 
 ## Limitations
-- Domain names could not be used as hosts (except Trojan)
+- Domain names could not be used as hosts (HTTP only)
 - Trojan via TLS 1.3
 - Direct IP connections bypass the proxy
 - On Windows builds before v10.0.16299 (including all Mobile versions), a VPN profile must be created manually with the following arguments:
