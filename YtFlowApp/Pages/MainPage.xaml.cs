@@ -116,7 +116,7 @@ namespace YtFlow.App.Pages
                     newProfile.DomainNameInfoList.Clear();
                     newProfile.DomainNameInfoList.Add(new VpnDomainNameInfo(".",
                         VpnDomainNameType.Suffix,
-                        new List<HostName>() { new HostName("1.1.1.1") },
+                        new List<HostName>() { new HostName("11.16.1.1") },
                         Array.Empty<HostName>()));
                     newProfile.ServerUris.Clear();
                     newProfile.ServerUris.Add(new Uri("https://github.com/YtFlow"));
