@@ -32,7 +32,6 @@ A UDP client is built in for debug purposes. Refer to  [wiki documentation](http
 Note that packet capture is **not** enabled for the released packages due to high performance downgrading. To enable packet capture, please manually append `YTLOG_VERBOSE` to conditional compilation symbols of `YtFlowTunnel` and rebuild.
 
 ## Limitations
-- Domain names could not be used as hosts (HTTP only)
 - Trojan via TLS 1.3
 - Direct IP connections bypass the proxy
 - On Windows builds before v10.0.16299 (including all Mobile versions), a VPN profile must be created manually with the following arguments:
