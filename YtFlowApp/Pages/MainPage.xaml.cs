@@ -112,16 +112,7 @@ namespace YtFlow.App.Pages
                         VpnPluginPackageFamilyName = Package.Current.Id.FamilyName,
                         RememberCredentials = false
                     };
-                    newProfile.Routes.Clear();
-                    newProfile.DomainNameInfoList.Clear();
-                    newProfile.DomainNameInfoList.Add(new VpnDomainNameInfo(".",
-                        VpnDomainNameType.Suffix,
-                        new List<HostName>() { new HostName("11.16.1.1") },
-                        Array.Empty<HostName>()));
-                    newProfile.ServerUris.Clear();
                     newProfile.ServerUris.Add(new Uri("https://github.com/YtFlow"));
-                    newProfile.AppTriggers.Clear();
-                    newProfile.TrafficFilters.Clear();
                     var addResult = await agent.AddProfileFromObjectAsync(newProfile);
                     if (addResult != VpnManagementErrorStatus.Ok)
                     {
