@@ -34,6 +34,7 @@ Note that packet capture is **not** enabled for the released packages due to hig
 ## Limitations
 - Trojan via TLS 1.3
 - Direct IP connections bypass the proxy
+- In a WSL 1 environment, prepend `1.1.1.1` to `/etc/resolv.conf` to apply the proxy. See [Troubleshooting Windows Subsystem for Linux - Bash loses network connectivity once connected to a VPN](https://docs.microsoft.com/en-us/windows/wsl/troubleshooting#bash-loses-network-connectivity-once-connected-to-a-vpn).
 - On Windows builds before v10.0.16299 (including all Mobile versions), a VPN profile must be created manually with the following arguments:
 
 | Name | Value |
