@@ -36,19 +36,27 @@ namespace YtFlow.App.Pages
         };
         private bool isBusy;
         private DisplayOrientations originalPerferredOrientation;
+        private Task<bool> captureInitTask = Task.FromResult(false);
 
         public QrCodePage()
         {
             this.InitializeComponent();
         }
 
-        protected override void OnNavigatedTo(NavigationEventArgs e)
+        protected async override void OnNavigatedTo(NavigationEventArgs e)
         {
             // Set device orientation to stick with the native one
             originalPerferredOrientation = DisplayInformation.AutoRotationPreferences;
             DisplayInformation.AutoRotationPreferences = DisplayInformation.GetForCurrentView().NativeOrientation;
-            InitVideoCapture();
-            InitVideoTimer();
+            captureInitTask = InitVideoCapture();
+            if (await captureInitTask)
+            {
+                InitVideoTimer();
+            }
+            else
+            {
+                Frame.GoBack();
+            }
         }
 
         protected async override void OnNavigatedFrom(NavigationEventArgs e)
@@ -57,8 +65,11 @@ namespace YtFlow.App.Pages
             DisplayInformation.AutoRotationPreferences = originalPerferredOrientation;
             timer.Stop();
             timer.Tick -= Timer_Tick;
-            await mediaCapture.StopPreviewAsync();
             isBusy = false;
+            if (await captureInitTask)
+            {
+                await mediaCapture.StopPreviewAsync();
+            }
         }
 
         private void InitVideoTimer()
@@ -181,13 +192,13 @@ namespace YtFlow.App.Pages
             });
         }
 
-        private async void InitVideoCapture()
+        private async Task<bool> InitVideoCapture()
         {
             var cameraDevice = await FindCameraDeviceByPanelAsync(Windows.Devices.Enumeration.Panel.Back);
             if (cameraDevice == null)
             {
                 await Utils.UiUtils.NotifyUser("No camera device found!");
-                return;
+                return false;
             }
 
             var settings = new MediaCaptureInitializationSettings
@@ -205,7 +216,7 @@ namespace YtFlow.App.Pages
             catch (UnauthorizedAccessException)
             {
                 await Utils.UiUtils.NotifyUser("Please turn on the camera permission of the app to ensure scan QR code normaly.");
-                return;
+                return false;
             }
 
             var focusControl = mediaCapture.VideoDeviceController.FocusControl;
@@ -245,6 +256,7 @@ namespace YtFlow.App.Pages
             {
                 await focusControl.FocusAsync();
             }
+            return true;
         }
 
         private static async Task<DeviceInformation> FindCameraDeviceByPanelAsync(Windows.Devices.Enumeration.Panel desiredPanel)
