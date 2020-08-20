@@ -117,7 +117,7 @@ namespace YtFlow.App.Pages
 
         private async void MethodComboBox_SelectionChanged (object sender, SelectionChangedEventArgs e)
         {
-            if (e.AddedItems.Contains("rc4-md5"))
+            if (e.RemovedItems.Count > 0 && e.AddedItems.Contains("rc4-md5"))
             {
                 var dialog = new MessageDialog("The chosen cipher has inherent weaknesses. DO NOT USE.", "Warning");
                 await dialog.ShowAsync();
