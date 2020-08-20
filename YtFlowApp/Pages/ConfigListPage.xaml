@@ -17,7 +17,12 @@
     </Page.Resources>
 
     <Grid>
-        <ListView ItemsSource="{x:Bind adapterConfigs, Mode=OneWay}" ItemClick="AdapterListView_ItemClick" SelectionMode="None" IsItemClickEnabled="True">
+        <ListView
+            x:Name="configList"
+            ItemsSource="{x:Bind adapterConfigs, Mode=OneWay}"
+            ItemClick="AdapterListView_ItemClick"
+            SelectionMode="None"
+            IsItemClickEnabled="True">
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="config:IAdapterConfig">
                     <StackPanel HorizontalAlignment="Stretch">
@@ -41,6 +46,17 @@
     </Grid>
     <Page.TopAppBar>
         <CommandBar x:Name="commandBar" DefaultLabelPosition="Right">
+            <AppBarButton
+                x:Name="selectButton"
+                Icon="Bullets"
+                Label="Select"
+                Click="SelectButton_Click" />
+            <AppBarButton
+                x:Name="selectAllButton"
+                Visibility="Collapsed"
+                Icon="SelectAll"
+                Label="Select All"
+                Click="SelectAllButton_Click" />
             <AppBarButton Icon="Add" Label="Create">
                 <AppBarButton.Flyout>
                     <controls:CommandBarFlyout>

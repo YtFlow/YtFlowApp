@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
+using Windows.Storage;
+using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
@@ -59,20 +61,38 @@ namespace YtFlow.App.Pages
         private async void RemoveButton_Click (object sender, RoutedEventArgs e)
         {
             var btn = (MenuFlyoutItem)sender;
-            var config = (IAdapterConfig)btn.DataContext;
-            var (_, result) = await Utils.UiUtils.NotifyUser("Remove this config?", primaryCommandText: "Yes");
+
+            IEnumerable<IAdapterConfig> configs;
+            ContentDialogResult result;
+            if (configList.SelectedItems.Count == 0)
+            {
+                (_, result) = await Utils.UiUtils.NotifyUser("Remove this config?", primaryCommandText: "Yes");
+                var config = (IAdapterConfig)((FrameworkElement)sender).DataContext;
+                configs = new[] { config };
+            }
+            else
+            {
+                (_, result) = await Utils.UiUtils.NotifyUser($"Remove {configList.SelectedItems.Count} configs?", primaryCommandText: "Yes");
+                configs = configList.SelectedItems.Cast<IAdapterConfig>();
+            }
             if (result != ContentDialogResult.Primary)
             {
                 return;
             }
             try
             {
-                File.Delete(config.Path);
-                adapterConfigs.Remove(config);
-                if (config.Path == AdapterConfig.GetDefaultConfigFilePath())
+                var defaultConfigPath = AdapterConfig.GetDefaultConfigFilePath();
+                var tasks = configs.Select(async config =>
                 {
-                    AdapterConfig.ClearDefaultConfigFilePath();
-                }
+                    var file = await StorageFile.GetFileFromPathAsync(config.Path);
+                    await file.DeleteAsync();
+                    adapterConfigs.Remove(config);
+                    if (config.Path == defaultConfigPath)
+                    {
+                        AdapterConfig.ClearDefaultConfigFilePath();
+                    }
+                });
+                await Task.WhenAll(tasks);
             }
             catch (Exception ex)
             {
@@ -113,12 +133,12 @@ namespace YtFlow.App.Pages
             });
         }
 
-        private void QrCodeShadowsocksButton_Click(object sender, RoutedEventArgs e)
+        private void QrCodeShadowsocksButton_Click (object sender, RoutedEventArgs e)
         {
             Frame.Navigate(typeof(QrCodeScannerPage));
         }
 
-        private async void ClipboardShadowsocksButton_Click(object sender, RoutedEventArgs e)
+        private async void ClipboardShadowsocksButton_Click (object sender, RoutedEventArgs e)
         {
             var content = Clipboard.GetContent();
             if (content.Contains(StandardDataFormats.Text))
@@ -128,10 +148,47 @@ namespace YtFlow.App.Pages
                 await Utils.ConfigUtils.SaveServersAsync(servers);
                 await LoadAdapterConfigs();
                 await Utils.UiUtils.NotifyUser($"Add {servers.Count} config in total", "OK");
-            } 
+            }
             else
             {
                 await Utils.UiUtils.NotifyUser($"No text in Clipboard");
+            }
+        }
+
+        private void SelectButton_Click (object sender, RoutedEventArgs e)
+        {
+            Frame.IsNavigationStackEnabled = false;
+            configList.SelectionMode = ListViewSelectionMode.Extended;
+            configList.IsItemClickEnabled = false;
+            selectAllButton.Visibility = Visibility.Visible;
+            selectButton.Visibility = Visibility.Collapsed;
+            SystemNavigationManager.GetForCurrentView().BackRequested += MultiSelect_BackRequest;
+            MainPage.OverrideGlobalBackNavigation = true;
+        }
+
+        private void MultiSelect_BackRequest (object sender, BackRequestedEventArgs e)
+        {
+            if (e.Handled)
+            {
+                return;
+            }
+            e.Handled = true;
+            SystemNavigationManager.GetForCurrentView().BackRequested -= MultiSelect_BackRequest;
+            configList.SelectionMode = ListViewSelectionMode.None;
+            configList.IsItemClickEnabled = true;
+            selectAllButton.Visibility = Visibility.Collapsed;
+            selectButton.Visibility = Visibility.Visible;
+        }
+
+        private void SelectAllButton_Click (object sender, RoutedEventArgs e)
+        {
+            if (configList.SelectedItems.Count == configList.Items.Count)
+            {
+                configList.SelectedItems.Clear();
+            }
+            else
+            {
+                configList.SelectAll();
             }
         }
     }
