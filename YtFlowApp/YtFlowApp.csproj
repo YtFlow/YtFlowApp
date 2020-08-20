@@ -140,8 +140,8 @@
     <Compile Include="Pages\NavigationPage.xaml.cs">
       <DependentUpon>NavigationPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Pages\QrCodePage.xaml.cs">
-      <DependentUpon>QrCodePage.xaml</DependentUpon>
+    <Compile Include="Pages\QrCodeScannerPage.xaml.cs">
+      <DependentUpon>QrCodeScannerPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\SettingPage.xaml.cs">
       <DependentUpon>SettingPage.xaml</DependentUpon>
@@ -239,7 +239,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Pages\QrCodePage.xaml">
+    <Page Include="Pages\QrCodeScannerPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

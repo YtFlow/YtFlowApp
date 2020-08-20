@@ -106,15 +106,16 @@ namespace YtFlow.App.Pages
         {
             Frame.Navigate(typeof(ConfigPage), new TrojanConfig()
             {
-                ServerHost = "127.0.0.1",
+                ServerHost = "example.com",
                 ServerPort = 443,
-                Name = "Connection " + (adapterConfigs.Count + 1)
+                Name = "Connection " + (adapterConfigs.Count + 1),
+                Password = "password1"
             });
         }
 
         private void QrCodeShadowsocksButton_Click(object sender, RoutedEventArgs e)
         {
-            Frame.Navigate(typeof(QrCodePage));
+            Frame.Navigate(typeof(QrCodeScannerPage));
         }
 
         private async void ClipboardShadowsocksButton_Click(object sender, RoutedEventArgs e)

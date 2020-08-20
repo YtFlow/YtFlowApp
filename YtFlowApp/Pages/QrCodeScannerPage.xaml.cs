@@ -26,7 +26,7 @@ namespace YtFlow.App.Pages
     /// <summary>
     /// 可用于自身或导航至 Frame 内部的空白页。
     /// </summary>
-    public sealed partial class QrCodePage : Page
+    public sealed partial class QrCodeScannerPage : Page
     {
         private Result result;
         private readonly MediaCapture mediaCapture = new MediaCapture();
@@ -38,7 +38,7 @@ namespace YtFlow.App.Pages
         private DisplayOrientations originalPerferredOrientation;
         private Task<bool> captureInitTask = Task.FromResult(false);
 
-        public QrCodePage()
+        public QrCodeScannerPage()
         {
             this.InitializeComponent();
         }
