@@ -9,6 +9,7 @@ using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
+using YtFlow.App.Utils;
 using YtFlow.Tunnel.Config;
 
 // https://go.microsoft.com/fwlink/?LinkId=234238 上介绍了“空白页”项模板
@@ -29,12 +30,26 @@ namespace YtFlow.App.Pages
 
         private async Task LoadAdapterConfigs ()
         {
-            var directory = await Utils.ConfigUtils.GetAdapterConfigDirectory();
-            var files = await directory.GetFilesAsync();
-            adapterConfigs.Clear();
-            foreach (var config in files.Select(f => AdapterConfig.GetConfigFromFilePath(f.Path)))
+            loadProgressBar.IsIndeterminate = true;
+            loadProgressBar.Visibility = Visibility.Visible;
+            try
             {
-                adapterConfigs.Add(config);
+                var directory = await ConfigUtils.GetAdapterConfigDirectoryAsync();
+                var files = await directory.GetFilesAsync();
+                adapterConfigs.Clear();
+                foreach (var config in files.Select(f => AdapterConfig.GetConfigFromFilePath(f.Path)))
+                {
+                    adapterConfigs.Add(config);
+                }
+            }
+            catch (Exception ex)
+            {
+                await UiUtils.NotifyUser("Error loading config list: " + ex.ToString());
+                Frame.GoBack();
+            }
+            finally
+            {
+                loadProgressBar.Visibility = Visibility.Collapsed;
             }
         }
 
@@ -62,41 +77,63 @@ namespace YtFlow.App.Pages
         {
             var btn = (MenuFlyoutItem)sender;
 
-            IEnumerable<IAdapterConfig> configs;
+            IList<object> configs;
             ContentDialogResult result;
             if (configList.SelectedItems.Count == 0)
             {
                 var config = (IAdapterConfig)((FrameworkElement)sender).DataContext;
-                configs = new[] { config };
-                (_, result) = await Utils.UiUtils.NotifyUser("Remove this config?", primaryCommandText: "Yes");
+                configs = new List<object>() { config };
+                (_, result) = await UiUtils.NotifyUser("Remove this config?", primaryCommandText: "Yes");
             }
             else
             {
-                configs = configList.SelectedItems.Cast<IAdapterConfig>();
-                (_, result) = await Utils.UiUtils.NotifyUser($"Remove {configList.SelectedItems.Count} configs?", primaryCommandText: "Yes");
+                configs = configList.SelectedItems;
+                (_, result) = await UiUtils.NotifyUser($"Remove {configList.SelectedItems.Count} configs?", primaryCommandText: "Yes");
             }
             if (result != ContentDialogResult.Primary)
             {
                 return;
             }
+            var deletedConfigs = new List<IAdapterConfig>(configs.Count);
+            loadProgressBar.IsIndeterminate = false;
+            loadProgressBar.Value = 0;
+            loadProgressBar.Visibility = Visibility.Visible;
             try
             {
                 var defaultConfigPath = AdapterConfig.GetDefaultConfigFilePath();
-                var tasks = configs.Select(async config =>
+                var tasks = configs.Select(async obj =>
                 {
+                    var config = (IAdapterConfig)obj;
                     var file = await StorageFile.GetFileFromPathAsync(config.Path);
                     await file.DeleteAsync();
-                    adapterConfigs.Remove(config);
+                    deletedConfigs.Add(config);
                     if (config.Path == defaultConfigPath)
                     {
                         AdapterConfig.ClearDefaultConfigFilePath();
                     }
+                    loadProgressBar.Value = (double)deletedConfigs.Count / configs.Count;
                 });
                 await Task.WhenAll(tasks);
             }
             catch (Exception ex)
             {
-                await Utils.UiUtils.NotifyUser("Error while deleting config file: " + ex.Message);
+                await UiUtils.NotifyUser("Error while deleting config file: " + ex.ToString());
+            }
+            finally
+            {
+                loadProgressBar.IsIndeterminate = true;
+                loadProgressBar.Visibility = Visibility.Collapsed;
+                if (deletedConfigs.Count == adapterConfigs.Count)
+                {
+                    adapterConfigs.Clear();
+                }
+                else
+                {
+                    foreach (var deleted in deletedConfigs)
+                    {
+                        adapterConfigs.Remove(deleted);
+                    }
+                }
             }
         }
 
@@ -141,17 +178,29 @@ namespace YtFlow.App.Pages
         private async void ClipboardPasteButton_Click (object sender, RoutedEventArgs e)
         {
             var content = Clipboard.GetContent();
-            if (content.Contains(StandardDataFormats.Text))
+            if (!content.Contains(StandardDataFormats.Text))
+            {
+                await UiUtils.NotifyUser("No text in Clipboard");
+            }
+            configList.IsEnabled = false;
+            loadProgressBar.IsIndeterminate = false;
+            loadProgressBar.Value = 0;
+            loadProgressBar.Visibility = Visibility.Visible;
+            try
             {
                 var text = await content.GetTextAsync();
-                var servers = Utils.ConfigUtils.DecodeServersFromLinks(text);
-                await Utils.ConfigUtils.SaveServersAsync(servers);
+                var result = await ConfigUtils.ImportLinksAsync(text, p => loadProgressBar.Value = p);
+                var notifyTask = UiUtils.NotifyUser(result.GenerateMessage());
+                // Complete updates in background
+                _ = result.Files.BatchCompleteUpdates();
                 await LoadAdapterConfigs();
-                await Utils.UiUtils.NotifyUser($"Add {servers.Count} config in total", "OK");
+                await notifyTask;
             }
-            else
+            finally
             {
-                await Utils.UiUtils.NotifyUser($"No text in Clipboard");
+                loadProgressBar.IsIndeterminate = true;
+                loadProgressBar.Visibility = Visibility.Collapsed;
+                configList.IsEnabled = true;
             }
         }
 

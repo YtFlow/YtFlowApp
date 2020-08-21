@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -236,6 +235,10 @@ namespace YtFlow.App.Pages
                 Frame.GoBack();
                 e.Handled = true;
             }
+            var navManager = SystemNavigationManager.GetForCurrentView();
+            navManager.AppViewBackButtonVisibility = Frame.CanGoBack
+                ? AppViewBackButtonVisibility.Visible
+                : AppViewBackButtonVisibility.Collapsed;
         }
 
         private void Frame_Navigated (object sender, NavigationEventArgs e)

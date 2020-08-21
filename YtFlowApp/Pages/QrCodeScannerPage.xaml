@@ -8,17 +8,57 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     mc:Ignorable="d">
 
+    <Page.Resources>
+        <Storyboard x:Name="warningTextStoryboard" Completed="warningTextStoryboard_Completed">
+            <DoubleAnimationUsingKeyFrames
+                Storyboard.TargetName="warningContainer"
+                Storyboard.TargetProperty="Opacity">
+                <LinearDoubleKeyFrame KeyTime="0:0:0.0" Value="0" />
+                <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="1">
+                    <EasingDoubleKeyFrame.EasingFunction>
+                        <ExponentialEase EasingMode="EaseOut" />
+                    </EasingDoubleKeyFrame.EasingFunction>
+                </EasingDoubleKeyFrame>
+                <LinearDoubleKeyFrame KeyTime="0:0:5.4" Value="1" />
+                <EasingDoubleKeyFrame KeyTime="0:0:5.8" Value="0">
+                    <EasingDoubleKeyFrame.EasingFunction>
+                        <ExponentialEase EasingMode="EaseIn" />
+                    </EasingDoubleKeyFrame.EasingFunction>
+                </EasingDoubleKeyFrame>
+            </DoubleAnimationUsingKeyFrames>
+        </Storyboard>
+    </Page.Resources>
     <Grid Background="Black">
         <Grid x:Name="ContentPanel">
+            <ProgressBar
+                x:Name="loadProgressBar"
+                VerticalAlignment="Top"
+                Visibility="Collapsed" />
             <!--  Perview  -->
             <CaptureElement x:Name="VideoCapture" Stretch="Uniform" />
             <!--  Tips  -->
-            <TextBlock
-                Margin="36"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Bottom"
-                Foreground="White"
-                Text="Take QR Code In The Preview" />
+            <StackPanel
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Bottom">
+                <TextBlock
+                    Margin="0, 0, 0, 4"
+                    TextAlignment="Center"
+                    Foreground="White"
+                    Text="Take QR Code In The Preview" />
+                <Border
+                    x:Name="warningContainer"
+                    Margin="0, 0, 0, 12"
+                    Padding="8"
+                    HorizontalAlignment="Center"
+                    Background="#88000000"
+                    Opacity="0">
+                    <TextBlock
+                        x:Name="warningText"
+                        HorizontalTextAlignment="Center"
+                        TextWrapping="NoWrap"
+                        Foreground="#FFF000" />
+                </Border>
+            </StackPanel>
         </Grid>
     </Grid>
     <Page.TopAppBar>

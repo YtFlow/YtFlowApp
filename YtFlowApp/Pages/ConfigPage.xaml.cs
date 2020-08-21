@@ -88,21 +88,12 @@ namespace YtFlow.App.Pages
             isSaving = true;
             try
             {
-                if (string.IsNullOrEmpty(config.Path))
-                {
-                    var dir = await Utils.ConfigUtils.GetAdapterConfigDirectory();
-                    var file = await dir.CreateFileAsync(Guid.NewGuid().ToString() + ".json", CreationCollisionOption.GenerateUniqueName);
-                    config.Path = file.Path;
-                }
-                CachedFileManager.DeferUpdates(await StorageFile.GetFileFromPathAsync(config.Path));
-                config.SaveToFile(config.Path);
-                AdapterConfig.SetDefaultConfigFilePath(config.Path);
-                await CachedFileManager.CompleteUpdatesAsync(await StorageFile.GetFileFromPathAsync(config.Path));
+                await ConfigUtils.SaveServerAsync(config);
                 Frame.GoBack();
             }
             catch (Exception ex)
             {
-                await Utils.UiUtils.NotifyUser("Cannot save config: " + ex.Message);
+                await UiUtils.NotifyUser("Cannot save config: " + ex.Message);
             }
             finally
             {

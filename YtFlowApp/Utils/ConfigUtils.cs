@@ -1,52 +1,114 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Storage;
+using Windows.Storage.Provider;
 using YtFlow.App.ConfigEncoding;
+using YtFlow.App.Models;
 using YtFlow.Tunnel.Config;
 
 namespace YtFlow.App.Utils
 {
-    internal class ConfigUtils
+    internal static class ConfigUtils
     {
-        public static async Task SaveServersAsync(List<IAdapterConfig> configs)
+        private static readonly List<IConfigDecoder> decoders = new List<IConfigDecoder>
         {
-            var lastConfig = "";
-            foreach (var config in configs)
+            new ShadowsocksConfigDecoder(),
+            new TrojanConfigDecoder()
+        };
+
+        public static async Task<StorageFile> SaveServerAsync (IAdapterConfig config)
+        {
+            StorageFile file;
+            if (string.IsNullOrEmpty(config.Path))
             {
-                if (string.IsNullOrEmpty(config.Path))
-                {
-                    var dir = await GetAdapterConfigDirectory();
-                    var file = await dir.CreateFileAsync(Guid.NewGuid().ToString() + ".json", CreationCollisionOption.GenerateUniqueName);
-                    config.Path = file.Path;
-                }
-                config.SaveToFile(config.Path);
-                lastConfig = config.Path;
+                config.Name = string.IsNullOrEmpty(config.Name) ? $"New {config.AdapterType} Config" : config.Name;
+                var dir = await GetAdapterConfigDirectoryAsync();
+                file = await dir.CreateFileAsync(Guid.NewGuid().ToString() + ".json", CreationCollisionOption.GenerateUniqueName);
+                config.Path = file.Path;
             }
-            if (!string.IsNullOrEmpty(lastConfig))
+            else
             {
-                AdapterConfig.SetDefaultConfigFilePath(lastConfig);
+                file = await StorageFile.GetFileFromPathAsync(config.Path);
             }
+            CachedFileManager.DeferUpdates(file);
+            await config.SaveToFileAsync(config.Path);
+            return file;
         }
 
-        public static IAsyncOperation<StorageFolder> GetAdapterConfigDirectory()
+        public static IAsyncOperation<StorageFolder> GetAdapterConfigDirectoryAsync ()
         {
             return ApplicationData.Current.RoamingFolder.CreateFolderAsync("configs", CreationCollisionOption.OpenIfExists);
         }
 
-        public static List<IAdapterConfig> GetServers(string data)
+        public static (List<IAdapterConfig> servers, List<string> unrecognized) DecodeServersFromLinks (string lines)
         {
-            var decoders = new List<IConfigDecoder> { new ShadowsocksConfigDecoder(), new TrojanConfigDecoder() };
-            foreach (var decoder in decoders)
+            var ret = new List<IAdapterConfig>();
+            var unrecognized = new List<string>();
+            using (var reader = new StringReader(lines))
             {
-                var configs = decoder.Decode(data);
-                if (configs != null && configs.Count > 0)
+                while (reader.ReadLine() is string line)
                 {
-                    return configs;
+                    if (decoders
+                        .Select(decoder => decoder.Decode(line.Trim()))
+                        .Where(c => c != null)
+                        .FirstOrDefault() is IAdapterConfig config)
+                    {
+                        ret.Add(config);
+                    }
+                    else
+                    {
+                        unrecognized.Add(line);
+                    }
                 }
             }
-            return new List<IAdapterConfig>();
+            return (ret, unrecognized);
+        }
+
+        public static async Task<LinkImportResult> ImportLinksAsync (string links, Action<double> onProgress = null)
+        {
+            var (servers, unrecognized) = DecodeServersFromLinks(links);
+            int saved = 0, failed = 0;
+            var errors = new Dictionary<string, string>();
+            var files = new List<StorageFile>(servers.Count);
+            await Task.WhenAll(servers.Select(async server =>
+            {
+                try
+                {
+                    files.Add(await SaveServerAsync(server));
+                    saved++;
+                }
+                catch (Exception ex)
+                {
+                    failed++;
+                    errors.TryAdd(ex.Message, ex.ToString());
+                }
+                finally
+                {
+                    onProgress?.Invoke((saved + failed) / (double)servers.Count * 100.0);
+                }
+            }));
+            return new LinkImportResult()
+            {
+                SavedCount = saved,
+                FailedCount = failed,
+                UnrecognizedLines = unrecognized,
+                Files = files,
+                Errors = errors
+            };
+        }
+
+        public static Task BatchCompleteUpdates (this List<StorageFile> files)
+        {
+            var tasks = new List<Task<FileUpdateStatus>>(files.Count);
+            foreach (var file in files)
+            {
+                tasks.Add(CachedFileManager.CompleteUpdatesAsync(file).AsTask());
+            }
+            return Task.WhenAll(tasks);
         }
     }
 }

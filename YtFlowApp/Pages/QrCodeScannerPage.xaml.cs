@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -11,7 +12,6 @@ using Windows.Media.Capture;
 using Windows.Media.Devices;
 using Windows.Media.MediaProperties;
 using Windows.Storage.Streams;
-using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Imaging;
@@ -28,22 +28,32 @@ namespace YtFlow.App.Pages
     /// </summary>
     public sealed partial class QrCodeScannerPage : Page
     {
-        private Result result;
+        private static readonly TimeSpan FADEIN_DURATION = TimeSpan.FromMilliseconds(200);
         private readonly MediaCapture mediaCapture = new MediaCapture();
         private readonly DispatcherTimer timer = new DispatcherTimer
         {
-            Interval = TimeSpan.FromSeconds(3)
+            Interval = TimeSpan.FromSeconds(2)
+        };
+        private readonly BarcodeReader barcodeReader = new BarcodeReader
+        {
+            AutoRotate = true,
+            Options = new ZXing.Common.DecodingOptions
+            {
+                TryHarder = true,
+                // https://github.com/micjahn/ZXing.Net/issues/242
+                PossibleFormats = new List<BarcodeFormat>() { BarcodeFormat.QR_CODE }
+            },
         };
         private bool isBusy;
         private DisplayOrientations originalPerferredOrientation;
         private Task<bool> captureInitTask = Task.FromResult(false);
 
-        public QrCodeScannerPage()
+        public QrCodeScannerPage ()
         {
             this.InitializeComponent();
         }
 
-        protected async override void OnNavigatedTo(NavigationEventArgs e)
+        protected async override void OnNavigatedTo (NavigationEventArgs e)
         {
             // Set device orientation to stick with the native one
             originalPerferredOrientation = DisplayInformation.AutoRotationPreferences;
@@ -53,13 +63,9 @@ namespace YtFlow.App.Pages
             {
                 InitVideoTimer();
             }
-            else
-            {
-                Frame.GoBack();
-            }
         }
 
-        protected async override void OnNavigatedFrom(NavigationEventArgs e)
+        protected async override void OnNavigatedFrom (NavigationEventArgs e)
         {
             // Unlock device orientation
             DisplayInformation.AutoRotationPreferences = originalPerferredOrientation;
@@ -68,40 +74,43 @@ namespace YtFlow.App.Pages
             isBusy = false;
             if (await captureInitTask)
             {
-                await mediaCapture.StopPreviewAsync();
+                try
+                {
+                    await mediaCapture.StopPreviewAsync();
+                }
+                catch (Exception) { }
             }
         }
 
-        private void InitVideoTimer()
+        private void InitVideoTimer ()
         {
             timer.Tick += Timer_Tick;
             timer.Start();
         }
 
-        private async void Timer_Tick(object sender, object e)
+        private async void Timer_Tick (object sender, object e)
         {
+            if (isBusy)
+            {
+                return;
+            }
             try
             {
-                if (!isBusy)
+                isBusy = true;
+                using (var stream = new InMemoryRandomAccessStream())
                 {
-                    isBusy = true;
-                    using (var stream = new InMemoryRandomAccessStream())
-                    {
-                        await mediaCapture.CapturePhotoToStreamAsync(ImageEncodingProperties.CreateJpeg(), stream);
-                        var writeableBmp = await ReadBitmap(stream, ".jpg");
-                        await Task.Factory.StartNew(async () => { await ScanBitmap(writeableBmp); });
-                    }
+                    await mediaCapture.CapturePhotoToStreamAsync(ImageEncodingProperties.CreateJpeg(), stream);
+                    var writeableBmp = await ReadBitmap(stream, ".jpg");
+                    await ScanBitmap(writeableBmp);
                 }
-                isBusy = false;
-                await Task.Delay(100);
             }
-            catch (Exception)
+            finally
             {
                 isBusy = false;
             }
         }
 
-        private static Guid DecoderIDFromFileExtension(string strExtension)
+        private static Guid DecoderIDFromFileExtension (string strExtension)
         {
             Guid encoderId;
             switch (strExtension.ToLower())
@@ -131,7 +140,7 @@ namespace YtFlow.App.Pages
         /// <param name="fileStream"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        public async static Task<WriteableBitmap> ReadBitmap(IRandomAccessStream fileStream, string type)
+        public async static Task<WriteableBitmap> ReadBitmap (IRandomAccessStream fileStream, string type)
         {
             var decoderId = DecoderIDFromFileExtension(type);
             var decoder = await BitmapDecoder.CreateAsync(decoderId, fileStream);
@@ -162,42 +171,68 @@ namespace YtFlow.App.Pages
         /// </summary>
         /// <param name="writeableBmp">图片</param>
         /// <returns></returns>
-        private async Task ScanBitmap(WriteableBitmap writeableBmp)
+        private async Task ScanBitmap (WriteableBitmap writeableBmp)
         {
-            var barcodeReader = new BarcodeReader
+            if (!(barcodeReader.Decode(writeableBmp) is Result qrResult))
             {
-                AutoRotate = true,
-                Options = new ZXing.Common.DecodingOptions { TryHarder = true }
-            };
-            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+                return;
+            }
+            var text = qrResult.Text;
+            var importResult = await ConfigUtils.ImportLinksAsync(text, p =>
             {
-                try
-                {
-                    result = barcodeReader.Decode(writeableBmp);
-                    if (result != null)
-                    {
-                        var text = result.Text;
-                        var servers = Utils.ConfigUtils.GetServers(text);
-                        if (servers.Count > 0)
-                        {
-                            await Utils.ConfigUtils.SaveServersAsync(servers);
-                            Frame.GoBack();
-                        }
-                    }
-                } 
-                catch
-                {
-                    //Ignored Zxing Inner Exception
-                }
+                ShowWarningText("Saving...");
+                loadProgressBar.Value = p;
             });
+            if (importResult.SavedCount > 0 || importResult.FailedCount > 0)
+            {
+                Frame.GoBack();
+                var notifyTask = UiUtils.NotifyUser(importResult.GenerateMessage());
+                // Complete updates in background
+                _ = importResult.Files.BatchCompleteUpdates();
+                await notifyTask;
+            }
+            else if (importResult.UnrecognizedLines.Count > 0)
+            {
+                if (text.Length >= 30)
+                {
+                    ToolTipService.SetToolTip(warningText, text);
+                    ShowWarningText($"No recognizable content. ({text.Substring(0, 30)}...)");
+                }
+                else
+                {
+                    ToolTipService.SetToolTip(warningText, null);
+                    ShowWarningText($"No recognizable content. ({text})");
+                }
+            }
+            else
+            {
+                ToolTipService.SetToolTip(warningText, null);
+                ShowWarningText("No Content");
+            }
         }
 
-        private async Task<bool> InitVideoCapture()
+        private void ShowWarningText (string text)
+        {
+            if (warningText.Text == text)
+            {
+                if (warningTextStoryboard.GetCurrentTime() > FADEIN_DURATION)
+                {
+                    warningTextStoryboard.Seek(FADEIN_DURATION);
+                }
+            }
+            else
+            {
+                warningText.Text = text;
+                warningTextStoryboard.Begin();
+            }
+        }
+
+        private async Task<bool> InitVideoCapture ()
         {
             var cameraDevice = await FindCameraDeviceByPanelAsync(Windows.Devices.Enumeration.Panel.Back);
             if (cameraDevice == null)
             {
-                await Utils.UiUtils.NotifyUser("No camera device found!");
+                await UiUtils.NotifyUser("No camera device found!");
                 return false;
             }
 
@@ -215,7 +250,7 @@ namespace YtFlow.App.Pages
             }
             catch (UnauthorizedAccessException)
             {
-                await Utils.UiUtils.NotifyUser("Please turn on the camera permission of the app to ensure scan QR code normaly.");
+                await UiUtils.NotifyUser("Please turn on the camera permission of the app to ensure scan QR code normaly.");
                 return false;
             }
 
@@ -259,14 +294,14 @@ namespace YtFlow.App.Pages
             return true;
         }
 
-        private static async Task<DeviceInformation> FindCameraDeviceByPanelAsync(Windows.Devices.Enumeration.Panel desiredPanel)
+        private static async Task<DeviceInformation> FindCameraDeviceByPanelAsync (Windows.Devices.Enumeration.Panel desiredPanel)
         {
             var allVideoDevices = await DeviceInformation.FindAllAsync(DeviceClass.VideoCapture);
             var desiredDevice = allVideoDevices.FirstOrDefault(x => x.EnclosureLocation != null && x.EnclosureLocation.Panel == desiredPanel);
             return desiredDevice ?? allVideoDevices.FirstOrDefault();
         }
 
-        private async void FromPictureButton_Click(object sender, RoutedEventArgs e)
+        private async void FromPictureButton_Click (object sender, RoutedEventArgs e)
         {
             var picker = new Windows.Storage.Pickers.FileOpenPicker
             {
@@ -280,9 +315,14 @@ namespace YtFlow.App.Pages
                 using (var stream = await file.OpenAsync(Windows.Storage.FileAccessMode.Read))
                 {
                     var writeableBmp = await ReadBitmap(stream, file.FileType);
-                    await Task.Factory.StartNew(async () => { await ScanBitmap(writeableBmp); });
+                    await ScanBitmap(writeableBmp);
                 }
             }
+        }
+
+        private void warningTextStoryboard_Completed (object sender, object e)
+        {
+            warningText.Text = string.Empty;
         }
     }
 }

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -14,22 +12,7 @@ namespace YtFlow.App.ConfigEncoding
 
         private static readonly Regex InfoMatch = new Regex(@"^((?<method>.+?):(?<password>.*)@(?<host>.+?):(?<port>\d+?))$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-        public List<IAdapterConfig> Decode(string data)
-        {
-            var uris = data.Split(new[] { '\r', '\n', ' ' }, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim());
-            var servers = new List<IAdapterConfig>();
-            foreach (var uri in uris)
-            {
-                var config = DecodeUriToConfig(uri);
-                if (config != null)
-                {
-                    servers.Add(config);
-                }
-            }
-            return servers;
-        }
-
-        private static ShadowsocksConfig DecodeOldUrl(string url)
+        private static ShadowsocksConfig DecodeOldUrl (string url)
         {
             var match = SchemeMatch.Match(url);
             if (!match.Success)
@@ -41,28 +24,64 @@ namespace YtFlow.App.ConfigEncoding
             {
                 name = WebUtility.UrlDecode(tag);
             }
-            var infos = InfoMatch.Match(Encoding.UTF8.GetString(Convert.FromBase64String(
-                base64.PadRight(base64.Length + (4 - base64.Length % 4) % 4, '='))));
-            if (!infos.Success)
+            Match infos;
+            try
+            {
+                infos = InfoMatch.Match(Encoding.UTF8.GetString(Convert.FromBase64String(
+                    base64.PadRight(base64.Length + (4 - base64.Length % 4) % 4, '='))));
+            }
+            catch (Exception)
+            {
                 return null;
+            }
+            if (!infos.Success
+                || !int.TryParse(infos.Groups["port"].Value, out var port))
+            {
+                return null;
+            }
             return new ShadowsocksConfig
             {
                 Name = name,
                 Method = infos.Groups["method"].Value,
                 Password = infos.Groups["password"].Value,
                 ServerHost = infos.Groups["host"].Value,
-                ServerPort = int.Parse(infos.Groups["port"].Value)
+                ServerPort = port,
             };
         }
 
-        private static ShadowsocksConfig DecodeUriToConfig(string ssUri)
+        public IAdapterConfig Decode (string link)
         {
-            if (string.IsNullOrEmpty(ssUri) || !ssUri.StartsWith("ss://", StringComparison.OrdinalIgnoreCase))
+            try
+            {
+                return DecodeImpl(link);
+            }
+            catch (FormatException)
+            {
                 return null;
-            var config = DecodeOldUrl(ssUri);
+            }
+        }
+        /// <summary>
+        /// Decode a Shadowsocks server aggressively
+        /// </summary>
+        /// <param name="link">URI</param>
+        /// <exception cref="FormatException">
+        ///     The link is not a valid URI,
+        ///     or the user info part is not a valid Base64 string,
+        ///     or the user info part contains invalid Unicode code points.
+        /// </exception>
+        /// <returns>A Shadowsocks server for a valid URI, otherwise null.</returns>
+        private IAdapterConfig DecodeImpl (string link)
+        {
+            if (string.IsNullOrEmpty(link) || !link.StartsWith("ss://", StringComparison.OrdinalIgnoreCase))
+                return null;
+            var config = DecodeOldUrl(link);
             if (config == null)
             {
-                var uri = new Uri(ssUri);
+                var uri = new Uri(link);
+                if (!uri.IsAbsoluteUri)
+                {
+                    return null;
+                }
                 var name = WebUtility.UrlDecode(uri.GetComponents(UriComponents.Fragment, UriFormat.Unescaped));
                 var host = uri.IdnHost;
                 var port = uri.Port;

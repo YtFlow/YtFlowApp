@@ -17,6 +17,11 @@
     </Page.Resources>
 
     <Grid>
+        <ProgressBar
+            x:Name="loadProgressBar"
+            VerticalAlignment="Top"
+            IsIndeterminate="True"
+            Visibility="Collapsed" />
         <ListView
             x:Name="configList"
             ItemsSource="{x:Bind adapterConfigs, Mode=OneWay}"

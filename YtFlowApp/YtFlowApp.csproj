@@ -123,6 +123,7 @@
     <Compile Include="Converters\AdapterTypeToDisplayNameConverter.cs" />
     <Compile Include="Converters\ConnectionStatusToIsEnabledConverter.cs" />
     <Compile Include="Converters\ConnectionStatusToIsCheckedConverter.cs" />
+    <Compile Include="Models\LinkImportResult.cs" />
     <Compile Include="Models\TunnelConnectionStatus.cs" />
     <Compile Include="Pages\AboutPage.xaml.cs">
       <DependentUpon>AboutPage.xaml</DependentUpon>
