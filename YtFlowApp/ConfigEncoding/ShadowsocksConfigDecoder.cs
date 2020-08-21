@@ -63,7 +63,7 @@ namespace YtFlow.App.ConfigEncoding
             if (config == null)
             {
                 var uri = new Uri(ssUri);
-                var name = uri.GetComponents(UriComponents.Fragment, UriFormat.Unescaped);
+                var name = WebUtility.UrlDecode(uri.GetComponents(UriComponents.Fragment, UriFormat.Unescaped));
                 var host = uri.IdnHost;
                 var port = uri.Port;
                 var rawInfos = uri.GetComponents(UriComponents.UserInfo, UriFormat.Unescaped);
