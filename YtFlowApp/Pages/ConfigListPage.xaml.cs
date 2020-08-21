@@ -66,14 +66,14 @@ namespace YtFlow.App.Pages
             ContentDialogResult result;
             if (configList.SelectedItems.Count == 0)
             {
-                (_, result) = await Utils.UiUtils.NotifyUser("Remove this config?", primaryCommandText: "Yes");
                 var config = (IAdapterConfig)((FrameworkElement)sender).DataContext;
                 configs = new[] { config };
+                (_, result) = await Utils.UiUtils.NotifyUser("Remove this config?", primaryCommandText: "Yes");
             }
             else
             {
-                (_, result) = await Utils.UiUtils.NotifyUser($"Remove {configList.SelectedItems.Count} configs?", primaryCommandText: "Yes");
                 configs = configList.SelectedItems.Cast<IAdapterConfig>();
+                (_, result) = await Utils.UiUtils.NotifyUser($"Remove {configList.SelectedItems.Count} configs?", primaryCommandText: "Yes");
             }
             if (result != ContentDialogResult.Primary)
             {
@@ -133,18 +133,18 @@ namespace YtFlow.App.Pages
             });
         }
 
-        private void QrCodeShadowsocksButton_Click (object sender, RoutedEventArgs e)
+        private void QrCodeScanButton_Click (object sender, RoutedEventArgs e)
         {
             Frame.Navigate(typeof(QrCodeScannerPage));
         }
 
-        private async void ClipboardShadowsocksButton_Click (object sender, RoutedEventArgs e)
+        private async void ClipboardPasteButton_Click (object sender, RoutedEventArgs e)
         {
             var content = Clipboard.GetContent();
             if (content.Contains(StandardDataFormats.Text))
             {
                 var text = await content.GetTextAsync();
-                var servers = Utils.ConfigUtils.GetServers(text);
+                var servers = Utils.ConfigUtils.DecodeServersFromLinks(text);
                 await Utils.ConfigUtils.SaveServersAsync(servers);
                 await LoadAdapterConfigs();
                 await Utils.UiUtils.NotifyUser($"Add {servers.Count} config in total", "OK");
