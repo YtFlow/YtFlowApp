@@ -84,7 +84,7 @@ namespace YtFlow.App.Utils
                 catch (Exception ex)
                 {
                     failed++;
-                    errors.TryAdd(ex.Message, ex.ToString());
+                    errors[ex.Message] = ex.ToString();
                 }
                 finally
                 {
