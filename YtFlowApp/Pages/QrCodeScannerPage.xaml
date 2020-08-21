@@ -29,7 +29,11 @@
         </Storyboard>
     </Page.Resources>
     <Grid Background="Black">
-        <Grid x:Name="ContentPanel">
+        <Grid
+            x:Name="ContentPanel"
+            AllowDrop="True"
+            DragOver="ContentPanel_DragOver"
+            Drop="ContentPanel_Drop">
             <ProgressBar
                 x:Name="loadProgressBar"
                 VerticalAlignment="Top"

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.DataTransfer;
 using Windows.Devices.Enumeration;
 using Windows.Foundation;
 using Windows.Graphics.Display;
@@ -11,7 +12,9 @@ using Windows.Graphics.Imaging;
 using Windows.Media.Capture;
 using Windows.Media.Devices;
 using Windows.Media.MediaProperties;
+using Windows.Storage;
 using Windows.Storage.Streams;
+using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Imaging;
@@ -30,6 +33,12 @@ namespace YtFlow.App.Pages
     {
         private static readonly TimeSpan FADEIN_DURATION = TimeSpan.FromMilliseconds(200);
         private readonly MediaCapture mediaCapture = new MediaCapture();
+        private readonly List<string> fileTypeFilter = new List<string>()
+        {
+            "jpg", "jpeg",
+            "png",
+            "bmp"
+        };
         private readonly DispatcherTimer timer = new DispatcherTimer
         {
             Interval = TimeSpan.FromSeconds(2)
@@ -44,7 +53,8 @@ namespace YtFlow.App.Pages
                 PossibleFormats = new List<BarcodeFormat>() { BarcodeFormat.QR_CODE }
             },
         };
-        private bool isBusy;
+        private Task ScanImportTask = Task.CompletedTask;
+        private bool clipboardChanged = false;
         private DisplayOrientations originalPerferredOrientation;
         private Task<bool> captureInitTask = Task.FromResult(false);
 
@@ -63,6 +73,8 @@ namespace YtFlow.App.Pages
             {
                 InitVideoTimer();
             }
+            Clipboard.ContentChanged += Clipboard_ContentChanged;
+            Window.Current.Activated += CurrentWindow_Activated;
         }
 
         protected async override void OnNavigatedFrom (NavigationEventArgs e)
@@ -71,7 +83,7 @@ namespace YtFlow.App.Pages
             DisplayInformation.AutoRotationPreferences = originalPerferredOrientation;
             timer.Stop();
             timer.Tick -= Timer_Tick;
-            isBusy = false;
+            ScanImportTask = Task.CompletedTask;
             if (await captureInitTask)
             {
                 try
@@ -79,6 +91,63 @@ namespace YtFlow.App.Pages
                     await mediaCapture.StopPreviewAsync();
                 }
                 catch (Exception) { }
+            }
+            Clipboard.ContentChanged -= Clipboard_ContentChanged;
+            Window.Current.Activated -= CurrentWindow_Activated;
+        }
+
+        private void CurrentWindow_Activated (object sender, WindowActivatedEventArgs e)
+        {
+            if (clipboardChanged)
+            {
+                FromClipboard();
+            }
+        }
+
+        private void Clipboard_ContentChanged (object sender, object e)
+        {
+            clipboardChanged = true;
+            ShowWarningText("Clipboard changes detected");
+        }
+
+        private async void FromClipboard ()
+        {
+            await ScanImportTask;
+            // If clipboardChanged becomes false, importing has done.
+            if (!clipboardChanged)
+            {
+                // No need to scan from clipboard.
+                return;
+            }
+            clipboardChanged = false;
+            ScanImportTask = FromSharedDataImpl(Clipboard.GetContent(), true);
+        }
+
+        private async Task FromSharedDataImpl (DataPackageView content, bool prompt)
+        {
+            if (content.Contains(StandardDataFormats.Bitmap))
+            {
+                var streamRef = await content.GetBitmapAsync();
+                using (var stream = await streamRef.OpenReadAsync())
+                {
+                    var contentType = stream.ContentType;
+                    var bitmap = await ReadBitmap(stream, "." + contentType.Substring(contentType.IndexOf('/') + 1));
+                    await ScanBitmap(bitmap, prompt ? "Import from copied QR Code image?" : null);
+                }
+            }
+            else if (content.Contains(StandardDataFormats.StorageItems))
+            {
+                var items = await content.GetStorageItemsAsync();
+                foreach (var file in items
+                    .Select(f => f as StorageFile)
+                    .Where(f => f != null && fileTypeFilter.Any(t => f.Name.EndsWith(t))))
+                {
+                    using (var stream = await file.OpenAsync(FileAccessMode.Read))
+                    {
+                        var writeableBmp = await ReadBitmap(stream, file.FileType);
+                        await ScanBitmap(writeableBmp, prompt ? $"Import from copied file {file.Name} containing a QR Code?" : null);
+                    }
+                }
             }
         }
 
@@ -88,25 +157,21 @@ namespace YtFlow.App.Pages
             timer.Start();
         }
 
-        private async void Timer_Tick (object sender, object e)
+        private async Task Timer_TickImpl (object sender, object e)
         {
-            if (isBusy)
+            using (var stream = new InMemoryRandomAccessStream())
             {
-                return;
+                await mediaCapture.CapturePhotoToStreamAsync(ImageEncodingProperties.CreateJpeg(), stream);
+                var writeableBmp = await ReadBitmap(stream, ".jpg");
+                await ScanBitmap(writeableBmp);
             }
-            try
+        }
+
+        private void Timer_Tick (object sender, object e)
+        {
+            if (ScanImportTask.IsCompleted)
             {
-                isBusy = true;
-                using (var stream = new InMemoryRandomAccessStream())
-                {
-                    await mediaCapture.CapturePhotoToStreamAsync(ImageEncodingProperties.CreateJpeg(), stream);
-                    var writeableBmp = await ReadBitmap(stream, ".jpg");
-                    await ScanBitmap(writeableBmp);
-                }
-            }
-            finally
-            {
-                isBusy = false;
+                ScanImportTask = Timer_TickImpl(sender, e);
             }
         }
 
@@ -170,14 +235,23 @@ namespace YtFlow.App.Pages
         /// 解析二维码图片
         /// </summary>
         /// <param name="writeableBmp">图片</param>
+        /// <param name="promptBeforeImport">导入前向用户确认的消息，null 表示不确认直接导入。</param>
         /// <returns></returns>
-        private async Task ScanBitmap (WriteableBitmap writeableBmp)
+        private async Task ScanBitmap (WriteableBitmap writeableBmp, string promptMessage = null)
         {
             if (!(barcodeReader.Decode(writeableBmp) is Result qrResult))
             {
                 return;
             }
             var text = qrResult.Text;
+            if (promptMessage is string prompt)
+            {
+                var (_secondaryAsClose, result) = await UiUtils.NotifyUser(prompt, "QR Code detected", "Yes");
+                if (result != ContentDialogResult.Primary)
+                {
+                    return;
+                }
+            }
             var importResult = await ConfigUtils.ImportLinksAsync(text, p =>
             {
                 ShowWarningText("Saving...");
@@ -185,6 +259,8 @@ namespace YtFlow.App.Pages
             });
             if (importResult.SavedCount > 0 || importResult.FailedCount > 0)
             {
+                // Avoid reading clipboard after importing
+                clipboardChanged = false;
                 Frame.GoBack();
                 var notifyTask = UiUtils.NotifyUser(importResult.GenerateMessage());
                 // Complete updates in background
@@ -312,7 +388,7 @@ namespace YtFlow.App.Pages
             var file = await picker.PickSingleFileAsync();
             if (file != null)
             {
-                using (var stream = await file.OpenAsync(Windows.Storage.FileAccessMode.Read))
+                using (var stream = await file.OpenAsync(FileAccessMode.Read))
                 {
                     var writeableBmp = await ReadBitmap(stream, file.FileType);
                     await ScanBitmap(writeableBmp);
@@ -323,6 +399,21 @@ namespace YtFlow.App.Pages
         private void warningTextStoryboard_Completed (object sender, object e)
         {
             warningText.Text = string.Empty;
+        }
+
+        private void ContentPanel_DragOver (object sender, DragEventArgs e)
+        {
+            e.AcceptedOperation = DataPackageOperation.Copy;
+            if (e.DataView.Contains(StandardDataFormats.Bitmap)
+                || e.DataView.Contains(StandardDataFormats.StorageItems))
+            {
+                ShowWarningText("Drop to import");
+            }
+        }
+
+        private void ContentPanel_Drop (object sender, DragEventArgs e)
+        {
+            ScanImportTask = FromSharedDataImpl(e.DataView, false);
         }
     }
 }
