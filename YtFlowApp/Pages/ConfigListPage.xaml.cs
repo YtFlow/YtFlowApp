@@ -5,10 +5,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
-using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
+using YtFlow.App.ConfigEncoding;
 using YtFlow.App.Utils;
 using YtFlow.Tunnel.Config;
 
@@ -57,6 +57,24 @@ namespace YtFlow.App.Pages
             base.OnNavigatedTo(e);
 
             await LoadAdapterConfigs();
+        }
+
+        protected override void OnNavigatingFrom (NavigatingCancelEventArgs e)
+        {
+            base.OnNavigatingFrom(e);
+
+            if (e.Cancel)
+            {
+                return;
+            }
+            if (selectButton.Visibility == Visibility.Collapsed)
+            {
+                if (e.NavigationMode == NavigationMode.Back)
+                {
+                    e.Cancel = true;
+                }
+                ExitMultiSelectMode();
+            }
         }
 
         private void AdapterListView_ItemClick (object sender, ItemClickEventArgs e)
@@ -209,23 +227,19 @@ namespace YtFlow.App.Pages
 
         private void SelectButton_Click (object sender, RoutedEventArgs e)
         {
-            Frame.IsNavigationStackEnabled = false;
+            EnterMultiSelectMode();
+        }
+
+        private void EnterMultiSelectMode ()
+        {
             configList.SelectionMode = ListViewSelectionMode.Extended;
             configList.IsItemClickEnabled = false;
             selectAllButton.Visibility = Visibility.Visible;
             selectButton.Visibility = Visibility.Collapsed;
-            SystemNavigationManager.GetForCurrentView().BackRequested += MultiSelect_BackRequest;
-            MainPage.OverrideGlobalBackNavigation = true;
         }
 
-        private void MultiSelect_BackRequest (object sender, BackRequestedEventArgs e)
+        private void ExitMultiSelectMode ()
         {
-            if (e.Handled)
-            {
-                return;
-            }
-            e.Handled = true;
-            SystemNavigationManager.GetForCurrentView().BackRequested -= MultiSelect_BackRequest;
             configList.SelectionMode = ListViewSelectionMode.None;
             configList.IsItemClickEnabled = true;
             selectAllButton.Visibility = Visibility.Collapsed;
@@ -241,6 +255,49 @@ namespace YtFlow.App.Pages
             else
             {
                 configList.SelectAll();
+            }
+        }
+
+        private void CopyShareLinkButton_Click (object sender, RoutedEventArgs e)
+        {
+            IEnumerable<IAdapterConfig> configs;
+            if (configList.SelectedItems.Count == 0)
+            {
+                var config = (IAdapterConfig)((FrameworkElement)sender).DataContext;
+                configs = new[] { config };
+            }
+            else
+            {
+                configs = configList.SelectedItems.Cast<IAdapterConfig>();
+            }
+
+            int encoded = 0, ignored = 0;
+            var ret = string.Join(Environment.NewLine, configs.Select(c =>
+            {
+                try
+                {
+                    encoded++;
+                    return c.Encode();
+                }
+                catch (NotSupportedException)
+                {
+                    encoded--;
+                    ignored++;
+                    return null;
+                }
+            }).Where(s => s != null));
+
+            var dataPackage = new DataPackage();
+            dataPackage.SetText(ret);
+            Clipboard.SetContent(dataPackage);
+
+            if (ignored == 0)
+            {
+                _ = UiUtils.NotifyUser($"Copied {encoded} share links");
+            }
+            else
+            {
+                _ = UiUtils.NotifyUser($"Copied {encoded} share links ({ignored} ignored)");
             }
         }
     }

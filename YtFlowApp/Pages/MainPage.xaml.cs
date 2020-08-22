@@ -28,7 +28,6 @@ namespace YtFlow.App.Pages
         private const string PROFILE_NAME = "YtFlow Auto";
         private static readonly bool newWindowsBuild = ApiInformation.IsApiContractPresent("Windows.Foundation.UniversalApiContract", 7);
         public static readonly DependencyProperty TunnelConnectionStatusProperty = DependencyProperty.Register(nameof(TunnelConnectionStatus), typeof(TunnelConnectionStatus), typeof(MainPage), null);
-        public static bool OverrideGlobalBackNavigation = false;
 
         bool pageDisplaying;
 
@@ -223,11 +222,6 @@ namespace YtFlow.App.Pages
         {
             if (e.Handled)
             {
-                return;
-            }
-            if (OverrideGlobalBackNavigation)
-            {
-                OverrideGlobalBackNavigation = false;
                 return;
             }
             if (Frame.CanGoBack)
