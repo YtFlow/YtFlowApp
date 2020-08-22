@@ -19,6 +19,7 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
+using YtFlow.App.Models;
 using YtFlow.App.Utils;
 using ZXing;
 
@@ -75,6 +76,10 @@ namespace YtFlow.App.Pages
             }
             Clipboard.ContentChanged += Clipboard_ContentChanged;
             Window.Current.Activated += CurrentWindow_Activated;
+
+            // Trigger clipboard check once
+            clipboardChanged = true;
+            FromClipboard();
         }
 
         protected async override void OnNavigatedFrom (NavigationEventArgs e)
@@ -252,11 +257,22 @@ namespace YtFlow.App.Pages
                     return;
                 }
             }
-            var importResult = await ConfigUtils.ImportLinksAsync(text, p =>
+            loadProgressBar.Visibility = Visibility.Visible;
+            loadProgressBar.IsIndeterminate = true;
+            LinkImportResult importResult;
+            try
             {
-                ShowWarningText("Saving...");
-                loadProgressBar.Value = p;
-            });
+                importResult = await ConfigUtils.ImportLinksAsync(text, p =>
+                {
+                    ShowWarningText("Saving...");
+                    loadProgressBar.IsIndeterminate = false;
+                    loadProgressBar.Value = p;
+                });
+            }
+            finally
+            {
+                loadProgressBar.Visibility = Visibility.Collapsed;
+            }
             if (importResult.SavedCount > 0 || importResult.FailedCount > 0)
             {
                 // Avoid reading clipboard after importing

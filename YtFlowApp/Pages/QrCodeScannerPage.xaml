@@ -34,12 +34,14 @@
             AllowDrop="True"
             DragOver="ContentPanel_DragOver"
             Drop="ContentPanel_Drop">
+            <!--  Perview  -->
+            <!--  Must be placed in prior to any other elements -->
+            <CaptureElement x:Name="VideoCapture" Stretch="Uniform" />
+            <!--  Progress indicator -->
             <ProgressBar
                 x:Name="loadProgressBar"
                 VerticalAlignment="Top"
                 Visibility="Collapsed" />
-            <!--  Perview  -->
-            <CaptureElement x:Name="VideoCapture" Stretch="Uniform" />
             <!--  Tips  -->
             <StackPanel
                 HorizontalAlignment="Stretch"

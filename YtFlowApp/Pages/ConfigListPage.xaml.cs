@@ -30,7 +30,6 @@ namespace YtFlow.App.Pages
 
         private async Task LoadAdapterConfigs ()
         {
-            loadProgressBar.IsIndeterminate = true;
             loadProgressBar.Visibility = Visibility.Visible;
             try
             {
@@ -121,8 +120,6 @@ namespace YtFlow.App.Pages
             }
             finally
             {
-                loadProgressBar.IsIndeterminate = true;
-                loadProgressBar.Visibility = Visibility.Collapsed;
                 if (deletedConfigs.Count == adapterConfigs.Count)
                 {
                     adapterConfigs.Clear();
@@ -134,6 +131,8 @@ namespace YtFlow.App.Pages
                         adapterConfigs.Remove(deleted);
                     }
                 }
+                loadProgressBar.IsIndeterminate = true;
+                loadProgressBar.Visibility = Visibility.Collapsed;
             }
         }
 
@@ -183,13 +182,17 @@ namespace YtFlow.App.Pages
                 await UiUtils.NotifyUser("No text in Clipboard");
             }
             configList.IsEnabled = false;
-            loadProgressBar.IsIndeterminate = false;
+            loadProgressBar.IsIndeterminate = true;
             loadProgressBar.Value = 0;
             loadProgressBar.Visibility = Visibility.Visible;
             try
             {
                 var text = await content.GetTextAsync();
-                var result = await ConfigUtils.ImportLinksAsync(text, p => loadProgressBar.Value = p);
+                var result = await ConfigUtils.ImportLinksAsync(text, p =>
+                {
+                    loadProgressBar.IsIndeterminate = false;
+                    loadProgressBar.Value = p;
+                });
                 var notifyTask = UiUtils.NotifyUser(result.GenerateMessage());
                 // Complete updates in background
                 _ = result.Files.BatchCompleteUpdates();

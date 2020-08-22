@@ -88,7 +88,8 @@ namespace YtFlow.App.Pages
             isSaving = true;
             try
             {
-                await ConfigUtils.SaveServerAsync(config);
+                var file = await ConfigUtils.SaveServerAsync(config);
+                await CachedFileManager.CompleteUpdatesAsync(file);
                 Frame.GoBack();
             }
             catch (Exception ex)
