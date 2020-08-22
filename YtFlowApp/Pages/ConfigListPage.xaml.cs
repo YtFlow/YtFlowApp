@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
@@ -194,18 +195,53 @@ namespace YtFlow.App.Pages
 
         private async void ClipboardPasteButton_Click (object sender, RoutedEventArgs e)
         {
-            var content = Clipboard.GetContent();
-            if (!content.Contains(StandardDataFormats.Text))
+            string text;
+            try
+            {
+                text = await GetTextFromClipboard();
+            }
+            catch (Exception ex)
+            {
+                await UiUtils.NotifyUser("Error reading clipboard data: " + ex.ToString());
+                return;
+            }
+            if (string.IsNullOrWhiteSpace(text))
             {
                 await UiUtils.NotifyUser("No text in Clipboard");
+                return;
             }
+            await ImportShareLinks(text);
+        }
+        private async Task<string> GetTextFromClipboard ()
+        {
+            var content = Clipboard.GetContent();
+            if (content.Contains(StandardDataFormats.Text))
+            {
+                return await content.GetTextAsync();
+            }
+            else if (content.Contains(StandardDataFormats.StorageItems))
+            {
+                var items = await content.GetStorageItemsAsync();
+                var sb = new StringBuilder();
+                foreach (var file in items
+                    .Select(f => f as StorageFile)
+                    .Where(f => f != null && f.ContentType.Contains("text")))
+                {
+                    sb.AppendLine(await FileIO.ReadTextAsync(file));
+                }
+                return sb.ToString();
+            }
+            return null;
+        }
+
+        private async Task ImportShareLinks (string text)
+        {
             configList.IsEnabled = false;
             loadProgressBar.IsIndeterminate = true;
             loadProgressBar.Value = 0;
             loadProgressBar.Visibility = Visibility.Visible;
             try
             {
-                var text = await content.GetTextAsync();
                 var result = await ConfigUtils.ImportLinksAsync(text, p =>
                 {
                     loadProgressBar.IsIndeterminate = false;

@@ -125,9 +125,20 @@ namespace YtFlow.App.Pages
                 return;
             }
             clipboardChanged = false;
-            ScanImportTask = FromSharedDataImpl(Clipboard.GetContent(), true);
+            ScanImportTask = FromSharedData(Clipboard.GetContent(), true);
         }
 
+        private async Task FromSharedData (DataPackageView content, bool prompt)
+        {
+            try
+            {
+                await FromSharedDataImpl(content, prompt);
+            }
+            catch (Exception ex)
+            {
+                await UiUtils.NotifyUser("Error reading shared content: " + ex.ToString());
+            }
+        }
         private async Task FromSharedDataImpl (DataPackageView content, bool prompt)
         {
             if (content.Contains(StandardDataFormats.Bitmap))
@@ -429,7 +440,7 @@ namespace YtFlow.App.Pages
 
         private void ContentPanel_Drop (object sender, DragEventArgs e)
         {
-            ScanImportTask = FromSharedDataImpl(e.DataView, false);
+            ScanImportTask = FromSharedData(e.DataView, false);
         }
     }
 }

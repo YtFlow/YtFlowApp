@@ -371,8 +371,7 @@
                 <FlyoutBase.AttachedFlyout>
                     <Flyout>
                         <StackPanel>
-                            <Image
-                                x:Name="qrImage" />
+                            <Image x:Name="qrImage" />
                             <StackPanel
                                 Margin="0, 10, 0, 10"
                                 HorizontalAlignment="Center"
