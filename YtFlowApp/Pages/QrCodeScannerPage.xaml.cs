@@ -33,7 +33,7 @@ namespace YtFlow.App.Pages
     public sealed partial class QrCodeScannerPage : Page
     {
         private static readonly TimeSpan FADEIN_DURATION = TimeSpan.FromMilliseconds(200);
-        private readonly MediaCapture mediaCapture = new MediaCapture();
+        private MediaCapture mediaCapture = null;
         private readonly List<string> fileTypeFilter = new List<string>()
         {
             "jpg", "jpeg",
@@ -64,7 +64,7 @@ namespace YtFlow.App.Pages
             this.InitializeComponent();
         }
 
-        protected async override void OnNavigatedTo (NavigationEventArgs e)
+        protected override async void OnNavigatedTo (NavigationEventArgs e)
         {
             // Set device orientation to stick with the native one
             originalPerferredOrientation = DisplayInformation.AutoRotationPreferences;
@@ -76,29 +76,50 @@ namespace YtFlow.App.Pages
             }
             Clipboard.ContentChanged += Clipboard_ContentChanged;
             Window.Current.Activated += CurrentWindow_Activated;
+            CoreWindow.GetForCurrentThread().VisibilityChanged += CoreWindow_VisibilityChanged;
 
             // Trigger clipboard check once
             clipboardChanged = true;
             FromClipboard();
         }
 
-        protected async override void OnNavigatedFrom (NavigationEventArgs e)
+        private async void CoreWindow_VisibilityChanged (CoreWindow sender, VisibilityChangedEventArgs args)
+        {
+            if (args.Visible)
+            {
+                captureInitTask = InitVideoCapture();
+            }
+            else
+            {
+                if (await captureInitTask)
+                {
+                    await mediaCapture.StopPreviewAsync();
+                    mediaCapture.Dispose();
+                    mediaCapture = null;
+                }
+            }
+        }
+
+        protected override async void OnNavigatedFrom (NavigationEventArgs e)
         {
             // Unlock device orientation
             DisplayInformation.AutoRotationPreferences = originalPerferredOrientation;
             timer.Stop();
             timer.Tick -= Timer_Tick;
             ScanImportTask = Task.CompletedTask;
-            if (await captureInitTask)
+            try
             {
-                try
+                if (await captureInitTask)
                 {
                     await mediaCapture.StopPreviewAsync();
                 }
-                catch (Exception) { }
             }
+            catch (Exception) { }
+            mediaCapture?.Dispose();
+            mediaCapture = null;
             Clipboard.ContentChanged -= Clipboard_ContentChanged;
             Window.Current.Activated -= CurrentWindow_Activated;
+            CoreWindow.GetForCurrentThread().VisibilityChanged += CoreWindow_VisibilityChanged;
         }
 
         private void CurrentWindow_Activated (object sender, WindowActivatedEventArgs e)
@@ -221,7 +242,7 @@ namespace YtFlow.App.Pages
         /// <param name="fileStream"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        public async static Task<WriteableBitmap> ReadBitmap (IRandomAccessStream fileStream, string type)
+        public static async Task<WriteableBitmap> ReadBitmap (IRandomAccessStream fileStream, string type)
         {
             var decoderId = DecoderIDFromFileExtension(type);
             var decoder = await BitmapDecoder.CreateAsync(decoderId, fileStream);
@@ -332,6 +353,7 @@ namespace YtFlow.App.Pages
 
         private async Task<bool> InitVideoCapture ()
         {
+            mediaCapture = new MediaCapture();
             var cameraDevice = await FindCameraDeviceByPanelAsync(Windows.Devices.Enumeration.Panel.Back);
             if (cameraDevice == null)
             {
