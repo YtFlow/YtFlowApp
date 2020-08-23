@@ -89,9 +89,11 @@ namespace YtFlow.App.Pages
             if (args.Visible)
             {
                 captureInitTask = InitVideoCapture();
+                timer.Start();
             }
             else
             {
+                timer.Stop();
                 if (await captureInitTask)
                 {
                     await mediaCapture.StopPreviewAsync();
