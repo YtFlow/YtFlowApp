@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Text;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Devices.Enumeration;
@@ -149,43 +150,53 @@ namespace YtFlow.App.Pages
             ScanImportTask = FromSharedData(Clipboard.GetContent(), true);
         }
 
-        private async Task FromSharedData (DataPackageView content, bool prompt)
+        private async Task FromSharedData (DataPackageView content, bool passive)
         {
             try
             {
-                await FromSharedDataImpl(content, prompt);
+                await FromSharedDataImpl(content, passive);
             }
             catch (Exception ex)
             {
                 await UiUtils.NotifyUser("Error reading shared content: " + ex.ToString());
             }
         }
-        private async Task FromSharedDataImpl (DataPackageView content, bool prompt)
+        private async Task FromSharedDataImpl (DataPackageView content, bool passive)
         {
+            string text = null;
             if (content.Contains(StandardDataFormats.Bitmap))
             {
                 var streamRef = await content.GetBitmapAsync();
                 using (var stream = await streamRef.OpenReadAsync())
                 {
                     var contentType = stream.ContentType;
-                    var bitmap = await ReadBitmap(stream, "." + contentType.Substring(contentType.IndexOf('/') + 1));
-                    await ScanBitmap(bitmap, prompt ? "Import from copied QR Code image?" : null);
+                    text = await ScanBitmap(stream, "." + contentType.Substring(contentType.IndexOf('/') + 1));
+                    if (text == null
+                        || passive
+                            && (await UiUtils.NotifyUser("Import from copied QR Code image?", "QR Code found", "Yes"))
+                            .Result != ContentDialogResult.Primary)
+                    {
+                        return;
+                    }
                 }
             }
             else if (content.Contains(StandardDataFormats.StorageItems))
             {
                 var items = await content.GetStorageItemsAsync();
-                foreach (var file in items
-                    .Select(f => f as StorageFile)
-                    .Where(f => f != null && fileTypeFilter.Any(t => f.Name.EndsWith(t))))
+                text = await ScanImageFiles(items);
+                if (text == null
+                    || passive
+                        && (await UiUtils.NotifyUser("Import from copied image files?", "QR Code found", "Yes"))
+                            .Result != ContentDialogResult.Primary)
                 {
-                    using (var stream = await file.OpenAsync(FileAccessMode.Read))
-                    {
-                        var writeableBmp = await ReadBitmap(stream, file.FileType);
-                        await ScanBitmap(writeableBmp, prompt ? $"Import from copied file {file.Name} containing a QR Code?" : null);
-                    }
+                    return;
                 }
             }
+            else
+            {
+                return;
+            }
+            await ImportShareLinks(text);
         }
 
         private void InitVideoTimer ()
@@ -199,8 +210,11 @@ namespace YtFlow.App.Pages
             using (var stream = new InMemoryRandomAccessStream())
             {
                 await mediaCapture.CapturePhotoToStreamAsync(ImageEncodingProperties.CreateJpeg(), stream);
-                var writeableBmp = await ReadBitmap(stream, ".jpg");
-                await ScanBitmap(writeableBmp);
+                var text = await ScanBitmap(stream, ".jpg");
+                if (text != null)
+                {
+                    await ImportShareLinks(text);
+                }
             }
         }
 
@@ -237,12 +251,12 @@ namespace YtFlow.App.Pages
         public static Size MaxSizeSupported = new Size(4000, 3000);
 
         /// <summary>
-        /// 读取照片流 转为WriteableBitmap给二维码解码器
+        /// 识别照片流中的二维码
         /// </summary>
         /// <param name="fileStream"></param>
         /// <param name="type"></param>
-        /// <returns></returns>
-        public static async Task<WriteableBitmap> ReadBitmap (IRandomAccessStream fileStream, string type)
+        /// <returns>识别到的文本，未识别到时返回 null。</returns>
+        public async Task<string> ScanBitmap (IRandomAccessStream fileStream, string type)
         {
             var decoderId = DecoderIDFromFileExtension(type);
             var decoder = await BitmapDecoder.CreateAsync(decoderId, fileStream);
@@ -265,30 +279,37 @@ namespace YtFlow.App.Pages
             var pixelStream2 = bitmap.PixelBuffer.AsStream();
             pixelStream2.Write(pixels, 0, pixels.Length);
 
-            return bitmap;
+            return barcodeReader.Decode(bitmap)?.Text;
+        }
+
+        private async Task<string> ScanImageFiles (IReadOnlyList<IStorageItem> files)
+        {
+            var sb = new StringBuilder();
+            var containsValidQrcode = false;
+            foreach (var file in files
+                                .Select(f => f as StorageFile)
+                                .Where(f => f != null && fileTypeFilter.Any(t => f.Name.EndsWith(t))))
+            {
+                using (var stream = await file.OpenAsync(FileAccessMode.Read))
+                {
+                    var fileText = await ScanBitmap(stream, file.FileType);
+                    if (fileText != null)
+                    {
+                        containsValidQrcode = true;
+                        sb.AppendLine(fileText);
+                    }
+                }
+            }
+            return containsValidQrcode ? sb.ToString() : null;
         }
 
         /// <summary>
         /// 解析二维码图片
         /// </summary>
-        /// <param name="writeableBmp">图片</param>
-        /// <param name="promptBeforeImport">导入前向用户确认的消息，null 表示不确认直接导入。</param>
+        /// <param name="text">非 null 字符串</param>
         /// <returns></returns>
-        private async Task ScanBitmap (WriteableBitmap writeableBmp, string promptMessage = null)
+        private async Task ImportShareLinks (string text)
         {
-            if (!(barcodeReader.Decode(writeableBmp) is Result qrResult))
-            {
-                return;
-            }
-            var text = qrResult.Text;
-            if (promptMessage is string prompt)
-            {
-                var (_secondaryAsClose, result) = await UiUtils.NotifyUser(prompt, "QR Code detected", "Yes");
-                if (result != ContentDialogResult.Primary)
-                {
-                    return;
-                }
-            }
             loadProgressBar.Visibility = Visibility.Visible;
             loadProgressBar.IsIndeterminate = true;
             LinkImportResult importResult;
@@ -309,11 +330,10 @@ namespace YtFlow.App.Pages
             {
                 // Avoid reading clipboard after importing
                 clipboardChanged = false;
-                Frame.GoBack();
-                var notifyTask = UiUtils.NotifyUser(importResult.GenerateMessage());
+                _ = UiUtils.NotifyUser(importResult.GenerateMessage());
                 // Complete updates in background
                 _ = importResult.Files.BatchCompleteUpdates();
-                await notifyTask;
+                Frame.GoBack();
             }
             else if (importResult.UnrecognizedLines.Count > 0)
             {
@@ -434,15 +454,8 @@ namespace YtFlow.App.Pages
                 SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.PicturesLibrary,
                 FileTypeFilter = { ".jpg", ".jpeg", ".png", ".bmp" }
             };
-            var file = await picker.PickSingleFileAsync();
-            if (file != null)
-            {
-                using (var stream = await file.OpenAsync(FileAccessMode.Read))
-                {
-                    var writeableBmp = await ReadBitmap(stream, file.FileType);
-                    await ScanBitmap(writeableBmp);
-                }
-            }
+            var files = await picker.PickMultipleFilesAsync();
+            await ScanImageFiles(files);
         }
 
         private void warningTextStoryboard_Completed (object sender, object e)
