@@ -36,7 +36,7 @@ namespace YtFlow.App.Pages
             loadProgressBar.Visibility = Visibility.Visible;
             try
             {
-                var directory = await ConfigUtils.GetAdapterConfigDirectoryAsync();
+                var directory = await ConfigUtils.AdapterConfigFolderTask;
                 var files = await directory.GetFilesAsync();
                 adapterConfigs.Clear();
                 foreach (var config in files.Select(f => AdapterConfig.GetConfigFromFilePath(f.Path)))
@@ -115,7 +115,7 @@ namespace YtFlow.App.Pages
                 return;
             }
             var deletedConfigs = new List<IAdapterConfig>(configs.Count);
-            loadProgressBar.IsIndeterminate = false;
+            loadProgressBar.IsIndeterminate = true;
             loadProgressBar.Value = 0;
             loadProgressBar.Visibility = Visibility.Visible;
             try
@@ -131,6 +131,7 @@ namespace YtFlow.App.Pages
                     {
                         AdapterConfig.ClearDefaultConfigFilePath();
                     }
+                    loadProgressBar.IsIndeterminate = false;
                     loadProgressBar.Value = (double)deletedConfigs.Count / configs.Count;
                 });
                 await Task.WhenAll(tasks);

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Windows.Foundation;
 using Windows.Storage;
 using Windows.Storage.Provider;
 using YtFlow.App.ConfigEncoding;
@@ -14,6 +13,8 @@ namespace YtFlow.App.Utils
 {
     internal static class ConfigUtils
     {
+        public static readonly Task<StorageFolder> AdapterConfigFolderTask =
+            ApplicationData.Current.RoamingFolder.CreateFolderAsync("configs", CreationCollisionOption.OpenIfExists).AsTask();
         private static readonly List<IConfigDecoder> decoders = new List<IConfigDecoder>
         {
             new ShadowsocksConfigDecoder(),
@@ -26,7 +27,7 @@ namespace YtFlow.App.Utils
             if (string.IsNullOrEmpty(config.Path))
             {
                 config.Name = string.IsNullOrEmpty(config.Name) ? $"New {config.AdapterType} Config" : config.Name;
-                var dir = await GetAdapterConfigDirectoryAsync();
+                var dir = await AdapterConfigFolderTask;
                 file = await dir.CreateFileAsync(Guid.NewGuid().ToString() + ".json", CreationCollisionOption.GenerateUniqueName);
                 config.Path = file.Path;
             }
@@ -37,11 +38,6 @@ namespace YtFlow.App.Utils
             CachedFileManager.DeferUpdates(file);
             await config.SaveToFileAsync(config.Path);
             return file;
-        }
-
-        public static IAsyncOperation<StorageFolder> GetAdapterConfigDirectoryAsync ()
-        {
-            return ApplicationData.Current.RoamingFolder.CreateFolderAsync("configs", CreationCollisionOption.OpenIfExists);
         }
 
         public static (List<IAdapterConfig> servers, List<string> unrecognized) DecodeServersFromLinks (string lines)
