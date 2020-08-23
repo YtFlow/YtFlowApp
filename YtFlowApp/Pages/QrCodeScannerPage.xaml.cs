@@ -122,7 +122,7 @@ namespace YtFlow.App.Pages
             mediaCapture = null;
             Clipboard.ContentChanged -= Clipboard_ContentChanged;
             Window.Current.Activated -= CurrentWindow_Activated;
-            CoreWindow.GetForCurrentThread().VisibilityChanged += CoreWindow_VisibilityChanged;
+            CoreWindow.GetForCurrentThread().VisibilityChanged -= CoreWindow_VisibilityChanged;
         }
 
         private void CurrentWindow_Activated (object sender, WindowActivatedEventArgs e)

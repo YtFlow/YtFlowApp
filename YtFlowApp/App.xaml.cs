@@ -44,7 +44,9 @@ namespace YtFlow.App
             {
                 DebugLogger.Log("Unhandled fatal application inner exception: " + e.Exception.InnerException.ToString());
             }
+#if !DEBUG
             e.Handled = true;
+#endif
         }
 
         /// <summary>
