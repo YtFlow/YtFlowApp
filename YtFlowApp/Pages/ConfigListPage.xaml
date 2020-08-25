@@ -545,10 +545,7 @@
                         <StackPanel.ContextFlyout>
                             <MenuFlyout>
                                 <MenuFlyoutItem Text="Set as default" Icon="Favorite" Click="SetDefaultButton_Click"/>
-                                <MenuFlyoutItem Text="Copy share link" Click="CopyShareLinkButton_Click">
-                                    <MenuFlyoutItem.Icon>
-                                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE72D;"/>
-                                    </MenuFlyoutItem.Icon>
+                                <MenuFlyoutItem Text="Copy share link" Icon="Link" Click="CopyShareLinkButton_Click">
                                 </MenuFlyoutItem>
                                 <MenuFlyoutItem Text="Remove" Icon="Delete" Click="RemoveButton_Click"/>
                             </MenuFlyout>
