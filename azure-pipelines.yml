@@ -15,7 +15,7 @@ variables:
   buildPlatform: 'x86|x64|ARM'
   buildConfiguration: 'Release'
   appxPackageDir: '$(build.artifactStagingDirectory)\AppxPackages\\'
-  keyFile: 'YtFlowApp_StoreKey.pfx'
+  keyFile: 'YtFlowApp_TemporaryKey.pfx'
   NUGET_PACKAGES: $(Pipeline.Workspace)/.nuget/packages
   cleanBuild: false
 
