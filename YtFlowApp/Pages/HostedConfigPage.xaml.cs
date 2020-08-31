@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.Foundation;
+using Windows.Foundation.Metadata;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Animation;
@@ -20,6 +21,7 @@ namespace YtFlow.App.Pages
     public sealed partial class HostedConfigPage : Page
     {
         private const string CONNECTED_ANIMATION_HOSTED_CONFIG_NAME = "hostedConfigName";
+        private static double _persistedHeight = -1;
         private static string _persistedItemKey = "";
         private static string _persistedPosition = "";
 
@@ -57,7 +59,10 @@ namespace YtFlow.App.Pages
                 _persistedPosition = null;
                 var animation = ConnectedAnimationService.GetForCurrentView()
                     .PrepareToAnimate(CONNECTED_ANIMATION_HOSTED_CONFIG_NAME, hostedConfigNameTextBlock);
-                animation.Configuration = new DirectConnectedAnimationConfiguration();
+                if (ApiInformation.IsTypePresent("Windows.UI.Xaml.Media.Animation.DirectConnectedAnimationConfiguration"))
+                {
+                    animation.Configuration = new DirectConnectedAnimationConfiguration();
+                }
             }
         }
 
@@ -98,6 +103,7 @@ namespace YtFlow.App.Pages
         {
             if (item is IAdapterConfig adapter)
             {
+                _persistedHeight = ((GridViewItem)itemGridView.ContainerFromItem(item)).ActualHeight;
                 _persistedItemKey = adapter.Name;
                 return _persistedItemKey;
             }
@@ -133,6 +139,32 @@ namespace YtFlow.App.Pages
             var textBox = (TextBox)sender;
             _ = HostedConfigListItem.Rename(textBox.Text);
             Flyout.GetAttachedFlyout(hostedConfigNameTextBlock).Hide();
+        }
+
+        private void ItemGridView_ContainerContentChanging (ListViewBase sender, ContainerContentChangingEventArgs args)
+        {
+            string key;
+            switch (args.Item)
+            {
+                case IAdapterConfig adapter:
+                    key = adapter.Name;
+                    break;
+                default:
+                    return;
+            }
+            if (key != _persistedItemKey)
+            {
+                return;
+            }
+
+            if (!args.InRecycleQueue)
+            {
+                args.ItemContainer.Height = _persistedHeight;
+            }
+            else
+            {
+                args.ItemContainer.ClearValue(HeightProperty);
+            }
         }
     }
 }

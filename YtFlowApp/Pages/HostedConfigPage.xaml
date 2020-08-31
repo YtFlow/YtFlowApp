@@ -182,7 +182,10 @@
                     <StackPanel>
                         <TextBlock Width="40" HorizontalAlignment="Left" Text="URL" />
                         <HyperlinkButton NavigateUri="{x:Bind Url}">
-                            <TextBlock Text="{x:Bind Url}" IsTextSelectionEnabled="True" />
+                            <TextBlock
+                                TextWrapping="Wrap"
+                                Text="{x:Bind Url}"
+                                IsTextSelectionEnabled="True" />
                         </HyperlinkButton>
                     </StackPanel>
                 </DataTemplate>
@@ -192,31 +195,46 @@
         <selectors:HostedConfigItemSelector x:Key="itemSelector">
             <selectors:HostedConfigItemSelector.AdapterTemplate>
                 <DataTemplate x:DataType="config:IAdapterConfig">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="30" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <FontIcon
-                            Grid.Column="0"
-                            FontSize="24"
-                            Height="70"
-                            Glyph="&#xEC05;" />
-                        <ScrollViewer
-                            Grid.Column="1"
-                            VerticalScrollBarVisibility="Hidden">
-                            <StackPanel Width="180" VerticalAlignment="Center">
+                    <UserControl>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="30" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <FontIcon
+                                Grid.Column="0"
+                                FontSize="24"
+                                Height="70"
+                                Glyph="&#xEC05;" />
+                            <StackPanel
+                                x:Name="textPanel"
+                                Grid.Column="1"
+                                Width="120"
+                                VerticalAlignment="Center">
                                 <TextBlock
                                     TextWrapping="Wrap"
+                                    MaxLines="2"
                                     VerticalAlignment="Bottom"
                                     Text="{x:Bind Name}" />
                                 <TextBlock
                                     Style="{ThemeResource CaptionTextBlockStyle}"
                                     Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
-                                    Text="{x:Bind AdapterType, Converter={StaticResource adapterName}}" /> 
+                                    Text="{x:Bind AdapterType, Converter={StaticResource adapterName}}" />
                             </StackPanel>
-                        </ScrollViewer>
-                    </Grid>
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup>
+                                    <VisualState>
+                                        <VisualState.StateTriggers>
+                                            <AdaptiveTrigger MinWindowWidth="480" />
+                                        </VisualState.StateTriggers>
+                                        <VisualState.Setters>
+                                            <Setter Target="textPanel.Width" Value="180" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                        </Grid>
+                    </UserControl>
                 </DataTemplate>
             </selectors:HostedConfigItemSelector.AdapterTemplate>
         </selectors:HostedConfigItemSelector>
@@ -228,7 +246,8 @@
             IsItemClickEnabled="True"
             ItemsSource="{Binding Source={StaticResource snapshotCvs}, Mode=OneWay}"
             ItemTemplateSelector="{StaticResource itemSelector}"
-            ItemClick="itemGridView_ItemClick">
+            ItemClick="itemGridView_ItemClick"
+            ContainerContentChanging="ItemGridView_ContainerContentChanging">
             <GridView.Header>
                 <StackPanel Margin="20, 32, 20, 16">
                     <Border

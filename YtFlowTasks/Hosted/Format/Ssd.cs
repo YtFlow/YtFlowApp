@@ -33,9 +33,9 @@ namespace YtFlow.Tasks.Hosted.Format
                 string prefix = string.Empty;
                 if (TrafficUsed != null)
                 {
-                    prefix = $"{TrafficTotal - TrafficUsed:0.##} GB available / ";
+                    prefix = $"{TrafficTotal - TrafficUsed:0.##} GB / ";
                 }
-                return $"{prefix}{TrafficTotal:0.##} GB in total";
+                return $"{prefix}{TrafficTotal:0.##} GB";
             }
         }
         public double TrafficRemainingPercentage
