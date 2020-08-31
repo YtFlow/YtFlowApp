@@ -335,7 +335,10 @@ namespace YtFlow.App.Pages
                 _ = UiUtils.NotifyUser(importResult.GenerateMessage());
                 // Complete updates in background
                 _ = importResult.Files.BatchCompleteUpdates();
-                Frame.GoBack();
+                if (Frame.CanGoBack)
+                {
+                    Frame.GoBack();
+                }
             }
             else if (importResult.UnrecognizedLines.Count > 0)
             {

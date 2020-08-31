@@ -78,7 +78,12 @@
                 <TextBlock x:Name="debugSocketRestartTxt" Grid.Row="1" Grid.ColumnSpan="3" Visibility="Collapsed" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="OrangeRed" TextWrapping="WrapWholeWords" Text="Debug settings will only take effect after restarting the proxy."/>
             </Grid>
             <TextBlock Style="{ThemeResource TitleTextBlockStyle}" Margin="16" Text="Settings"/>
-            <ListView SelectionMode="None" ScrollViewer.VerticalScrollMode="Disabled" ScrollViewer.HorizontalScrollMode="Disabled" IsItemClickEnabled="True" ItemClick="ListView_ItemClick">
+            <ListView
+                SelectionMode="None"
+                ScrollViewer.VerticalScrollMode="Disabled"
+                ScrollViewer.HorizontalScrollMode="Disabled"
+                IsItemClickEnabled="True"
+                ItemClick="ListView_ItemClick">
                 <ListView.ItemContainerStyle>
                     <Style TargetType="ListViewItem">
                         <Setter Property="Margin" Value="4,0,4,0"/>
@@ -88,6 +93,10 @@
                     <StackPanel DataContext="configList" Orientation="Horizontal">
                         <SymbolIcon Symbol="List"/>
                         <TextBlock>Server configuration</TextBlock>
+                    </StackPanel>
+                    <StackPanel DataContext="hostedConfigList" Orientation="Horizontal">
+                        <SymbolIcon Symbol="SyncFolder"/>
+                        <TextBlock>Hosted configuration</TextBlock>
                     </StackPanel>
                     <StackPanel DataContext="about" Orientation="Horizontal">
                         <FontIcon Glyph="&#xE946;"/>

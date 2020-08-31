@@ -37,7 +37,8 @@ namespace YtFlow.App.Pages
                 var directory = await ConfigUtils.AdapterConfigFolderTask;
                 var files = await directory.GetFilesAsync();
                 adapterConfigs.Clear();
-                foreach (var config in files.Select(f => AdapterConfig.GetConfigFromFilePath(f.Path)))
+                foreach (var config in await Task.WhenAll(files.Select(
+                    f => AdapterConfig.GetConfigFromFilePath(f.Path).AsTask())))
                 {
                     adapterConfigs.Add(config);
                 }

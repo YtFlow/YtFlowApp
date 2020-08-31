@@ -1,0 +1,170 @@
+﻿<Page
+    x:Class="YtFlow.App.Pages.HostedConfigListPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:YtFlow.App.Pages"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:models="using:YtFlow.App.Models" xmlns:selectors="using:YtFlow.App.Selectors" xmlns:converters="using:YtFlow.App.Converters"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    NavigationCacheMode="Enabled">
+    <Page.Resources>
+        <converters:SnapshotToDescriptionConverter x:Key="snapshotDesc" />
+        <converters:DateTimeOffsetHumanizer x:Key="dateTimeOffset" />
+        <selectors:HostedConfigListItemTaskStatusSelector x:Key="snapshotSummarySelector">
+            <selectors:HostedConfigListItemTaskStatusSelector.RunningTemplate>
+                <DataTemplate x:DataType="models:SnapshotTask">
+                    <ProgressRing IsActive="True" />
+                </DataTemplate>
+            </selectors:HostedConfigListItemTaskStatusSelector.RunningTemplate>
+            <selectors:HostedConfigListItemTaskStatusSelector.FaultedTemplate>
+                <DataTemplate x:DataType="models:SnapshotTask">
+                    <TextBlock
+                        Text="{x:Bind Task.Exception.Message}"
+                        TextWrapping="WrapWholeWords"
+                        Foreground="#FFF000" />
+                </DataTemplate>
+            </selectors:HostedConfigListItemTaskStatusSelector.FaultedTemplate>
+            <selectors:HostedConfigListItemTaskStatusSelector.CompletionTemplate>
+                <DataTemplate x:DataType="models:SnapshotTask">
+                    <TextBlock
+                        Foreground="{ThemeResource SystemAccentColorLight1}"
+                        Text="{x:Bind Task.Result, Converter={StaticResource snapshotDesc}}" />
+                </DataTemplate>
+            </selectors:HostedConfigListItemTaskStatusSelector.CompletionTemplate>
+            <selectors:HostedConfigListItemTaskStatusSelector.NullTemplate>
+                <DataTemplate x:DataType="models:SnapshotTask">
+                    <Border/>
+                </DataTemplate>
+            </selectors:HostedConfigListItemTaskStatusSelector.NullTemplate>
+        </selectors:HostedConfigListItemTaskStatusSelector>
+
+        <selectors:HostedConfigListItemTaskStatusSelector x:Key="lastUpdateSelector">
+            <selectors:HostedConfigListItemTaskStatusSelector.RunningTemplate>
+                <DataTemplate x:DataType="models:SnapshotTask">
+                    <Border/>
+                </DataTemplate>
+            </selectors:HostedConfigListItemTaskStatusSelector.RunningTemplate>
+            <selectors:HostedConfigListItemTaskStatusSelector.FaultedTemplate>
+                <DataTemplate x:DataType="models:SnapshotTask">
+                    <Border/>
+                </DataTemplate>
+            </selectors:HostedConfigListItemTaskStatusSelector.FaultedTemplate>
+            <selectors:HostedConfigListItemTaskStatusSelector.CompletionTemplate>
+                <DataTemplate x:DataType="models:SnapshotTask">
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel.Transitions>
+                            <TransitionCollection>
+                                <EntranceThemeTransition />
+                            </TransitionCollection>
+                        </StackPanel.Transitions>
+                        <TextBlock Margin="0, 0, 4, 0" Text="•"/>
+                        <TextBlock
+                            Text="{x:Bind Task.Result.RetrievedAt, Converter={StaticResource dateTimeOffset}}" />
+                    </StackPanel>
+                </DataTemplate>
+            </selectors:HostedConfigListItemTaskStatusSelector.CompletionTemplate>
+            <selectors:HostedConfigListItemTaskStatusSelector.NullTemplate>
+                <DataTemplate x:DataType="models:SnapshotTask">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Margin="0, 0, 4, 0" Text="•"/>
+                        <TextBlock Text="Never update" />
+                    </StackPanel>
+                </DataTemplate>
+            </selectors:HostedConfigListItemTaskStatusSelector.NullTemplate>
+        </selectors:HostedConfigListItemTaskStatusSelector>
+
+    </Page.Resources>
+    <Grid>
+        <ListView
+            x:Name="hostedConfigList"
+            IsItemClickEnabled="True"
+            SelectionMode="None"
+            ItemsSource="{x:Bind hostedConfigListItems, Mode=OneWay}"
+            ItemClick="hostedConfigList_ItemClick">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                </Style>
+            </ListView.ItemContainerStyle>
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="models:HostedConfigListItem">
+                    <Grid HorizontalAlignment="Stretch">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ContextFlyout>
+                            <MenuFlyout>
+                                <MenuFlyoutItem Icon="Rename" Text="Rename" Click="RenameFlyoutItem_Click" />
+                                <MenuFlyoutItem Icon="Delete" Text="Delete" Click="RemoveFlyoutItem_Click" />
+                            </MenuFlyout>
+                        </Grid.ContextFlyout>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition MinWidth="200" Width="2*" />
+                            <ColumnDefinition Width="1*" />
+                        </Grid.ColumnDefinitions>
+                        <Border
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            Margin="20, 20, 20, 4"
+                            Padding="0, 0, 0, 4"
+                            BorderBrush="{ThemeResource ButtonDisabledBorderThemeBrush}"
+                            BorderThickness="0, 0, 0, 1">
+                            <TextBlock
+                                x:Name="nameText"
+                                FontSize="{ThemeResource TextStyleLargeFontSize}"
+                                TextWrapping="Wrap"
+                                Text="{x:Bind HostedConfig.Name, Mode=OneWay}">
+                                <FlyoutBase.AttachedFlyout>
+                                    <Flyout Placement="Bottom">
+                                        <TextBox
+                                            Text="{x:Bind HostedConfig.Name, Mode=OneWay}"
+                                            KeyDown="RenameTextBox_KeyDown" />
+                                    </Flyout>
+                                </FlyoutBase.AttachedFlyout>
+                            </TextBlock>
+                        </Border>
+                        <StackPanel 
+                            Grid.Row="1"
+                            Grid.Column="0"
+                            Margin="20, 0, 20, 20"
+                            Orientation="Horizontal">
+                            <TextBlock
+                                Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
+                                Text="{x:Bind HostedConfig.Format.FriendlyName}"/>
+                            <ContentControl
+                                Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
+                                Margin="4, 0, 0, 0"
+                                Content="{x:Bind LoadSnapshotTask, Mode=OneWay}"
+                                ContentTemplateSelector="{StaticResource lastUpdateSelector}">
+                            </ContentControl>
+                        </StackPanel>
+                        <ContentControl
+                            Grid.Column="1"
+                            Grid.Row="0"
+                            Grid.RowSpan="2"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Left"
+                            Content="{x:Bind LoadSnapshotTask, Mode=OneWay}"
+                            ContentTemplateSelector="{StaticResource snapshotSummarySelector}">
+                            <ContentControl.Transitions>
+                                <TransitionCollection>
+                                    <ContentThemeTransition />
+                                </TransitionCollection>
+                            </ContentControl.Transitions>
+                        </ContentControl>
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </Grid>
+    <Page.TopAppBar>
+        <CommandBar DefaultLabelPosition="Right">
+            <AppBarButton
+                Icon="Add"
+                Label="Add"
+                Click="AddButton_Click" />
+        </CommandBar>
+    </Page.TopAppBar>
+</Page>

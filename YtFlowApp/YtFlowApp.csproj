@@ -123,6 +123,12 @@
     <Compile Include="Converters\AdapterTypeToDisplayNameConverter.cs" />
     <Compile Include="Converters\ConnectionStatusToIsEnabledConverter.cs" />
     <Compile Include="Converters\ConnectionStatusToIsCheckedConverter.cs" />
+    <Compile Include="Converters\DateTimeOffsetHumanizer.cs" />
+    <Compile Include="Converters\NullToVisibilityConverter.cs" />
+    <Compile Include="Models\SnapshotItemGroup.cs" />
+    <Compile Include="Converters\SnapshotToDescriptionConverter.cs" />
+    <Compile Include="Converters\SnapshotTaskToGroupConverter.cs" />
+    <Compile Include="Models\HostedConfigListItem.cs" />
     <Compile Include="Models\LinkImportResult.cs" />
     <Compile Include="Models\TunnelConnectionStatus.cs" />
     <Compile Include="Pages\AboutPage.xaml.cs">
@@ -135,11 +141,20 @@
     <Compile Include="Pages\ConfigPage.xaml.cs">
       <DependentUpon>ConfigPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Pages\HostedConfigListPage.xaml.cs">
+      <DependentUpon>HostedConfigListPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\HostedConfigPage.xaml.cs">
+      <DependentUpon>HostedConfigPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\NavigationPage.xaml.cs">
       <DependentUpon>NavigationPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\NewHostedConfigPage.xaml.cs">
+      <DependentUpon>NewHostedConfigPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\QrCodeScannerPage.xaml.cs">
       <DependentUpon>QrCodeScannerPage.xaml</DependentUpon>
@@ -148,8 +163,14 @@
       <DependentUpon>SettingPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Selectors\HostedConfigItemSelector.cs" />
+    <Compile Include="Selectors\HostedConfigListItemAssociatedDataSelector.cs" />
+    <Compile Include="Selectors\HostedConfigListItemTaskStatusSelector.cs" />
     <Compile Include="Selectors\AdapterConfigTypeSelector.cs" />
     <Compile Include="Selectors\ConnectionStatusSelector.cs" />
+    <Compile Include="Selectors\HostedConfigSourceSelector.cs" />
+    <Compile Include="Utils\HostedUtils.cs" />
+    <Compile Include="Utils\IoUtils.cs" />
     <Compile Include="Utils\UiUtils.cs" />
     <Compile Include="Utils\ConfigUtils.cs" />
   </ItemGroup>
@@ -232,11 +253,23 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Pages\HostedConfigListPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\HostedConfigPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Pages\MainPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Pages\NavigationPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\NewHostedConfigPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -250,6 +283,9 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Humanizer.Core">
+      <Version>2.8.26</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.2.10</Version>
     </PackageReference>
@@ -264,6 +300,10 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\YtFlowTasks\YtFlowTasks.csproj">
+      <Project>{927EDBE0-A65B-40F1-B3F4-C19A22C62588}</Project>
+      <Name>YtFlowTasks</Name>
+    </ProjectReference>
     <ProjectReference Include="..\YtFlowTunnel\YtFlowTunnel\YtFlowTunnel.csproj">
       <Project>{1e4fb15b-52af-4b16-9918-46e6a62a3bd6}</Project>
       <Name>YtFlowTunnel</Name>

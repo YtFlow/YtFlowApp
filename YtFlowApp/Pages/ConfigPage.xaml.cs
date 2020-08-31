@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Graphics.Imaging;
 using Windows.Storage;
@@ -79,7 +80,11 @@ namespace YtFlow.App.Pages
         }
 
         bool isSaving = false;
-        private async void SaveButton_Click (object sender, RoutedEventArgs e)
+        private void SaveButton_Click (object sender, RoutedEventArgs e)
+        {
+            _ = SaveAsync(false);
+        }
+        private async Task SaveAsync (bool setAsDefault)
         {
             if (isSaving)
             {
@@ -89,6 +94,11 @@ namespace YtFlow.App.Pages
             try
             {
                 var file = await ConfigUtils.SaveServerAsync(config);
+                config.Path = file.Path;
+                if (setAsDefault)
+                {
+                    AdapterConfig.SetDefaultConfigFilePath(config.Path);
+                }
                 await CachedFileManager.CompleteUpdatesAsync(file);
                 Frame.GoBack();
             }
@@ -185,6 +195,11 @@ namespace YtFlow.App.Pages
             }
             manager.DataRequested += Manager_DataRequested;
             DataTransferManager.ShowShareUI();
+        }
+
+        private void SaveAsDefaultButton_Click (object sender, RoutedEventArgs e)
+        {
+            _ = SaveAsync(true);
         }
     }
 }

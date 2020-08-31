@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.Storage;
-using Windows.Storage.Provider;
 using YtFlow.App.ConfigEncoding;
 using YtFlow.App.Models;
 using YtFlow.Tunnel.Config;
@@ -23,20 +22,9 @@ namespace YtFlow.App.Utils
 
         public static async Task<StorageFile> SaveServerAsync (IAdapterConfig config)
         {
-            StorageFile file;
-            if (string.IsNullOrEmpty(config.Path))
-            {
-                config.Name = string.IsNullOrEmpty(config.Name) ? $"New {config.AdapterType} Config" : config.Name;
-                var dir = await AdapterConfigFolderTask;
-                file = await dir.CreateFileAsync(Guid.NewGuid().ToString() + ".json", CreationCollisionOption.GenerateUniqueName);
-                config.Path = file.Path;
-            }
-            else
-            {
-                file = await StorageFile.GetFileFromPathAsync(config.Path);
-            }
-            CachedFileManager.DeferUpdates(file);
-            await config.SaveToFileAsync(config.Path);
+            config.Name = string.IsNullOrEmpty(config.Name) ? $"New {config.AdapterType} Config" : config.Name;
+            var file = await IoUtils.SaveUniqueObjAsync(config.Path, config, await AdapterConfigFolderTask);
+            config.Path = file.Path;
             return file;
         }
 
@@ -66,6 +54,8 @@ namespace YtFlow.App.Utils
 
         public static async Task<LinkImportResult> ImportLinksAsync (string links, Action<double> onProgress = null)
         {
+            // Preheat config folder task
+            await AdapterConfigFolderTask;
             var (servers, unrecognized) = DecodeServersFromLinks(links);
             int saved = 0, failed = 0;
             var errors = new Dictionary<string, string>();
@@ -97,14 +87,5 @@ namespace YtFlow.App.Utils
             };
         }
 
-        public static Task BatchCompleteUpdates (this List<StorageFile> files)
-        {
-            var tasks = new List<Task<FileUpdateStatus>>(files.Count);
-            foreach (var file in files)
-            {
-                tasks.Add(CachedFileManager.CompleteUpdatesAsync(file).AsTask());
-            }
-            return Task.WhenAll(tasks);
-        }
     }
 }

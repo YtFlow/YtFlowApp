@@ -544,10 +544,9 @@
                     <StackPanel HorizontalAlignment="Stretch">
                         <StackPanel.ContextFlyout>
                             <MenuFlyout>
-                                <MenuFlyoutItem Text="Set as default" Icon="Favorite" Click="SetDefaultButton_Click"/>
-                                <MenuFlyoutItem Text="Copy share link" Icon="Link" Click="CopyShareLinkButton_Click">
-                                </MenuFlyoutItem>
-                                <MenuFlyoutItem Text="Remove" Icon="Delete" Click="RemoveButton_Click"/>
+                                <MenuFlyoutItem Text="Set as default" Icon="Favorite" Click="SetDefaultButton_Click" />
+                                <MenuFlyoutItem Text="Copy share link" Icon="Link" Click="CopyShareLinkButton_Click" />
+                                <MenuFlyoutItem Text="Remove" Icon="Delete" Click="RemoveButton_Click" />
                             </MenuFlyout>
                         </StackPanel.ContextFlyout>
                         <TextBlock Text="{x:Bind Name}" Style="{ThemeResource BodyTextBlockStyle}" FontWeight="{x:Bind Path=Path, Converter={StaticResource CurrentConfigToFont}}"/>

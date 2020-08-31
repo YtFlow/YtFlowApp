@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -27,6 +28,12 @@ namespace YtFlow.App.Pages
     {
         private const string PROFILE_NAME = "YtFlow Auto";
         private static readonly bool newWindowsBuild = ApiInformation.IsApiContractPresent("Windows.Foundation.UniversalApiContract", 7);
+        private static readonly Dictionary<string, Type> listitemToPageType = new Dictionary<string, Type>()
+        {
+            { "configList", typeof(ConfigListPage) },
+            { "hostedConfigList", typeof(HostedConfigListPage) },
+            { "about", typeof(AboutPage) }
+        };
         public static readonly DependencyProperty TunnelConnectionStatusProperty = DependencyProperty.Register(nameof(TunnelConnectionStatus), typeof(TunnelConnectionStatus), typeof(MainPage), null);
 
         bool pageDisplaying;
@@ -90,7 +97,7 @@ namespace YtFlow.App.Pages
             }
             try
             {
-                AdapterConfig.GetConfigFromFilePath(AdapterConfig.GetDefaultConfigFilePath());
+                await AdapterConfig.GetConfigFromFilePath(AdapterConfig.GetDefaultConfigFilePath());
             }
             catch (Exception ex)
             {
@@ -281,15 +288,7 @@ namespace YtFlow.App.Pages
         private void ListView_ItemClick (object sender, ItemClickEventArgs e)
         {
             var el = (FrameworkElement)e.ClickedItem;
-            switch (el.DataContext as string)
-            {
-                case "configList":
-                    Frame.Navigate(typeof(ConfigListPage));
-                    break;
-                case "about":
-                    Frame.Navigate(typeof(AboutPage));
-                    break;
-            }
+            Frame.Navigate(listitemToPageType[(string)el.DataContext]);
         }
 
         private async void debugBtn_Checked (object sender, RoutedEventArgs e)

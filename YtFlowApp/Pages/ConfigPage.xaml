@@ -5,10 +5,13 @@
     xmlns:config="using:YtFlow.Tunnel.Config"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:selectors="using:YtFlow.App.Selectors"
+    xmlns:selectors="using:YtFlow.App.Selectors" xmlns:converters="using:YtFlow.App.Converters"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     mc:Ignorable="d">
-
+    <Page.Resources>
+        <converters:NullToVisibilityConverter x:Key="nullToVisibility" />
+        <converters:NullToVisibilityConverter x:Key="revNullToVisibility" Reverse="True" />
+    </Page.Resources>
     <Grid>
         <ContentControl HorizontalContentAlignment="Stretch" Content="{x:Bind config}">
             <ContentControl.ContentTemplateSelector>
@@ -358,9 +361,15 @@
     <Page.BottomAppBar>
         <CommandBar DefaultLabelPosition="Right">
             <AppBarButton
+                Visibility="{x:Bind config.Path, Converter={StaticResource nullToVisibility}}"
                 Click="SaveButton_Click"
                 Icon="Save"
                 Label="Save" />
+            <AppBarButton
+                Visibility="{x:Bind config.Path, Converter={StaticResource revNullToVisibility}}"
+                Click="SaveButton_Click"
+                Icon="Add"
+                Label="Create" />
             <AppBarButton
                 x:Name="shareButton"
                 Label="Share"
@@ -392,6 +401,12 @@
                 Click="CancelButton_Click"
                 Icon="Cancel"
                 Label="Cancel" />
+            <CommandBar.SecondaryCommands>
+                <AppBarButton
+                    Click="SaveAsDefaultButton_Click"
+                    Icon="Save"
+                    Label="Save As Default" />
+            </CommandBar.SecondaryCommands>
         </CommandBar>
     </Page.BottomAppBar>
 </Page>

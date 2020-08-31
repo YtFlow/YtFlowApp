@@ -1,0 +1,135 @@
+﻿<Page
+    x:Class="YtFlow.App.Pages.NewHostedConfigPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:YtFlow.App.Pages"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Page.Resources>
+        <CollectionViewSource
+            x:Key="configTypeGroupCollection"
+            x:Name="configTypeGroupCollection"
+            IsSourceGrouped="True"
+            ItemsPath="Items">
+            <CollectionViewSource.Source>
+                <local:NewHostedConfigTypeGroupCollection>
+                    <local:NewHostedConfigTypeGroup Title="Server Provider">
+                        <local:NewHostedConfigType Id="ssd" Name="SSD" Description="A Shadowsocks subscription format designed for ISPs" />
+                    </local:NewHostedConfigTypeGroup>
+                    <!--<local:NewHostedConfigTypeGroup Title="Ruleset Provider" />-->
+                    <local:NewHostedConfigTypeGroup Title="Complex Provider">
+                        <local:NewHostedConfigType Id="clash" Name="Clash" Description="Clash configuration file format" />
+                    </local:NewHostedConfigTypeGroup>
+                </local:NewHostedConfigTypeGroupCollection>
+            </CollectionViewSource.Source>
+        </CollectionViewSource>
+    </Page.Resources>
+    <Grid>
+        <ScrollViewer>
+            <StackPanel>
+                <Pivot x:Name="sourcePivot">
+                    <PivotItem Header="URL">
+                        <StackPanel>
+                            <TextBlock Text="URL" />
+                            <TextBox x:Name="urlText" HorizontalAlignment="Stretch" InputScope="Url" />
+                        </StackPanel>
+                    </PivotItem>
+                    <!--PivotItem Header="File">
+                        <StackPanel>
+                            <TextBlock Text="Select file" />
+                            <Button>
+                                Browse
+                            </Button>
+                            <TextBlock HorizontalAlignment="Stretch" />
+                        </StackPanel>
+                    </PivotItem>
+                    <PivotItem Header="GitHub Release">
+                        <StackPanel>
+                            <TextBlock Text="Repository URL" />
+                            <TextBox HorizontalAlignment="Stretch" InputScope="Url" />
+                            <TextBlock Text="File Name" />
+                            <TextBox HorizontalAlignment="Stretch" />
+                            <CheckBox Content="Verify SHA-256 checksum" />
+                        </StackPanel>
+                    </PivotItem-->
+                </Pivot>
+                <GridView
+                    x:Name="hostedTypeGridView"
+                    ItemsSource="{Binding Source={StaticResource configTypeGroupCollection}}">
+                    <GridView.GroupStyle>
+                        <GroupStyle>
+                            <GroupStyle.HeaderTemplate>
+                                <DataTemplate x:DataType="local:NewHostedConfigTypeGroup">
+                                    <TextBlock Text="{x:Bind Title}"/>
+                                </DataTemplate>
+                            </GroupStyle.HeaderTemplate>
+                        </GroupStyle>
+                    </GridView.GroupStyle>
+                    <GridView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <ItemsWrapGrid Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </GridView.ItemsPanel>
+                    <GridView.ItemContainerStyle>
+                        <Style TargetType="GridViewItem">
+                            <Setter Property="Margin" Value="32, 8, 0, 0" />
+                            <Setter Property="VerticalContentAlignment" Value="Top" />
+                        </Style>
+                    </GridView.ItemContainerStyle>
+                    <GridView.ItemTemplate>
+                        <DataTemplate x:DataType="local:NewHostedConfigType">
+                            <StackPanel Margin="20" VerticalAlignment="Top">
+                                <StackPanel.Transitions>
+                                    <TransitionCollection>
+                                        <EntranceThemeTransition />
+                                    </TransitionCollection>
+                                </StackPanel.Transitions>
+                                <TextBlock
+                                    Style="{ThemeResource SubtitleTextBlockStyle}"
+                                    Margin="0, 0, 0, 4"
+                                    Text="{x:Bind Name}" />
+                                <TextBlock
+                                    Style="{ThemeResource CaptionTextBlockStyle}"
+                                    Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
+                                    Width="160"
+                                    TextWrapping="WrapWholeWords"
+                                    Text="{x:Bind Description}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </GridView.ItemTemplate>
+                </GridView>
+            </StackPanel>
+        </ScrollViewer>
+        <Border
+            x:Name="loadingCover"
+            VerticalAlignment="Stretch"
+            HorizontalAlignment="Stretch"
+            Background="#80000000"
+            Visibility="Collapsed"
+            IsHitTestVisible="False">
+            <Border.Resources>
+                <Storyboard x:Key="loadingStartStoryboard" x:Name="loadingStartStoryboard">
+                    <FadeInThemeAnimation Storyboard.TargetName="loadingCover"/>
+                </Storyboard>
+                <Storyboard x:Key="loadingEndStoryboard" x:Name="loadingEndStoryboard">
+                    <FadeOutThemeAnimation Storyboard.TargetName="loadingCover"/>
+                </Storyboard>
+            </Border.Resources>
+            <ProgressRing
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center"
+                IsActive="True" />
+        </Border>
+    </Grid>
+    <Page.BottomAppBar>
+        <CommandBar DefaultLabelPosition="Right">
+            <AppBarButton
+                Icon="SaveLocal"
+                Label="Subscribe"
+                Click="SubscribeButton_Click" />
+        </CommandBar>
+    </Page.BottomAppBar>
+</Page>
