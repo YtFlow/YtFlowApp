@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Threading.Tasks;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using YtFlow.App.Models;
@@ -16,7 +17,7 @@ namespace YtFlow.App.Selectors
             get => format; set
             {
                 format = value;
-                if (snapshotTask is SnapshotTask task && task.Task.IsCompletedSuccessfully)
+                if (snapshotTask is SnapshotTask task && task.Task.Status == TaskStatus.RanToCompletion)
                 {
                     AssociatedData = format.GetAssociatedDataFromObject(task.Task.Result?.AssociatedData);
                 }
@@ -32,7 +33,7 @@ namespace YtFlow.App.Selectors
             get => snapshotTask; set
             {
                 snapshotTask = value;
-                if (format is IHostedConfigFormat configFormat && snapshotTask.Task.IsCompletedSuccessfully)
+                if (format is IHostedConfigFormat configFormat && snapshotTask.Task.Status == TaskStatus.RanToCompletion)
                 {
                     AssociatedData = format.GetAssociatedDataFromObject(snapshotTask.Task.Result?.AssociatedData);
                 }
