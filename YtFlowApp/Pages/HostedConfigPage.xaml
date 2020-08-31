@@ -180,7 +180,7 @@
             <selectors:HostedConfigSourceSelector.UrlTemplate>
                 <DataTemplate x:DataType="source:UrlSource">
                     <StackPanel>
-                        <TextBlock Width="40" HorizontalAlignment="Left" Text="URL" />
+                        <TextBlock HorizontalAlignment="Left" Text="URL" />
                         <HyperlinkButton NavigateUri="{x:Bind Url}">
                             <TextBlock
                                 TextWrapping="Wrap"
@@ -190,6 +190,17 @@
                     </StackPanel>
                 </DataTemplate>
             </selectors:HostedConfigSourceSelector.UrlTemplate>
+            <selectors:HostedConfigSourceSelector.FileTemplate>
+                <DataTemplate x:DataType="source:FileSource">
+                    <StackPanel>
+                        <TextBlock HorizontalAlignment="Left" Text="From file" />
+                        <TextBlock
+                            TextWrapping="Wrap"
+                            Text="{x:Bind FileName}"
+                            IsTextSelectionEnabled="True" />
+                    </StackPanel>
+                </DataTemplate>
+            </selectors:HostedConfigSourceSelector.FileTemplate>
         </selectors:HostedConfigSourceSelector>
 
         <selectors:HostedConfigItemSelector x:Key="itemSelector">

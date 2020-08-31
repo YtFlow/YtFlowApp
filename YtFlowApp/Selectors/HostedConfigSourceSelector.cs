@@ -7,12 +7,15 @@ namespace YtFlow.App.Selectors
     class HostedConfigSourceSelector : DataTemplateSelector
     {
         public DataTemplate UrlTemplate { get; set; }
+        public DataTemplate FileTemplate { get; set; }
         protected override DataTemplate SelectTemplateCore (object item)
         {
             switch (item)
             {
                 case UrlSource _:
                     return UrlTemplate;
+                case FileSource _:
+                    return FileTemplate;
             }
             return base.SelectTemplateCore(item);
         }

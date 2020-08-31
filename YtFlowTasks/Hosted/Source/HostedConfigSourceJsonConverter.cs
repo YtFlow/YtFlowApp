@@ -12,12 +12,17 @@ namespace YtFlow.Tasks.Hosted.Source
         {
             var obj = JObject.Load(reader);
             var type = obj[nameof(IHostedConfigSource.SourceType)].Value<string>();
+            var subReader = obj.CreateReader();
             switch (type)
             {
                 case "url":
                     var url = new UrlSource();
-                    serializer.Populate(obj.CreateReader(), url);
+                    serializer.Populate(subReader, url);
                     return url;
+                case "file":
+                    var file = new FileSource();
+                    serializer.Populate(subReader, file);
+                    return file;
             }
             return null;
         }

@@ -128,6 +128,7 @@
     <Compile Include="Hosted\Format\Ssd.cs" />
     <Compile Include="Hosted\HostedConfig.cs" />
     <Compile Include="Hosted\Snapshot.cs" />
+    <Compile Include="Hosted\Source\FileSource.cs" />
     <Compile Include="Hosted\Source\HostedConfigSourceJsonConverter.cs" />
     <Compile Include="Hosted\Source\UrlSource.cs" />
     <Compile Include="HttpUtils.cs" />

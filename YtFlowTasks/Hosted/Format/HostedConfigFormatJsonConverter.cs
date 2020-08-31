@@ -13,15 +13,16 @@ namespace YtFlow.Tasks.Hosted.Format
         {
             var obj = JObject.Load(reader);
             var format = obj[nameof(IHostedConfigFormat.FormatType)].Value<string>();
+            var subReader = obj.CreateReader();
             switch (format)
             {
                 case "ssd":
                     var ssd = new Ssd();
-                    serializer.Populate(obj.CreateReader(), ssd);
+                    serializer.Populate(subReader, ssd);
                     return ssd;
                 case "clash":
                     var clash = new Clash();
-                    serializer.Populate(obj.CreateReader(), clash);
+                    serializer.Populate(subReader, clash);
                     return clash;
             }
             return null;

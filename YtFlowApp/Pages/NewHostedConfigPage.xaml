@@ -37,16 +37,18 @@
                             <TextBox x:Name="urlText" HorizontalAlignment="Stretch" InputScope="Url" />
                         </StackPanel>
                     </PivotItem>
-                    <!--PivotItem Header="File">
+                    <PivotItem Header="File">
                         <StackPanel>
                             <TextBlock Text="Select file" />
-                            <Button>
+                            <Button Click="PickFileButton_Click">
                                 Browse
                             </Button>
-                            <TextBlock HorizontalAlignment="Stretch" />
+                            <TextBlock
+                                x:Name="previewFileNameText"
+                                HorizontalAlignment="Stretch" />
                         </StackPanel>
                     </PivotItem>
-                    <PivotItem Header="GitHub Release">
+                    <!--<PivotItem Header="GitHub Release">
                         <StackPanel>
                             <TextBlock Text="Repository URL" />
                             <TextBox HorizontalAlignment="Stretch" InputScope="Url" />
@@ -54,7 +56,7 @@
                             <TextBox HorizontalAlignment="Stretch" />
                             <CheckBox Content="Verify SHA-256 checksum" />
                         </StackPanel>
-                    </PivotItem-->
+                    </PivotItem>-->
                 </Pivot>
                 <GridView
                     x:Name="hostedTypeGridView"

@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Storage;
-using Windows.Storage.Streams;
+using Windows.Storage.Pickers;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Markup;
@@ -43,8 +43,15 @@ namespace YtFlow.App.Pages
     /// </summary>
     public sealed partial class NewHostedConfigPage : Page
     {
+        private static readonly FileOpenPicker FileOpenPicker = new FileOpenPicker()
+        {
+            SuggestedStartLocation = PickerLocationId.Downloads,
+            FileTypeFilter = { "*" }
+        };
+
         private CancellationTokenSource LoadSnapshotCancellationSource;
         private ObservableCollection<HostedConfigListItem> HostedConfigListItems;
+
         public NewHostedConfigPage ()
         {
             this.InitializeComponent();
@@ -70,7 +77,6 @@ namespace YtFlow.App.Pages
         {
             var cancellationToken = LoadSnapshotCancellationSource.Token;
             var config = new HostedConfig();
-            IInputStream stream;
             // Create source
             switch (sourcePivot.SelectedIndex)
             {
@@ -89,28 +95,40 @@ namespace YtFlow.App.Pages
                         Url = urlText.Text
                     };
                     config.Source = urlSource;
-                    stream = await config.Source.FetchAsync().AsTask(cancellationToken);
+                    break;
+                case 1:
+                    // File
+                    if (!(previewFileNameText.DataContext is StorageFile file))
+                    {
+                        file = await FileOpenPicker.PickSingleFileAsync();
+                    }
+                    if (file == null)
+                    {
+                        throw new InvalidDataException("No file is chosen");
+                    }
+                    config.Source = new FileSource(file);
                     break;
                 default:
                     throw new NotSupportedException("The source type is not supported yet");
             }
-            Snapshot snapshot;
+
             // Create format
+            Snapshot snapshot;
             cancellationToken.ThrowIfCancellationRequested();
             switch (((NewHostedConfigType)hostedTypeGridView.SelectedItem).Id)
             {
                 case "ssd":
-                    var ssd = new Ssd();
-                    config.Format = ssd;
-                    snapshot = await ssd.DecodeAsync(stream).AsTask(cancellationToken);
+                    config.Format = new Ssd();
                     break;
                 case "clash":
-                    var clash = new Clash();
-                    config.Format = clash;
-                    snapshot = await clash.DecodeAsync(stream).AsTask(cancellationToken);
+                    config.Format = new Clash();
                     break;
                 default:
                     throw new NotSupportedException("The hosted config type is not supported yet");
+            }
+            using (var stream = await config.Source.FetchAsync().AsTask(cancellationToken))
+            {
+                snapshot = await config.Format.DecodeAsync(stream).AsTask(cancellationToken);
             }
             config.Name = config.Source.GetFileName();
 
@@ -163,6 +181,16 @@ namespace YtFlow.App.Pages
                 loadingEndStoryboard.Begin();
                 BottomAppBar.IsEnabled = true;
             }
+        }
+
+        private async void PickFileButton_Click (object sender, RoutedEventArgs e)
+        {
+            if (!(await FileOpenPicker.PickSingleFileAsync() is StorageFile file))
+            {
+                return;
+            }
+            previewFileNameText.DataContext = file;
+            previewFileNameText.Text = file.Name;
         }
     }
 }
