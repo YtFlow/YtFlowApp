@@ -35,7 +35,7 @@ namespace YtFlow.Tasks.Hosted.Source
 
         public string FileName { get; set; }
 
-        public IAsyncOperation<IInputStream> FetchAsync ()
+        public IAsyncOperation<FetchResult> FetchAsync ()
         {
             if (CoreWindow.GetForCurrentThread() == null)
             {
@@ -63,13 +63,18 @@ namespace YtFlow.Tasks.Hosted.Source
                 }
                 var stream = await PreloadedFile.OpenAsync(FileAccessMode.Read).AsTask(token);
                 PreloadedFile = null;
-                return (IInputStream)stream;
+                return new FetchResult() { Stream = stream, };
             });
         }
 
         public string GetFileName ()
         {
             return FileName;
+        }
+
+        public object GetAssociatedDataFromObject (object obj)
+        {
+            return null;
         }
     }
 }

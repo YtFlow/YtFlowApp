@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:YtFlow.App.Pages"
+    xmlns:tasks="using:YtFlow.Tasks"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:selectors="using:YtFlow.App.Selectors" xmlns:models="using:YtFlow.App.Models" xmlns:format="using:YtFlow.Tasks.Hosted.Format" xmlns:source="using:YtFlow.Tasks.Hosted.Source" xmlns:converters="using:YtFlow.App.Converters" xmlns:config="using:YtFlow.Tunnel.Config"
     mc:Ignorable="d"
@@ -27,6 +28,43 @@
                 </StackPanel>
             </Button>
         </DataTemplate>
+        <DataTemplate x:Key="trafficUsageTemplate" x:DataType="tasks:TrafficUsage">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="130"/>
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Margin="0, 0, 0, 4"
+                    Text="Expiry date" />
+                <TextBlock
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
+                    Text="{x:Bind ExpiryString}" />
+                <TextBlock
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    VerticalAlignment="Center"
+                    Text="Data limit" />
+                <StackPanel Grid.Row="1" Grid.Column="1">
+                    <TextBlock
+                        Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
+                        Text="{x:Bind TrafficLimit}" />
+                    <ProgressBar
+                        Margin="0, 4, 0, 0"
+                        Height="4"
+                        MinWidth="200"
+                        Value="{x:Bind TrafficRemainingPercentage}" />
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
 
         <converters:SnapshotTaskToGroupConverter x:Key="snapshotTaskToGroup" />
         <converters:SnapshotToDescriptionConverter x:Key="listFooterDescriptor" Separator=", " />
@@ -35,57 +73,38 @@
             x:Key="associatedDataSelector"
             x:Name="associatedDataSelector"
             Format="{x:Bind HostedConfigListItem.HostedConfig.Format}"
+            Source="{x:Bind HostedConfigListItem.HostedConfig.Source}"
             SnapshotTask="{x:Bind HostedConfigListItem.LoadSnapshotTask, Mode=OneWay}">
+            <selectors:HostedConfigListItemAssociatedDataSelector.UrlTemplate>
+                <DataTemplate x:DataType="source:UrlAssociatedData">
+                    <ContentControl
+                        Content="{x:Bind TrafficUsage}"
+                        ContentTemplate="{StaticResource trafficUsageTemplate}" />
+                </DataTemplate>
+            </selectors:HostedConfigListItemAssociatedDataSelector.UrlTemplate>
             <selectors:HostedConfigListItemAssociatedDataSelector.SsdTemplate>
                 <DataTemplate x:DataType="format:SsdAssociatedData">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <TextBlock
-                            Grid.Row="0"
-                            Grid.Column="0"
-                            Margin="0, 0, 20, 4"
-                            Text="Operator name" />
-                        <TextBlock
-                            Grid.Row="0"
-                            Grid.Column="1"
-                            Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
-                            Text="{x:Bind Airport}" />
-                        <TextBlock
-                            Grid.Row="1"
-                            Grid.Column="0"
-                            Margin="0, 0, 0, 4"
-                            Text="Expiry date" />
-                        <TextBlock
-                            Grid.Row="1"
-                            Grid.Column="1"
-                            Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
-                            Text="{x:Bind ExpiryString}" />
-                        <TextBlock
-                            Grid.Row="2"
-                            Grid.Column="0"
-                            VerticalAlignment="Center"
-                            Text="Data limit" />
-                        <StackPanel Grid.Row="2" Grid.Column="1" Visibility="{x:Bind TrafficLimitAvailable}">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock
+                                Width="110"
+                                Margin="0, 0, 20, 4"
+                                Text="Operator name" />
                             <TextBlock
                                 Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
-                                Text="{x:Bind TrafficLimit}" />
-                            <ProgressBar
-                                Margin="0, 4, 0, 0"
-                                Height="4"
-                                MinWidth="200"
-                                Value="{x:Bind TrafficRemainingPercentage}" />
+                                Text="{x:Bind Airport}" />
                         </StackPanel>
-                    </Grid>
+                        <ContentControl
+                            Content="{x:Bind TrafficUsage}"
+                            ContentTemplate="{StaticResource trafficUsageTemplate}" />
+                    </StackPanel>
                 </DataTemplate>
             </selectors:HostedConfigListItemAssociatedDataSelector.SsdTemplate>
+            <selectors:HostedConfigListItemAssociatedDataSelector.NullTemplate>
+                <DataTemplate>
+                    <Border />
+                </DataTemplate>
+            </selectors:HostedConfigListItemAssociatedDataSelector.NullTemplate>
         </selectors:HostedConfigListItemAssociatedDataSelector>
 
         <selectors:HostedConfigListItemTaskStatusSelector x:Key="lastUpdateSelector">
@@ -300,6 +319,10 @@
                         Grid.Row="3"
                         Content="{x:Bind HostedConfigListItem.HostedConfig.Source}"
                         ContentTemplateSelector="{StaticResource sourceSelector}" />
+                    <ContentControl
+                        Grid.Row="5"
+                        Content="{x:Bind associatedDataSelector.SourceAssociatedData, Mode=OneWay}"
+                        ContentTemplateSelector="{StaticResource associatedDataSelector}" />
                     <TextBlock
                         Grid.Row="4"
                         Margin="0, 16, 0, 10"
@@ -307,7 +330,7 @@
                         Text="{x:Bind HostedConfigListItem.HostedConfig.Format.FriendlyName}" />
                     <ContentControl
                         Grid.Row="5"
-                        Content="{x:Bind associatedDataSelector.AssociatedData, Mode=OneWay}"
+                        Content="{x:Bind associatedDataSelector.FormatAssociatedData, Mode=OneWay}"
                         ContentTemplateSelector="{StaticResource associatedDataSelector}" />
                 </StackPanel>
             </GridView.Header>

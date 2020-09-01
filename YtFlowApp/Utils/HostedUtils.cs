@@ -55,9 +55,9 @@ namespace YtFlow.App.Utils
         public static async Task<Snapshot> UpdateSnapshotAsync (HostedConfig hostedConfig, Snapshot oldSnapshot)
         {
             Snapshot newSnapshot;
-            using (var rawData = await hostedConfig.Source.FetchAsync())
+            using (var source = await hostedConfig.Source.FetchAsync())
             {
-                newSnapshot = await hostedConfig.Format.DecodeAsync(rawData);
+                newSnapshot = await source.DecodeAsync(hostedConfig.Format);
             }
             var newSnapshotFile = await (await SnapshotFolderTask).CreateFileAsync(Path.GetFileName(hostedConfig.Path), CreationCollisionOption.ReplaceExisting);
             await IoUtils.SerializeToFilePathAsync(newSnapshotFile, newSnapshot, default);

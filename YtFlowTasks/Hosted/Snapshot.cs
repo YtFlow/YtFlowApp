@@ -13,7 +13,8 @@ namespace YtFlow.Tasks.Hosted
         public DateTimeOffset RetrievedAt { get; set; }
         [JsonConverter(typeof(AdapterIListConverter))]
         public IList<IAdapterConfig> AdapterConfigs { get; set; }
-        public object AssociatedData { get; set; }
+        public object SourceAssociatedData { get; set; }
+        public object FormatAssociatedData { get; set; }
 
         public Snapshot ()
         {

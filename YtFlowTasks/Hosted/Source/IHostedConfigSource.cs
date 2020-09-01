@@ -7,6 +7,7 @@ namespace YtFlow.Tasks.Hosted.Source
     {
         string SourceType { get; set; }
         string GetFileName ();
-        IAsyncOperation<IInputStream> FetchAsync ();
+        IAsyncOperation<FetchResult> FetchAsync ();
+        object GetAssociatedDataFromObject (object obj);
     }
 }

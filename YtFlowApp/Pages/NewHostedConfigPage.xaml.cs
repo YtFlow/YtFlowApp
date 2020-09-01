@@ -126,9 +126,9 @@ namespace YtFlow.App.Pages
                 default:
                     throw new NotSupportedException("The hosted config type is not supported yet");
             }
-            using (var stream = await config.Source.FetchAsync().AsTask(cancellationToken))
+            using (var source = await config.Source.FetchAsync().AsTask(cancellationToken))
             {
-                snapshot = await config.Format.DecodeAsync(stream).AsTask(cancellationToken);
+                snapshot = await source.DecodeAsync(config.Format).AsTask(cancellationToken);
             }
             config.Name = config.Source.GetFileName();
 

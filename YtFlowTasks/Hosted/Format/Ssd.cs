@@ -15,35 +15,7 @@ namespace YtFlow.Tasks.Hosted.Format
     public sealed class SsdAssociatedData
     {
         public string Airport { get; set; }
-        public double? TrafficUsed { get; set; }
-        public double? TrafficTotal { get; set; }
-        // DateTime? is not a valid WinRT type
-        // public DateTime? Expiry { get; set; }
-        public object Expiry { get; set; }
-        public string ExpiryString { get => Expiry?.ToString(); }
-        public bool TrafficLimitAvailable { get => TrafficTotal != null && TrafficUsed != null; }
-        public string TrafficLimit
-        {
-            get
-            {
-                if (TrafficTotal == null)
-                {
-                    return string.Empty;
-                }
-                string prefix = string.Empty;
-                if (TrafficUsed != null)
-                {
-                    prefix = $"{TrafficTotal - TrafficUsed:0.##} GB / ";
-                }
-                return $"{prefix}{TrafficTotal:0.##} GB";
-            }
-        }
-        public double TrafficRemainingPercentage
-        {
-            get => TrafficLimitAvailable
-                ? (TrafficTotal.Value - TrafficUsed.Value) / TrafficTotal.Value * 100.0
-                : 0d;
-        }
+        public TrafficUsage TrafficUsage { get; set; }
     }
     public sealed class Ssd : IHostedConfigFormat
     {
@@ -59,7 +31,6 @@ namespace YtFlow.Tasks.Hosted.Format
                 // The ID field is completely useless.
                 // public int Id { get; set; }
                 // TODO: Other fields are omitted
-
             }
             public string Airport { get; set; }
             public ushort Port { get; set; }
@@ -123,7 +94,7 @@ namespace YtFlow.Tasks.Hosted.Format
             return new Snapshot()
             {
                 AdapterConfigs = servers,
-                AssociatedData = new JObject
+                FormatAssociatedData = new JObject
                 {
                     { nameof(SsdData.Airport), data.Airport },
                     { nameof(SsdData.TrafficUsed), data.TrafficUsed },
@@ -135,17 +106,33 @@ namespace YtFlow.Tasks.Hosted.Format
 
         public object GetAssociatedDataFromObject (object obj)
         {
-            if (obj is JObject json)
+            if (!(obj is JObject json))
+            {
+                return obj;
+            }
+            if (!json.TryGetValue(nameof(SsdData.Airport), out var airportToken)
+                || airportToken.Type != JTokenType.String)
+            {
+                return null;
+            }
+            var airport = airportToken.Value<string>();
+            try
             {
                 return new SsdAssociatedData()
                 {
-                    Airport = (string)json[nameof(SsdData.Airport)],
-                    TrafficUsed = (double?)json[nameof(SsdData.TrafficUsed)],
-                    TrafficTotal = (double?)json[nameof(SsdData.TrafficTotal)],
-                    Expiry = (DateTime?)json[nameof(SsdData.Expiry)],
+                    Airport = airport,
+                    TrafficUsage = new TrafficUsage()
+                    {
+                        TrafficUsed = (long)((double)json[nameof(SsdData.TrafficUsed)] * 1073741824d),
+                        TrafficTotal = (long)((double)json[nameof(SsdData.TrafficTotal)] * 1073741824d),
+                        Expiry = (DateTime)json[nameof(SsdData.Expiry)],
+                    },
                 };
             }
-            return null;
+            catch (Exception ex) when (ex is ArgumentNullException _ || ex is InvalidCastException _)
+            {
+                return new SsdAssociatedData() { Airport = airport };
+            }
         }
     }
 }
