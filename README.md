@@ -1,7 +1,7 @@
 # YtFlowApp
 [![Build Status](https://dev.azure.com/YtFlow/YtFlowApp/_apis/build/status/YtFlow.YtFlowApp?branchName=master)](https://dev.azure.com/YtFlow/YtFlowApp/_build/latest?definitionId=1&branchName=master) [![Telegram channel](https://img.shields.io/badge/Telegram-channel-blue)](https://t.me/YtFlowChannel) [![Join Beta testing](https://img.shields.io/badge/Join-Beta%20testing-blue)](https://forms.office.com/Pages/ResponsePage.aspx?id=DQSIkWdsW0yxEjajBLZtrQAAAAAAAAAAAAZAAJskVm9UMThNRlZRR1E5Q1dBMjM1MjFXVEk0UDlTMS4u)
 
-<a href='https://www.microsoft.com/store/apps/9PKF8HP44J2H?cid=storebadge&ocid=badge'><img src='https://developer.microsoft.com/en-us/store/badges/images/English_get-it-from-MS.png' alt='English badge' width="240"/></a>
+<a href='https://www.microsoft.com/store/apps/9NMB8FHL7MBZ?cid=storebadge&ocid=badge'><img src='https://developer.microsoft.com/en-us/store/badges/images/English_get-it-from-MS.png' alt='English badge' width="240"/></a>
 
 YtFlow is a network debug tool running on Universal Windows Platform that forwards any network traffic through certain types of tunnels.
 
