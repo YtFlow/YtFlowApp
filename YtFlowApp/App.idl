@@ -1,0 +1,65 @@
+namespace YtFlowApp
+{
+    [default_interface] runtimeclass MainPage : Windows.UI.Xaml.Controls.Page
+    {
+        MainPage();
+
+        Windows.UI.Xaml.Controls.Frame ContentFrame;
+    }
+
+    [default_interface] runtimeclass HomePage : Windows.UI.Xaml.Controls.Page
+    {
+        HomePage();
+
+        Windows.Foundation.Collections.IObservableVector<ProfileModel> Profiles
+        {
+            get;
+        };
+    }
+
+    [default_interface] runtimeclass FirstTimePage : Windows.UI.Xaml.Controls.Page
+    {
+        FirstTimePage();
+    }
+
+    [default_interface] runtimeclass NewProfilePage : Windows.UI.Xaml.Controls.Page
+    {
+        NewProfilePage();
+    }
+
+    [default_interface] runtimeclass EditProfilePage : Windows.UI.Xaml.Controls.Page
+    {
+        EditProfilePage();
+    }
+
+    [default_interface] runtimeclass HomeProfileControl : Windows.UI.Xaml.Controls.UserControl
+    {
+        HomeProfileControl();
+
+        ProfileModel Profile
+        {
+            get;
+            set;
+        };
+
+        Windows.UI.Xaml.Controls.MenuFlyout MoreActionsFlyout;
+
+        event Windows.Foundation.EventHandler<HomeProfileControl> ConnectRequested;
+        event Windows.Foundation.EventHandler<HomeProfileControl> EditRequested;
+        event Windows.Foundation.EventHandler<HomeProfileControl> DeleteRequested;
+    }
+
+    runtimeclass ProfileModel : Windows.UI.Xaml.Data.INotifyPropertyChanged
+    {
+        ProfileModel();
+
+        String Name
+        {
+            get;
+        };
+        UInt32 Id
+        {
+            get;
+        };
+    }
+}

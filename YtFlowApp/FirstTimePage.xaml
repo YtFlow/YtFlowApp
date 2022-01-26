@@ -1,0 +1,155 @@
+﻿<Page
+    x:Class="YtFlowApp.FirstTimePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:YtFlowApp"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    NavigationCacheMode="Enabled">
+
+    <Page.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Light">
+                    <Style TargetType="Border" x:Key="FakeBorder">
+                        <Setter Property="BorderBrush" Value="{ThemeResource ButtonBorderThemeBrush}" />
+                        <Setter Property="Background" Value="Transparent" />
+                    </Style>
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Dark">
+                    <Style TargetType="Border" x:Key="FakeBorder">
+                        <Setter Property="BorderBrush" Value="{ThemeResource SystemControlPageTextBaseHighBrush}" />
+                        <Setter Property="Background" Value="{ThemeResource SystemAccentColor}" />
+                    </Style>
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+            <Style x:Name="FakeSettingItemLabel" TargetType="TextBlock">
+                <Setter Property="Margin" Value="0, 16, 0, 4" />
+            </Style>
+            <Style x:Name="FakeSettingItemInput" TargetType="Control">
+                <Setter Property="HorizontalAlignment" Value="Stretch" />
+            </Style>
+            <Style x:Name="InstructionText" TargetType="TextBlock">
+                <Setter Property="Margin" Value="0, 0, 0, 23" />
+                <Setter Property="TextWrapping" Value="Wrap" />
+            </Style>
+        </ResourceDictionary>
+    </Page.Resources>
+
+    <ScrollViewer>
+        <StackPanel>
+            <ContentControl
+                x:Name="HeaderControl"
+                Margin="16, 0, 0, 0"
+                Style="{StaticResource NavigationViewTitleHeaderContentControlTextStyle}"
+            >
+                First Time Setup
+            </ContentControl>
+            <Grid x:Name="MainGrid" Padding="36" HorizontalAlignment="Stretch">
+                <Grid.ChildrenTransitions>
+                    <TransitionCollection>
+                        <RepositionThemeTransition />
+                    </TransitionCollection>
+                </Grid.ChildrenTransitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition x:Name="GapColumn" Width="0" />
+                    <ColumnDefinition x:Name="RightColumn" Width="0" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Border
+                    CornerRadius="15"
+                    HorizontalAlignment="Stretch"
+                    Grid.Column="0"
+                    Grid.Row="0"
+                    Padding="40, 20, 40, 20"
+                    Margin="0, 0, 0, 80"
+                    BorderThickness="1"
+                    Style="{StaticResource FakeBorder}"
+                >
+                    <StackPanel>
+                        <StackPanel.ChildrenTransitions>
+                            <TransitionCollection>
+                                <EntranceThemeTransition IsStaggeringEnabled="True" />
+                            </TransitionCollection>
+                        </StackPanel.ChildrenTransitions>
+                        <TextBlock Style="{ThemeResource SubtitleTextBlockStyle}" Margin="{ThemeResource ContentDialogTitleMargin}" FontWeight="SemiLight">Add VPN Connection</TextBlock>
+                        <TextBlock Style="{StaticResource FakeSettingItemLabel}">VPN provider</TextBlock>
+                        <ComboBox SelectedIndex="0" Style="{StaticResource FakeSettingItemInput}">
+                            <ComboBoxItem>YtFlow</ComboBoxItem>
+                        </ComboBox>
+                        <TextBlock Style="{StaticResource FakeSettingItemLabel}">Connection name</TextBlock>
+                        <TextBox Style="{StaticResource FakeSettingItemInput}" Text="YtFlow Auto" IsReadOnly="True" />
+                        <TextBlock Style="{StaticResource FakeSettingItemLabel}">Server name or address</TextBlock>
+                        <TextBox Style="{StaticResource FakeSettingItemInput}" Text="https://github.com/YtFlow" IsReadOnly="True" />
+                        <TextBlock
+                            x:Name="FakeOtherOptions"
+                            Style="{StaticResource FakeSettingItemLabel}"
+                            Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
+                            TextAlignment="Center"
+                            Margin="0, 10, 0, 10"
+                        >
+                            {... Leave other fields blank ...}
+                        </TextBlock>
+                        <Button HorizontalAlignment="Right" Margin="0, 16, 0, 0">Save</Button>
+                    </StackPanel>
+                </Border>
+                <StackPanel x:Name="InstructionPanel" Grid.Column="0" Grid.Row="1">
+                    <TextBlock
+                        Margin="0, 0, 0, 40"
+                        Style="{StaticResource SubtitleTextBlockStyle}"
+                    >
+                        One more step before we get started...
+                    </TextBlock>
+                    <TextBlock Style="{StaticResource InstructionText}">
+                        <Run>1. Go to</Run>
+                        <Run FontWeight="Bold">System Settings</Run>
+                        <Run>-</Run>
+                        <Run FontWeight="Bold">
+                             Network &amp; Internet
+                        </Run>
+                        <Run>-</Run>
+                        <Hyperlink NavigateUri="ms-settings:network-vpn" FontWeight="Bold">VPN</Hyperlink>
+                        <Run>.</Run>
+                    </TextBlock>
+                    <TextBlock Style="{StaticResource InstructionText}">
+                        <Run>2. Select</Run>
+                        <Run FontWeight="Bold">Add a VPN connection</Run>
+                        <Run>.</Run>
+                    </TextBlock>
+                    <TextBlock Style="{StaticResource InstructionText}">
+                        <Run>3. Create a new VPN connection using the details as shown in this page.</Run>
+                    </TextBlock>
+                    <TextBlock Style="{StaticResource InstructionText}">
+                        <Run>4. When finished, go back to this page and proceed.</Run>
+                    </TextBlock>
+                    <ProgressBar Margin="0, 40, 0, 0" IsIndeterminate="True" />
+                </StackPanel>
+            </Grid>
+        </StackPanel>
+
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup>
+                <VisualState>
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="{StaticResource MediumAdaptiveWidth}" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="HeaderControl.Margin" Value="{ThemeResource NavigationViewHeaderMargin}" />
+                        <Setter Target="MainGrid.Padding" Value="56" />
+                        <Setter Target="GapColumn.Width" Value="80" />
+                        <Setter Target="RightColumn.Width" Value="*" />
+                        <Setter Target="FakeOtherOptions.Margin" Value="0, 80, 0, 80" />
+                        <Setter Target="InstructionPanel.(Grid.Row)" Value="0" />
+                        <Setter Target="InstructionPanel.(Grid.Column)" Value="2" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+    </ScrollViewer>
+
+</Page>

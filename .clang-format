@@ -1,0 +1,8 @@
+BasedOnStyle: Microsoft
+NamespaceIndentation: All
+FixNamespaceComments: false
+IncludeCategories:
+  - Regex:           'pch'
+    Priority:        100
+    SortPriority:    -100
+    CaseSensitive:   true
