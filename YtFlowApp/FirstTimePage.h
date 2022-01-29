@@ -15,7 +15,7 @@ namespace winrt::YtFlowApp::implementation
         fire_and_forget Current_Activated(IInspectable const &sender, WindowActivatedEventArgs const &args);
 
       private:
-        std::optional<event_token> m_currentActivated;
+        event_token m_currentActivated;
     };
 }
 

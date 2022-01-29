@@ -49,6 +49,15 @@
     <ClCompile Include="UI.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
+    <ClCompile Include="PluginModel.cpp">
+      <Filter>Models</Filter>
+    </ClCompile>
+    <ClCompile Include="EditPluginModel.cpp">
+      <Filter>Models</Filter>
+    </ClCompile>
+    <ClCompile Include="EditPluginTreeViewItemTemplateSelector.cpp">
+      <Filter>TemplateSelector</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -69,6 +78,15 @@
     </ClInclude>
     <ClInclude Include="UI.h">
       <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="PluginModel.h">
+      <Filter>Models</Filter>
+    </ClInclude>
+    <ClInclude Include="EditPluginModel.h">
+      <Filter>Models</Filter>
+    </ClInclude>
+    <ClInclude Include="EditPluginTreeViewItemTemplateSelector.h">
+      <Filter>TemplateSelector</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -244,6 +262,9 @@
     </Filter>
     <Filter Include="Controls">
       <UniqueIdentifier>{ff544cab-c080-4777-9959-3044402a2a5a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TemplateSelector">
+      <UniqueIdentifier>{341d59ac-483d-4d78-b6b2-3a1d81953404}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

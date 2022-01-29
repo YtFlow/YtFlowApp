@@ -53,13 +53,92 @@ namespace YtFlowApp
     {
         ProfileModel();
 
-        String Name
-        {
-            get;
-        };
         UInt32 Id
         {
             get;
         };
+        String Name
+        {
+            get;
+            set;
+        };
+        String Locale
+        {
+            get;
+            set;
+        };
+    }
+    runtimeclass PluginModel : Windows.UI.Xaml.Data.INotifyPropertyChanged
+    {
+        UInt32 Id
+        {
+            get;
+        };
+        UInt32 ProfileId
+        {
+            get;
+        };
+        String Name
+        {
+            get;
+            set;
+        };
+        String Desc
+        {
+            get;
+            set;
+        };
+        String Plugin
+        {
+            get;
+            set;
+        };
+        UInt16 PluginVersion
+        {
+            get;
+            set;
+        };
+        UInt8[] Param
+        {
+            get;
+            set;
+        };
+    }
+    runtimeclass EditPluginModel : Windows.UI.Xaml.Data.INotifyPropertyChanged
+    {
+        EditPluginModel();
+
+        PluginModel Plugin
+        {
+            get;
+        };
+        Boolean IsEntry
+        {
+            get;
+            set;
+        };
+        Boolean IsNotEntry
+        {
+            get;
+        };
+        Boolean IsDirty
+        {
+            get;
+            set;
+        };
+        Windows.Foundation.IStringable EditorParam
+        {
+            get;
+            set;
+        };
+    }
+
+    [default_interface] runtimeclass EditPluginTreeViewItemTemplateSelector
+        : Windows.UI.Xaml.Controls.DataTemplateSelector
+    {
+        EditPluginTreeViewItemTemplateSelector();
+
+        Windows.UI.Xaml.DataTemplate CategoryTemplate;
+        Windows.UI.Xaml.DataTemplate PluginTemplate;
     }
 }

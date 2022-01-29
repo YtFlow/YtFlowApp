@@ -4,6 +4,13 @@
 
 namespace winrt::YtFlowApp::implementation
 {
+    struct FfiNoop
+    {
+        inline static std::pair<void *, uintptr_t> from_ffi(void *ptr, uintptr_t meta)
+        {
+            return std::make_pair(ptr, meta);
+        }
+    };
     struct FfiException : public std::exception
     {
         std::string msg;
@@ -24,19 +31,53 @@ namespace winrt::YtFlowApp::implementation
             throw ex;
         }
     }
-    struct FfiNoop
+    template <typename R> R unwrap_ffi_buffer(ytflow_core::FfiResult r)
     {
-        inline static std::pair<void *, uintptr_t> from_ffi(void *ptr, uintptr_t meta)
-        {
-            return std::make_pair(ptr, meta);
-        }
-    };
+        const auto [ptrRaw, metaRaw] = unwrap_ffi_result<FfiNoop>(r);
+        auto ptr = (const uint8_t *)ptrRaw;
+        auto meta = (size_t)metaRaw;
+        R json = nlohmann::json::from_cbor(ptr, ptr + meta);
+        unwrap_ffi_result<FfiNoop>(ytflow_core::ytflow_buffer_free(ptrRaw, metaRaw));
+        return json;
+    }
     struct FfiProfile
     {
         uint32_t id;
         std::string name;
+        std::string locale;
     };
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(FfiProfile, id, name)
+    struct FfiPluginDescriptor
+    {
+        std::string descriptor;
+        // TODO: bitflags Serializing
+        // std::string type;
+    };
+    struct FfiPluginVerifyResult
+    {
+        std::vector<FfiPluginDescriptor> required;
+        std::vector<FfiPluginDescriptor> provides;
+
+    };
+    inline void from_json(nlohmann::json const &json, FfiPluginVerifyResult &r)
+    {
+        json.at("requires").get_to(r.required);
+        json.at("provides").get_to(r.provides);
+    }
+    struct FfiPlugin
+    {
+        uint32_t id;
+        std::string name;
+        std::string desc;
+        std::string plugin;
+        uint16_t plugin_version;
+        std::vector<uint8_t> param;
+
+        static FfiPluginVerifyResult verify(char const *plugin, uint16_t plugin_version, uint8_t const *param,
+                                            size_t param_len);
+    };
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(FfiPluginDescriptor, descriptor)
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(FfiProfile, id, name, locale)
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(FfiPlugin, id, name, desc, plugin, plugin_version, param)
     struct FfiConn final
     {
         FfiConn(ytflow_core::Connection *conn) noexcept : conn_ptr(conn)
@@ -49,6 +90,12 @@ namespace winrt::YtFlowApp::implementation
         std::vector<FfiProfile> GetProfiles() const &;
         void DeleteProfile(uint32_t id) const &;
         uint32_t CreateProfile(const char *name, const char *locale) const &;
+        void UpdateProfile(uint32_t id, const char *name, const char *locale) const &;
+        std::vector<FfiPlugin> GetPluginsByProfile(uint32_t profileId) const &;
+        std::vector<FfiPlugin> GetEntryPluginsByProfile(uint32_t profileId) const &;
+        void SetPluginAsEntry(uint32_t pluginId, uint32_t profileId) const &;
+        void UnsetPluginAsEntry(uint32_t pluginId, uint32_t profileId) const &;
+        void DeletePlugin(uint32_t id) const &;
 
         static FfiConn from_ffi(void *ptr1, uintptr_t);
         ~FfiConn();

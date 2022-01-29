@@ -32,6 +32,13 @@ namespace winrt::YtFlowApp::implementation
         }
     }
 
+    FfiPluginVerifyResult FfiPlugin::verify(char const *plugin, uint16_t plugin_version, uint8_t const *param,
+                                            size_t param_len)
+    {
+        return unwrap_ffi_buffer<FfiPluginVerifyResult>(
+            ytflow_core::ytflow_plugin_verify(plugin, plugin_version, param, param_len));
+    }
+
     FfiDb::FfiDb(FfiDb &&that) noexcept : db_ptr(that.db_ptr)
     {
         that.db_ptr = nullptr;
@@ -79,22 +86,42 @@ namespace winrt::YtFlowApp::implementation
     }
     std::vector<FfiProfile> FfiConn::GetProfiles() const &
     {
-        const auto [ptrRaw, metaRaw] = unwrap_ffi_result<FfiNoop>(ytflow_core::ytflow_profiles_get_all(conn_ptr));
-        auto ptr = (const uint8_t *)ptrRaw;
-        auto meta = (size_t)metaRaw;
-        std::vector<FfiProfile> json = nlohmann::json::from_cbor(ptr, ptr + meta);
-        unwrap_ffi_result<FfiNoop>(ytflow_core::ytflow_buffer_free(ptrRaw, metaRaw));
-        return json;
+        return unwrap_ffi_buffer<std::vector<FfiProfile>>(ytflow_core::ytflow_profiles_get_all(conn_ptr));
     }
     uint32_t FfiConn::CreateProfile(const char *name, const char *locale) const &
     {
         const auto [ptrRaw, metaRaw] =
             unwrap_ffi_result<FfiNoop>(ytflow_core::ytflow_profile_create(name, locale, conn_ptr));
-        return (uint32_t)ptrRaw;
+        return (uint32_t)((uintptr_t)ptrRaw & 0xFFFFFFFF);
     }
     void FfiConn::DeleteProfile(uint32_t id) const &
     {
         unwrap_ffi_result<FfiNoop>(ytflow_core::ytflow_profile_delete(id, conn_ptr));
+    }
+    void FfiConn::UpdateProfile(uint32_t id, const char *name, const char *locale) const &
+    {
+        unwrap_ffi_result<FfiNoop>(ytflow_core::ytflow_profile_update(id, name, locale, conn_ptr));
+    }
+    std::vector<FfiPlugin> FfiConn::GetEntryPluginsByProfile(uint32_t profileId) const &
+    {
+        return unwrap_ffi_buffer<std::vector<FfiPlugin>>(ytflow_core::ytflow_plugins_get_entry(profileId, conn_ptr));
+    }
+    std::vector<FfiPlugin> FfiConn::GetPluginsByProfile(uint32_t profileId) const &
+    {
+        return unwrap_ffi_buffer<std::vector<FfiPlugin>>(
+            ytflow_core::ytflow_plugins_get_by_profile(profileId, conn_ptr));
+    }
+    void FfiConn::SetPluginAsEntry(uint32_t pluginId, uint32_t profileId) const &
+    {
+        unwrap_ffi_result<FfiNoop>(ytflow_core::ytflow_plugin_set_as_entry(pluginId, profileId, conn_ptr));
+    }
+    void FfiConn::UnsetPluginAsEntry(uint32_t pluginId, uint32_t profileId) const &
+    {
+        unwrap_ffi_result<FfiNoop>(ytflow_core::ytflow_plugin_unset_as_entry(pluginId, profileId, conn_ptr));
+    }
+    void FfiConn::DeletePlugin(uint32_t id) const &
+    {
+        unwrap_ffi_result<FfiNoop>(ytflow_core::ytflow_plugin_delete(id, conn_ptr));
     }
 
     FfiConn FfiConn::from_ffi(void *ptr1, uintptr_t)

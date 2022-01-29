@@ -24,10 +24,15 @@ App::App()
     InitializeComponent();
     Suspending({this, &App::OnSuspending});
 
-#if defined _DEBUG && !defined DISABLE_XAML_GENERATED_BREAK_ON_UNHANDLED_EXCEPTION
+#if !defined _DEBUG
     UnhandledException([this](IInspectable const &, UnhandledExceptionEventArgs const &e) {
         auto errorMessage = e.Message();
         NotifyUser(errorMessage, L"Unexpected error");
+    });
+#endif
+#if defined _DEBUG && !defined DISABLE_XAML_GENERATED_BREAK_ON_UNHANDLED_EXCEPTION
+    UnhandledException([this](IInspectable const &, UnhandledExceptionEventArgs const &e) {
+        auto errorMessage = e.Message();
         if (IsDebuggerPresent())
         {
             __debugbreak();
@@ -60,6 +65,7 @@ void App::OnLaunched(LaunchActivatedEventArgs const &e)
         // a SuspensionManager key
         rootFrame = Frame();
 
+        rootFrame.CacheSize(16);
         rootFrame.NavigationFailed({this, &App::OnNavigationFailed});
 
         if (e.PreviousExecutionState() == ApplicationExecutionState::Terminated)

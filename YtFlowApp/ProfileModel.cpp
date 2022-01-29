@@ -13,15 +13,6 @@ namespace winrt::YtFlowApp::implementation
     {
         m_propertyChanged.remove(token);
     }
-    hstring ProfileModel::Name()
-    {
-        return m_name;
-    }
-    void ProfileModel::Name(hstring const &value)
-    {
-        m_name = value;
-        m_propertyChanged(*this, Windows::UI::Xaml::Data::PropertyChangedEventArgs{L"Title"});
-    }
     uint32_t ProfileModel::Id()
     {
         return m_id;
@@ -29,5 +20,23 @@ namespace winrt::YtFlowApp::implementation
     void ProfileModel::Id(uint32_t const &value)
     {
         m_id = value;
+    }
+    hstring ProfileModel::Name()
+    {
+        return m_name;
+    }
+    void ProfileModel::Name(hstring const &value)
+    {
+        m_name = value;
+        m_propertyChanged(*this, Windows::UI::Xaml::Data::PropertyChangedEventArgs{L"Name"});
+    }
+    hstring ProfileModel::Locale()
+    {
+        return m_locale;
+    }
+    void ProfileModel::Locale(hstring const &value)
+    {
+        m_locale = value;
+        m_propertyChanged(*this, Windows::UI::Xaml::Data::PropertyChangedEventArgs{L"Locale"});
     }
 }

@@ -144,7 +144,7 @@ namespace winrt::YtFlowApp::implementation
         }
         deleting = true;
         const auto lifetime{get_strong()};
-        auto const &profile = control.Profile();
+        auto const profile = control.Profile();
         ConfirmProfileDeleteDialog().Content(profile);
         const auto ret{co_await ConfirmProfileDeleteDialog().ShowAsync()};
         if (ret != ContentDialogResult::Primary)
@@ -157,10 +157,10 @@ namespace winrt::YtFlowApp::implementation
         conn.DeleteProfile(profile.Id());
         co_await resume_foreground(Dispatcher());
         deleting = false;
+        ConfirmProfileDeleteDialog().Content(nullptr);
         uint32_t index;
         if (!m_profiles.IndexOf(profile, index))
         {
-            deleting = false;
             co_return;
         }
         m_profiles.RemoveAt(index);

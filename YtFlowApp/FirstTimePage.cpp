@@ -24,11 +24,9 @@ namespace winrt::YtFlowApp::implementation
     }
     void FirstTimePage::OnNavigatedFrom(Windows::UI::Xaml::Navigation::NavigationEventArgs const &)
     {
-        std::optional<event_token> currentActivated{};
-        m_currentActivated.swap(currentActivated);
-        if (currentActivated.has_value())
+        if (m_currentActivated)
         {
-            Window::Current().Activated(*currentActivated);
+            Window::Current().Activated(m_currentActivated);
         }
     }
     fire_and_forget FirstTimePage::Current_Activated(IInspectable const &, WindowActivatedEventArgs const &args)

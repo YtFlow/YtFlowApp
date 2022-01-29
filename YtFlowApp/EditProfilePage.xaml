@@ -5,9 +5,181 @@
     xmlns:local="using:YtFlowApp"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    mc:Ignorable="d"
+    NavigationCacheMode="Enabled">
 
-    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-        <Button x:Name="Button">Click Me</Button>
-    </StackPanel>
+    <Page.Resources>
+        <local:EditPluginTreeViewItemTemplateSelector x:Key="TreeItemSelector">
+            <local:EditPluginTreeViewItemTemplateSelector.CategoryTemplate>
+                <DataTemplate x:DataType="muxc:TreeViewNode">
+                    <StackPanel Orientation="Horizontal">
+                        <FontIcon Glyph="&#xED41;" Margin="0, 2, 4, 0" />
+                        <ContentControl Content="{x:Bind Content}" />
+                    </StackPanel>
+                </DataTemplate>
+            </local:EditPluginTreeViewItemTemplateSelector.CategoryTemplate>
+            <local:EditPluginTreeViewItemTemplateSelector.PluginTemplate>
+                <DataTemplate x:DataType="muxc:TreeViewNode">
+                    <StackPanel Orientation="Vertical">
+                        <StackPanel.ContextFlyout>
+                            <MenuFlyout>
+                                <MenuFlyoutItem
+                                    Text="Set as Entry"
+                                    Visibility="{x:Bind ((local:EditPluginModel)Content).IsNotEntry, Mode=OneWay}"
+                                    Click="SetAsEntryMenuItem_Click"
+                                >
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="&#xE819;" />
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                                <MenuFlyoutItem
+                                    Text="Deactivate"
+                                    Visibility="{x:Bind ((local:EditPluginModel)Content).IsEntry, Mode=OneWay}"
+                                    Click="DeactivateMenuItem_Click"
+                                >
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="&#xF140;" />
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                                <MenuFlyoutItem
+                                    Text="Delete"
+                                    Icon="Delete"
+                                    IsEnabled="{x:Bind ((local:EditPluginModel)Content).IsNotEntry, Mode=OneWay}"
+                                    Click="DeleteMenuItem_Click"
+                                />
+                            </MenuFlyout>
+                        </StackPanel.ContextFlyout>
+                        <StackPanel Orientation="Horizontal">
+                            <FontIcon
+                                Glyph="&#xE819;"
+                                Margin="0, 0, 4, 0"
+                                Visibility="{x:Bind ((local:EditPluginModel)Content).IsEntry, Mode=OneWay}"
+                            />
+                            <TextBlock Text="{x:Bind ((local:EditPluginModel)Content).Plugin.Name, Mode=OneWay}" />
+                        </StackPanel>
+                        <TextBlock
+                            Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
+                            Text="{x:Bind ((local:EditPluginModel)Content).Plugin.Plugin, Mode=OneWay}"
+                        />
+                    </StackPanel>
+                </DataTemplate>
+            </local:EditPluginTreeViewItemTemplateSelector.PluginTemplate>
+        </local:EditPluginTreeViewItemTemplateSelector>
+    </Page.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition x:Name="MasterCol" Width="*" />
+            <ColumnDefinition x:Name="DetailCol" Width="0" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Column="0" Grid.Row="0" Margin="16, 0, 0, 20">
+            <TextBlock Margin="4, 0, 0, 10" FontWeight="Bold">Editing Profile</TextBlock>
+            <TextBox
+                x:Name="ProfileNameBox"
+                Margin="0, 0, 10, 0"
+                Text="default-profile"
+                KeyDown="ProfileNameBox_KeyDown"
+                LostFocus="ProfileNameBox_LostFocus"
+            />
+        </StackPanel>
+
+        <muxc:TreeView
+            x:Name="PluginTreeView"
+            Grid.Column="0"
+            Grid.Row="1"
+            Margin="16, 0, 0, 0"
+            SelectionMode="None"
+            ScrollViewer.VerticalScrollMode="Disabled"
+            ItemTemplateSelector="{StaticResource TreeItemSelector}"
+            ItemInvoked="PluginTreeView_ItemInvoked"
+            Collapsed="PluginTreeView_Collapsed"
+        >
+            <muxc:TreeView.RootNodes>
+                <muxc:TreeViewNode>
+                    <muxc:TreeViewNode.Content>
+                        <StackPanel Orientation="Horizontal">
+                            <SymbolIcon Symbol="AddFriend" />
+                            <TextBlock Text="GGG" />
+                        </StackPanel>
+                    </muxc:TreeViewNode.Content>
+                </muxc:TreeViewNode>
+            </muxc:TreeView.RootNodes>
+        </muxc:TreeView>
+
+        <CommandBar Grid.Column="0" Grid.Row="2">
+            <AppBarButton Label="Add" Icon="Add" />
+            <AppBarButton Label="Sort" Icon="Sort">
+                <AppBarButton.Flyout>
+                    <MenuFlyout>
+                        <MenuFlyoutItem Text="By name" x:Name="SortByNameItem" Click="SortByItem_Click">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Visibility="Collapsed" Glyph="&#xEA3B;" FontSize="2" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutItem Text="By dependency" x:Name="SortByDependencyItem" Click="SortByItem_Click">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Visibility="Collapsed" Glyph="&#xEA3B;" FontSize="2" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutItem
+                            x:Name="SortByCategoryItem"
+                            Text="By category"
+                            Click="SortByItem_Click"
+                            Visibility="Collapsed"
+                        >
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Visibility="Collapsed" Glyph="&#xEA3B;" FontSize="2" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                    </MenuFlyout>
+                </AppBarButton.Flyout>
+            </AppBarButton>
+        </CommandBar>
+        <Frame Grid.Column="1" Grid.Row="0" Grid.RowSpan="3" CacheSize="0" />
+
+        <ContentDialog
+            x:Name="ConfirmPluginDeleteDialog"
+            Grid.ColumnSpan="2"
+            Grid.RowSpan="3"
+            CloseButtonText="Cancel"
+            PrimaryButtonText="Delete"
+            DefaultButton="Primary"
+            Title="Delete Plugin permanently?"
+        >
+            <ContentDialog.ContentTemplate>
+                <DataTemplate x:DataType="local:EditPluginModel">
+                    <TextBlock TextWrapping="Wrap">
+                        <Run>Do you want to delete Plugin</Run>
+                        <Run FontFamily="Consolas" Text="{x:Bind Plugin.Name}" />
+                        <Run>(</Run>
+                        <Run FontFamily="Consolas" Text="{x:Bind Plugin.Plugin}" />
+                        <Run>)</Run>
+                        <Run>? This operation cannot be undone.</Run>
+                    </TextBlock>
+                </DataTemplate>
+            </ContentDialog.ContentTemplate>
+        </ContentDialog>
+
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup>
+                <VisualState>
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="{StaticResource MediumAdaptiveWidth}" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="MasterCol.Width" Value="300" />
+                        <Setter Target="DetailCol.Width" Value="*" />
+                        <Setter Target="PluginTreeView.Margin" Value="0, 0, 0, 0" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+    </Grid>
 </Page>

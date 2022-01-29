@@ -2,6 +2,7 @@
 #include "App.xaml.g.h"
 
 #include "ProfileModel.h"
+#include "EditPluginTreeViewItemTemplateSelector.h"
 
 namespace winrt::YtFlowApp::implementation
 {
