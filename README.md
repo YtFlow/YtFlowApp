@@ -5,6 +5,8 @@
 
 YtFlow is a network debug tool running on Universal Windows Platform that forwards any network traffic through certain types of tunnels.
 
+**A note to prospective contributors: A complete rewrite of YtFlowApp is in progress. Contributions based on the current branch will not be entertained.**
+
 ## Supported protocols
 - Shadowsocks
   - stream ciphers (rc4-md5, aes-128-cfb, aes-192-cfb, aes-256-cfb, aes-128-ctr, aes-192-ctr, aes-256-ctr, camellia-128-cfb, camellia-192-cfb, camellia-256-cfb, salsa20, chacha20, chacha20-ietf)
