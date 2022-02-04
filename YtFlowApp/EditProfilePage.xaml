@@ -10,6 +10,9 @@
     NavigationCacheMode="Enabled">
 
     <Page.Resources>
+        <local:PluginTypeToDescConverter x:Key="PluginTypeToDesc" />
+        <local:BoolToFontWeightConverter x:Key="BoolToFontWeight" />
+
         <local:EditPluginTreeViewItemTemplateSelector x:Key="TreeItemSelector">
             <local:EditPluginTreeViewItemTemplateSelector.CategoryTemplate>
                 <DataTemplate x:DataType="muxc:TreeViewNode">
@@ -56,7 +59,10 @@
                                 Margin="0, 0, 4, 0"
                                 Visibility="{x:Bind ((local:EditPluginModel)Content).IsEntry, Mode=OneWay}"
                             />
-                            <TextBlock Text="{x:Bind ((local:EditPluginModel)Content).Plugin.Name, Mode=OneWay}" />
+                            <TextBlock
+                                Text="{x:Bind ((local:EditPluginModel)Content).Plugin.Name, Mode=OneWay}"
+                                FontWeight="{x:Bind ((local:EditPluginModel)Content).IsDirty, Mode=OneWay, Converter={StaticResource BoolToFontWeight}}"
+                            />
                         </StackPanel>
                         <TextBlock
                             Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
@@ -100,21 +106,10 @@
             ItemTemplateSelector="{StaticResource TreeItemSelector}"
             ItemInvoked="PluginTreeView_ItemInvoked"
             Collapsed="PluginTreeView_Collapsed"
-        >
-            <muxc:TreeView.RootNodes>
-                <muxc:TreeViewNode>
-                    <muxc:TreeViewNode.Content>
-                        <StackPanel Orientation="Horizontal">
-                            <SymbolIcon Symbol="AddFriend" />
-                            <TextBlock Text="GGG" />
-                        </StackPanel>
-                    </muxc:TreeViewNode.Content>
-                </muxc:TreeViewNode>
-            </muxc:TreeView.RootNodes>
-        </muxc:TreeView>
+        />
 
         <CommandBar Grid.Column="0" Grid.Row="2">
-            <AppBarButton Label="Add" Icon="Add" />
+            <AppBarButton Label="Add" Icon="Add" Click="AddPluginButton_Click" />
             <AppBarButton Label="Sort" Icon="Sort">
                 <AppBarButton.Flyout>
                     <MenuFlyout>
@@ -142,7 +137,14 @@
                 </AppBarButton.Flyout>
             </AppBarButton>
         </CommandBar>
-        <Frame Grid.Column="1" Grid.Row="0" Grid.RowSpan="3" CacheSize="0" />
+        <Frame
+            x:Name="EditorFrame"
+            Grid.Column="1"
+            Grid.Row="0"
+            Grid.RowSpan="3"
+            CacheSize="5"
+            Background="{ThemeResource LayerFillColorDefaultBrush}"
+        />
 
         <ContentDialog
             x:Name="ConfirmPluginDeleteDialog"
@@ -165,6 +167,58 @@
                     </TextBlock>
                 </DataTemplate>
             </ContentDialog.ContentTemplate>
+        </ContentDialog>
+        <ContentDialog
+            x:Name="AddPluginDialog"
+            Grid.ColumnSpan="2"
+            Grid.RowSpan="3"
+            CloseButtonText="Cancel"
+            PrimaryButtonText="Add"
+            DefaultButton="Primary"
+            Title="Create Plugin"
+            Closing="AddPluginDialog_Closing"
+        >
+            <StackPanel>
+                <TextBlock Style="{ThemeResource BaseTextBlockStyle}" Margin="0, 0, 0, 8">Type</TextBlock>
+                <ComboBox x:Name="NewPluginTypeBox" HorizontalAlignment="Stretch" SelectedIndex="0">
+                    <x:String>dns-server</x:String>
+                    <x:String>fake-ip</x:String>
+                    <x:String>forward</x:String>
+                    <x:String>host-resolver</x:String>
+                    <x:String>http-obfs-client</x:String>
+                    <x:String>http-obfs-server</x:String>
+                    <x:String>http-proxy-client</x:String>
+                    <x:String>ip-stack</x:String>
+                    <x:String>netif</x:String>
+                    <x:String>null</x:String>
+                    <x:String>redirect</x:String>
+                    <x:String>reject</x:String>
+                    <x:String>resolve-dest</x:String>
+                    <x:String>shadowsocks-client</x:String>
+                    <x:String>simple-dispatcher</x:String>
+                    <x:String>socket</x:String>
+                    <x:String>socket-listener</x:String>
+                    <x:String>socks5-client</x:String>
+                    <x:String>socks5-server</x:String>
+                    <x:String>system-resolver</x:String>
+                    <x:String>tls-client</x:String>
+                    <x:String>trojan-client</x:String>
+                    <x:String>vpn-tun</x:String>
+                </ComboBox>
+                <TextBlock
+                    Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
+                    TextWrapping="Wrap"
+                    Text="{x:Bind NewPluginTypeBox.SelectedItem, Converter={StaticResource PluginTypeToDesc}, Mode=OneWay}"
+                />
+                <TextBlock Style="{ThemeResource BaseTextBlockStyle}" Margin="0, 4, 0, 8">Name</TextBlock>
+                <TextBox
+                    x:Name="NewPluginNameText"
+                    HorizontalAlignment="Stretch"
+                    MaxLength="255"
+                    InputScope="AlphanumericHalfWidth"
+                    TextChanged="NewPluginNameText_TextChanged"
+                />
+            </StackPanel>
         </ContentDialog>
 
         <VisualStateManager.VisualStateGroups>

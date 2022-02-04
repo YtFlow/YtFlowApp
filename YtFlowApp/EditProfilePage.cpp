@@ -5,8 +5,11 @@
 #endif
 
 #include "PluginModel.h"
+#include "RxDispatcherScheduler.h"
 
+using namespace std::chrono_literals;
 using namespace winrt;
+using namespace Windows::UI::Text;
 using namespace Windows::UI::Xaml;
 using namespace Windows::UI::Xaml::Controls;
 using namespace Windows::UI::Xaml::Input;
@@ -18,6 +21,14 @@ namespace winrt::YtFlowApp::implementation
     EditProfilePage::EditProfilePage()
     {
         InitializeComponent();
+
+        auto const weak{get_weak()};
+        m_depChangeSubject$.get_observable().debounce(500ms, ObserveOnDispatcher()).subscribe([=](bool) {
+            if (auto self{weak.get()})
+            {
+                self->RefreshTreeView();
+            }
+        });
     }
 
     fire_and_forget EditProfilePage::OnNavigatedTo(NavigationEventArgs const &args)
@@ -25,10 +36,9 @@ namespace winrt::YtFlowApp::implementation
         const auto lifetime{get_strong()};
         m_profile = args.Parameter().as<ProfileModel>();
         ProfileNameBox().Text(m_profile->Name());
+        EditorFrame().Content(nullptr);
 
         co_await resume_background();
-        const auto initialSortType =
-            appData.LocalSettings().Values().TryLookup(L"YTFLOW_APP_PROFILE_EDIT_PLUGIN_SORT_TYPE").try_as<int32_t>();
         const auto conn{FfiDbInstance.Connect()};
         const auto plugins{conn.GetPluginsByProfile(m_profile->Id())};
         const auto entryPlugins{conn.GetEntryPluginsByProfile(m_profile->Id())};
@@ -36,17 +46,11 @@ namespace winrt::YtFlowApp::implementation
         co_await resume_foreground(Dispatcher());
         m_pluginModels.clear();
         m_pluginModels.reserve(plugins.size());
-        const auto profileId = m_profile->Id();
-        std::transform(plugins.begin(), plugins.end(), std::back_inserter(m_pluginModels), [=](auto p) {
-            auto pluginModel{winrt::make_self<YtFlowApp::implementation::PluginModel>(p, profileId)};
-            auto isEntry = entryPlugins.end() != std::find_if(entryPlugins.begin(), entryPlugins.end(),
-                                                              [&](auto const &ep) { return ep.id == p.id; });
-            return winrt::make_self<YtFlowApp::implementation::EditPluginModel>(std::move(pluginModel), isEntry);
+        std::transform(plugins.begin(), plugins.end(), std::back_inserter(m_pluginModels), [&](auto const &p) {
+            auto const isEntry{entryPlugins.end() != std::find_if(entryPlugins.begin(), entryPlugins.end(),
+                                                                  [&](auto const &ep) { return ep.id == p.id; })};
+            return CreateEditPluginModel(p, isEntry);
         });
-        if (initialSortType.has_value())
-        {
-            m_sortType = static_cast<SortType>(*initialSortType);
-        }
         RefreshTreeView();
     }
     void EditProfilePage::OnNavigatedFrom(NavigationEventArgs const & /* args */)
@@ -60,6 +64,52 @@ namespace winrt::YtFlowApp::implementation
         {
             PluginTreeView().Expanding(treeViewExpanding);
         }
+    }
+    void EditProfilePage::CheckRenamingPlugin(EditPluginModel *editPluginModel) const &
+    {
+        auto const name{editPluginModel->Plugin().Name()};
+        if (name.size() == 0)
+        {
+            editPluginModel->HasNamingConflict(true);
+            return;
+        }
+        for (auto const &model : m_pluginModels)
+        {
+            if (model->Plugin().Name() == name && editPluginModel != model.get())
+            {
+                editPluginModel->HasNamingConflict(true);
+                return;
+            }
+        }
+        editPluginModel->HasNamingConflict(false);
+    }
+    com_ptr<YtFlowApp::implementation::EditPluginModel> EditProfilePage::CreateEditPluginModel(FfiPlugin const &p,
+                                                                                               bool isEntry)
+    {
+        auto const pluginModel{winrt::make_self<YtFlowApp::implementation::PluginModel>(p, m_profile->Id())};
+        auto const editPluginModel{winrt::make_self<YtFlowApp::implementation::EditPluginModel>(pluginModel, isEntry)};
+        auto const editPluginModelWeak{weak_ref{editPluginModel}};
+        auto const weakThis{get_weak()};
+        pluginModel->PropertyChanged([=](auto const &, auto const &args) {
+            auto const self{weakThis.get()};
+            auto const editPluginModel{editPluginModelWeak.get()};
+            if (!self || !editPluginModel)
+            {
+                return;
+            }
+            editPluginModel->IsDirty(true);
+            auto const propertyName{args.PropertyName()};
+            if (propertyName == L"Name" || propertyName == L"Param")
+            {
+                m_depChangeSubject$.get_subscriber().on_next(true);
+            }
+            if (propertyName != L"Name")
+            {
+                return;
+            }
+            self->CheckRenamingPlugin(editPluginModel.get());
+        });
+        return editPluginModel;
     }
 
     void EditProfilePage::ProfileNameBox_KeyDown(IInspectable const & /* sender */, KeyRoutedEventArgs const &e)
@@ -261,6 +311,10 @@ namespace winrt::YtFlowApp::implementation
             tvNode.IsExpanded(!expanded);
             return;
         }
+
+        EditorFrame().BackStack().Clear();
+        EditorFrame().Navigate(xaml_typename<RawEditorPage>(), editPluginModel,
+                               Media::Animation::EntranceNavigationTransitionInfo{});
     }
 
     void EditProfilePage::SortByItem_Click(IInspectable const &sender, RoutedEventArgs const & /* e */)
@@ -307,8 +361,8 @@ namespace winrt::YtFlowApp::implementation
             node.HasUnrealizedChildren(false);
             for (auto const &dep : get_self<PluginModel>(model.Plugin())->GetDependencyPlugins())
             {
-                auto it = std::find_if(m_pluginModels.begin(), m_pluginModels.end(),
-                                       [&](auto const &m) { return m->Plugin().Name() == dep; });
+                auto const it = std::find_if(m_pluginModels.begin(), m_pluginModels.end(),
+                                             [&](auto const &m) { return m->Plugin().Name() == dep; });
                 if (it == m_pluginModels.end())
                 {
                     continue;
@@ -332,14 +386,18 @@ namespace winrt::YtFlowApp::implementation
         }
     }
 
-    void EditProfilePage::SetAsEntryMenuItem_Click(IInspectable const &sender, RoutedEventArgs const & /* e */)
+    fire_and_forget EditProfilePage::SetAsEntryMenuItem_Click(IInspectable const &sender,
+                                                              RoutedEventArgs const & /* e */)
     {
-        const auto &model{sender.as<FrameworkElement>()
+        auto const lifetime{get_strong()};
+        auto const &model{sender.as<FrameworkElement>()
                               .DataContext()
                               .as<muxc::TreeViewNode>()
                               .Content()
                               .as<YtFlowApp::EditPluginModel>()};
+        co_await resume_background();
         get_self<PluginModel>(model.Plugin())->SetAsEntry();
+        co_await resume_foreground(Dispatcher());
         model.IsEntry(true);
         if (m_sortType == SortType::ByDependency)
         {
@@ -347,14 +405,18 @@ namespace winrt::YtFlowApp::implementation
         }
     }
 
-    void EditProfilePage::DeactivateMenuItem_Click(IInspectable const &sender, RoutedEventArgs const & /* e */)
+    fire_and_forget EditProfilePage::DeactivateMenuItem_Click(IInspectable const &sender,
+                                                              RoutedEventArgs const & /* e */)
     {
-        const auto &model{sender.as<FrameworkElement>()
+        auto const lifetime{get_strong()};
+        auto const &model{sender.as<FrameworkElement>()
                               .DataContext()
                               .as<muxc::TreeViewNode>()
                               .Content()
                               .as<YtFlowApp::EditPluginModel>()};
+        co_await resume_background();
         get_self<PluginModel>(model.Plugin())->UnsetAsEntry();
+        co_await resume_foreground(Dispatcher());
         model.IsEntry(false);
         if (m_sortType == SortType::ByDependency)
         {
@@ -405,13 +467,58 @@ namespace winrt::YtFlowApp::implementation
         ConfirmPluginDeleteDialog().Content(nullptr);
         com_ptr<EditPluginModel> modelPtr;
         modelPtr.copy_from(get_self<EditPluginModel>(model));
-        auto it = std::find(m_pluginModels.begin(), m_pluginModels.end(), modelPtr);
+        auto const it{std::find(m_pluginModels.begin(), m_pluginModels.end(), modelPtr)};
         if (it == m_pluginModels.end())
         {
             co_return;
         }
         m_pluginModels.erase(it);
         RefreshTreeView();
+    }
+
+    fire_and_forget EditProfilePage::AddPluginButton_Click(IInspectable const & /* sender */,
+                                                           RoutedEventArgs const & /* e */)
+    {
+        auto const lifetime{get_strong()};
+        auto const res{co_await AddPluginDialog().ShowAsync()};
+        if (res != ContentDialogResult::Primary)
+        {
+            co_return;
+        };
+
+        // TODO:
+        // TODO: what if there is an unsaved plugin whose original name clash with this one?
+
+        RefreshTreeView();
+    }
+
+    void EditProfilePage::NewPluginNameText_TextChanged(IInspectable const & /* sender */,
+                                                        TextChangedEventArgs const & /* e */)
+    {
+        NewPluginNameText().Foreground({nullptr});
+    }
+
+    void EditProfilePage::AddPluginDialog_Closing(ContentDialog const & /* sender */,
+                                                  ContentDialogClosingEventArgs const &args)
+    {
+        if (args.Result() != ContentDialogResult::Primary)
+        {
+            return;
+        }
+        auto const pluginName{NewPluginNameText().Text()};
+        if (pluginName == L"")
+        {
+            NewPluginNameText().Focus(FocusState::Programmatic);
+            args.Cancel(true);
+            return;
+        }
+        auto const it{std::find_if(m_pluginModels.begin(), m_pluginModels.end(),
+                                   [&](auto const &model) { return model->Plugin().Name() == pluginName; })};
+        if (it != m_pluginModels.end())
+        {
+            NewPluginNameText().Foreground(Media::SolidColorBrush{Windows::UI::Colors::Red()});
+            args.Cancel(true);
+        }
     }
 
 }

@@ -1,5 +1,20 @@
 namespace YtFlowApp
 {
+    interface IPluginEditorParam
+    {
+        UInt8[] ToCbor();
+        String[] CheckErrors();
+    }
+
+    [default_interface] runtimeclass RawEditorParam : IPluginEditorParam
+    {
+        String RawJson
+        {
+            get;
+            set;
+        };
+    }
+
     [default_interface] runtimeclass MainPage : Windows.UI.Xaml.Controls.Page
     {
         MainPage();
@@ -30,6 +45,19 @@ namespace YtFlowApp
     [default_interface] runtimeclass EditProfilePage : Windows.UI.Xaml.Controls.Page
     {
         EditProfilePage();
+
+        Windows.UI.Xaml.Controls.ComboBox NewPluginTypeBox;
+    }
+    [default_interface] runtimeclass RawEditorPage : Windows.UI.Xaml.Controls.Page
+    {
+        RawEditorPage();
+        EditPluginModel Model
+        {
+            get;
+            set;
+        };
+
+        Windows.UI.Xaml.Media.SolidColorBrush PluginNameColor(Boolean hasNamingConflict);
     }
 
     [default_interface] runtimeclass HomeProfileControl : Windows.UI.Xaml.Controls.UserControl
@@ -126,7 +154,12 @@ namespace YtFlowApp
             get;
             set;
         };
-        Windows.Foundation.IStringable EditorParam
+        Boolean HasNamingConflict
+        {
+            get;
+            set;
+        };
+        IPluginEditorParam EditorParam
         {
             get;
             set;
@@ -140,5 +173,14 @@ namespace YtFlowApp
 
         Windows.UI.Xaml.DataTemplate CategoryTemplate;
         Windows.UI.Xaml.DataTemplate PluginTemplate;
+    }
+
+    [default_interface] runtimeclass PluginTypeToDescConverter : Windows.UI.Xaml.Data.IValueConverter
+    {
+        PluginTypeToDescConverter();
+    }
+    [default_interface] runtimeclass BoolToFontWeightConverter : Windows.UI.Xaml.Data.IValueConverter
+    {
+        BoolToFontWeightConverter();
     }
 }

@@ -22,6 +22,9 @@
     <Page Include="EditProfilePage.xaml">
       <Filter>Pages</Filter>
     </Page>
+    <Page Include="RawEditorPage.xaml">
+      <Filter>Pages\Editor</Filter>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Midl Include="App.idl" />
@@ -58,6 +61,18 @@
     <ClCompile Include="EditPluginTreeViewItemTemplateSelector.cpp">
       <Filter>TemplateSelector</Filter>
     </ClCompile>
+    <ClCompile Include="PluginTypeToDescConverter.cpp">
+      <Filter>Converter</Filter>
+    </ClCompile>
+    <ClCompile Include="BoolToFontWeightConverter.cpp">
+      <Filter>Converter</Filter>
+    </ClCompile>
+    <ClCompile Include="RawEditorParam.cpp">
+      <Filter>Models\PluginEditorParam</Filter>
+    </ClCompile>
+    <ClCompile Include="base64.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -87,6 +102,18 @@
     </ClInclude>
     <ClInclude Include="EditPluginTreeViewItemTemplateSelector.h">
       <Filter>TemplateSelector</Filter>
+    </ClInclude>
+    <ClInclude Include="PluginTypeToDescConverter.h">
+      <Filter>Converter</Filter>
+    </ClInclude>
+    <ClInclude Include="BoolToFontWeightConverter.h">
+      <Filter>Converter</Filter>
+    </ClInclude>
+    <ClInclude Include="RawEditorParam.h">
+      <Filter>Models\PluginEditorParam</Filter>
+    </ClInclude>
+    <ClInclude Include="base64.h">
+      <Filter>Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -265,6 +292,15 @@
     </Filter>
     <Filter Include="TemplateSelector">
       <UniqueIdentifier>{341d59ac-483d-4d78-b6b2-3a1d81953404}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Converter">
+      <UniqueIdentifier>{2817d091-1cee-4b22-838b-026b2fc1ac2c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Pages\Editor">
+      <UniqueIdentifier>{aef98080-0efb-4f97-8d63-38acb20c4442}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Models\PluginEditorParam">
+      <UniqueIdentifier>{44319004-09eb-4f67-9511-22650ad04300}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

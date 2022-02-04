@@ -6,9 +6,9 @@
 
 #include "ConnectionState.h"
 #include "CoreFfi.h"
+#include "EditProfilePage.h"
 #include "FirstTimePage.h"
 #include "NewProfilePage.h"
-#include "EditProfilePage.h"
 #include "ProfileModel.h"
 #include "RxDispatcherScheduler.h"
 #include "UI.h"
@@ -132,7 +132,8 @@ namespace winrt::YtFlowApp::implementation
     void HomePage::OnEditRequested(Windows::Foundation::IInspectable const & /* sender */,
                                    winrt::YtFlowApp::HomeProfileControl const &control)
     {
-        Frame().Navigate(xaml_typename<YtFlowApp::EditProfilePage>(), control.Profile());
+        Frame().Navigate(xaml_typename<YtFlowApp::EditProfilePage>(), control.Profile(),
+                         Media::Animation::DrillInNavigationTransitionInfo{});
     }
     fire_and_forget HomePage::OnDeleteRequested(Windows::Foundation::IInspectable const & /* sender */,
                                                 winrt::YtFlowApp::HomeProfileControl const &control)

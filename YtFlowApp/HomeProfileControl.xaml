@@ -32,9 +32,26 @@
             Margin="4, 8, 4, 2"
             HorizontalAlignment="Stretch"
             FontWeight="SemiBold"
-            Background="{ThemeResource SystemAccentColorDark1}"
             Click="ConnectButton_Click"
         >
+            <Button.Resources>
+                <ResourceDictionary>
+                    <ResourceDictionary.ThemeDictionaries>
+                        <ResourceDictionary x:Key="Light">
+                            <SolidColorBrush x:Key="ButtonBackground" Color="{ThemeResource SystemAccentColorLight3}" />
+                            <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="{ThemeResource SystemAccentColorLight2}" />
+                            <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="{ThemeResource SystemAccentColorLight2}" Opacity=".5" />
+                            <SolidColorBrush x:Key="ButtonForeground" Color="Black" Opacity=".7" />
+                            <SolidColorBrush x:Key="ButtonBorderBrush" Color="Transparent" />
+                        </ResourceDictionary>
+                        <ResourceDictionary x:Key="Dark">
+                            <SolidColorBrush x:Key="ButtonBackground" Color="{ThemeResource SystemAccentColorDark2}" />
+                            <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="{ThemeResource SystemAccentColorDark1}" />
+                            <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="{ThemeResource SystemAccentColorDark3}" />
+                        </ResourceDictionary>
+                    </ResourceDictionary.ThemeDictionaries>
+                </ResourceDictionary>
+            </Button.Resources>
             Connect
         </Button>
         <muxc:SplitButton

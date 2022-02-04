@@ -3,6 +3,8 @@
 
 #include "ProfileModel.h"
 #include "EditPluginTreeViewItemTemplateSelector.h"
+#include "PluginTypeToDescConverter.h"
+#include "BoolToFontWeightConverter.h"
 
 namespace winrt::YtFlowApp::implementation
 {

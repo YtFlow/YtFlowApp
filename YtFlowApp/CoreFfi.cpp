@@ -123,6 +123,19 @@ namespace winrt::YtFlowApp::implementation
     {
         unwrap_ffi_result<FfiNoop>(ytflow_core::ytflow_plugin_delete(id, conn_ptr));
     }
+    uint32_t FfiConn::CreatePlugin(uint32_t profileId, char const *name, char const *desc, char const *plugin,
+                                   uint16_t pluginVersion, uint8_t const *param, size_t paramLen) const &
+    {
+        const auto [ptrRaw, metaRaw] = unwrap_ffi_result<FfiNoop>(
+            ytflow_core::ytflow_plugin_create(profileId, name, desc, plugin, pluginVersion, param, paramLen, conn_ptr));
+        return (uint32_t)((uintptr_t)ptrRaw & 0xFFFFFFFF);
+    }
+    void FfiConn::UpdatePlugin(uint32_t id, uint32_t profileId, char const *name, char const *desc, char const *plugin,
+                               uint16_t pluginVersion, uint8_t const *param, size_t paramLen) const &
+    {
+        unwrap_ffi_result<FfiNoop>(ytflow_core::ytflow_plugin_update(
+            id, profileId, name, desc, plugin, pluginVersion, param, paramLen, conn_ptr));
+    }
 
     FfiConn FfiConn::from_ffi(void *ptr1, uintptr_t)
     {

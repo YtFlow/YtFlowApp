@@ -34,11 +34,20 @@ namespace winrt::YtFlowApp::implementation
         m_isDirty = value;
         m_propertyChanged(*this, Windows::UI::Xaml::Data::PropertyChangedEventArgs{L"IsDirty"});
     }
-    IStringable EditPluginModel::EditorParam()
+    bool EditPluginModel::HasNamingConflict()
+    {
+        return m_hasNamingConflict;
+    }
+    void EditPluginModel::HasNamingConflict(bool value)
+    {
+        m_hasNamingConflict = value;
+        m_propertyChanged(*this, Windows::UI::Xaml::Data::PropertyChangedEventArgs(L"HasNamingConflict"));
+    }
+    YtFlowApp::IPluginEditorParam EditPluginModel::EditorParam()
     {
         return m_editorParam;
     }
-    void EditPluginModel::EditorParam(IStringable const &value)
+    void EditPluginModel::EditorParam(IPluginEditorParam const &value)
     {
         m_editorParam = value;
         m_propertyChanged(*this, Windows::UI::Xaml::Data::PropertyChangedEventArgs{L"EditorParam"});

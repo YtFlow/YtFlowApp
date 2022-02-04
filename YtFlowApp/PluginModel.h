@@ -9,7 +9,7 @@ namespace winrt::YtFlowApp::implementation
     struct PluginModel : PluginModelT<PluginModel>
     {
         PluginModel(FfiPlugin const &plugin, uint32_t profileId)
-            : m_id(plugin.id), m_profileId(profileId), m_name(winrt::to_hstring(plugin.name)),
+            : OriginalPlugin(plugin), m_id(plugin.id), m_profileId(profileId), m_name(winrt::to_hstring(plugin.name)),
               m_desc(winrt::to_hstring(plugin.desc)), m_plugin(winrt::to_hstring(plugin.plugin)),
               m_pluginVersion(plugin.plugin_version), m_param(plugin.param)
         {
@@ -28,6 +28,8 @@ namespace winrt::YtFlowApp::implementation
         com_array<uint8_t> Param();
         void Param(array_view<uint8_t const> value);
 
+        FfiPlugin OriginalPlugin;
+
         winrt::event_token PropertyChanged(winrt::Windows::UI::Xaml::Data::PropertyChangedEventHandler const &handler);
         void PropertyChanged(winrt::event_token const &token) noexcept;
 
@@ -35,6 +37,7 @@ namespace winrt::YtFlowApp::implementation
         std::set<hstring> GetDependencyPlugins() const &;
         void SetAsEntry() const &;
         void UnsetAsEntry() const &;
+        void Update() const &;
 
       private:
         uint32_t m_id;

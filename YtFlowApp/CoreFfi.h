@@ -56,7 +56,6 @@ namespace winrt::YtFlowApp::implementation
     {
         std::vector<FfiPluginDescriptor> required;
         std::vector<FfiPluginDescriptor> provides;
-
     };
     inline void from_json(nlohmann::json const &json, FfiPluginVerifyResult &r)
     {
@@ -96,6 +95,10 @@ namespace winrt::YtFlowApp::implementation
         void SetPluginAsEntry(uint32_t pluginId, uint32_t profileId) const &;
         void UnsetPluginAsEntry(uint32_t pluginId, uint32_t profileId) const &;
         void DeletePlugin(uint32_t id) const &;
+        uint32_t CreatePlugin(uint32_t profileId, char const *name, char const *desc, char const *plugin,
+                              uint16_t pluginVersion, uint8_t const *param, size_t paramLen) const &;
+        void UpdatePlugin(uint32_t id, uint32_t profileId, char const *name, char const *desc, char const *plugin,
+                          uint16_t pluginVersion, uint8_t const *param, size_t paramLen) const &;
 
         static FfiConn from_ffi(void *ptr1, uintptr_t);
         ~FfiConn();

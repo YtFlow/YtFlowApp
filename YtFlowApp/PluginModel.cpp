@@ -110,4 +110,10 @@ namespace winrt::YtFlowApp::implementation
             // Ignore no entry error
         }
     }
+    void PluginModel::Update() const &
+    {
+        auto const conn{FfiDbInstance.Connect()};
+        conn.UpdatePlugin(m_id, m_profileId, winrt::to_string(m_name).data(), winrt::to_string(m_desc).data(),
+                          winrt::to_string(m_plugin).data(), m_pluginVersion, m_param.data(), m_param.size());
+    }
 }
