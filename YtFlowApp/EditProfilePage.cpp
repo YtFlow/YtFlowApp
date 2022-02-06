@@ -5,6 +5,7 @@
 #endif
 
 #include "PluginModel.h"
+#include "PluginTypeToDescConverter.h"
 #include "RxDispatcherScheduler.h"
 
 using namespace std::chrono_literals;
@@ -486,8 +487,32 @@ namespace winrt::YtFlowApp::implementation
             co_return;
         };
 
-        // TODO:
-        // TODO: what if there is an unsaved plugin whose original name clash with this one?
+        auto const pluginType{NewPluginTypeBox().SelectedValue().as<hstring>()};
+        auto const pluginName{NewPluginNameText().Text()};
+        FfiPlugin ffiPlugin;
+        ffiPlugin.name = winrt::to_string(pluginName);
+        ffiPlugin.desc = winrt::to_string(PluginTypeToDescConverter::DescMap.find(pluginType)->second.as<hstring>());
+        ffiPlugin.plugin = winrt::to_string(pluginType);
+        ffiPlugin.plugin_version = 0;
+        ffiPlugin.param = std::vector<uint8_t>{0xf6}; // TODO: param?
+
+        co_await resume_background();
+        auto const conn{FfiDbInstance.Connect()};
+        ffiPlugin.id =
+            conn.CreatePlugin(m_profile->Id(), ffiPlugin.name.data(), ffiPlugin.desc.data(), ffiPlugin.plugin.data(),
+                              ffiPlugin.plugin_version, ffiPlugin.param.data(), ffiPlugin.param.size());
+        co_await resume_foreground(Dispatcher());
+
+        for (auto const &model : m_pluginModels)
+        {
+            if (model->Plugin().Name() == pluginName)
+            {
+                model->HasNamingConflict(true);
+            }
+        }
+
+        auto const editPluginModel{CreateEditPluginModel(ffiPlugin, false)};
+        m_pluginModels.push_back(std::move(editPluginModel));
 
         RefreshTreeView();
     }
@@ -512,8 +537,10 @@ namespace winrt::YtFlowApp::implementation
             args.Cancel(true);
             return;
         }
-        auto const it{std::find_if(m_pluginModels.begin(), m_pluginModels.end(),
-                                   [&](auto const &model) { return model->Plugin().Name() == pluginName; })};
+        auto const pluginNameStr = winrt::to_string(pluginName);
+        auto const it{std::find_if(m_pluginModels.begin(), m_pluginModels.end(), [&](auto const &model) {
+            return get_self<PluginModel>(model->Plugin())->OriginalPlugin.name == pluginNameStr;
+        })};
         if (it != m_pluginModels.end())
         {
             NewPluginNameText().Foreground(Media::SolidColorBrush{Windows::UI::Colors::Red()});

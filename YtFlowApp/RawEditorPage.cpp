@@ -118,11 +118,11 @@ namespace winrt::YtFlowApp::implementation
             PluginNameBox().Focus(FocusState::Programmatic);
             co_return;
         }
-        auto const editorParam{m_model.EditorParam().as<YtFlowApp::RawEditorParam>()};
+        auto const editorParam{get_self<RawEditorParam>(m_model.EditorParam().as<YtFlowApp::RawEditorParam>())};
         hstring text;
         ParamEdit().Document().GetText(TextGetOptions::NoHidden, text);
-        editorParam.RawJson(text);
-        auto const paramErrors{editorParam.CheckErrors()};
+        editorParam->RawJson(text);
+        auto const paramErrors{editorParam->CheckErrors()};
         if (paramErrors.size() > 0)
         {
             hstring errorText;
@@ -134,9 +134,11 @@ namespace winrt::YtFlowApp::implementation
             ValidateErrorFlyout().ShowAt(SaveButton());
             co_return;
         }
+        editorParam->Prettify();
+        ParamEdit().Document().SetText(TextSetOptions::None, editorParam->RawJson());
 
         auto const pluginModel{get_self<PluginModel>(m_model.Plugin())};
-        auto const cbor{editorParam.ToCbor()};
+        auto const cbor{editorParam->ToCbor()};
         pluginModel->Param(cbor);
         try
         {

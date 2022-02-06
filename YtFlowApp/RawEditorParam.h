@@ -14,6 +14,7 @@ namespace winrt::YtFlowApp::implementation
         void RawJson(hstring const &value);
         com_array<uint8_t> ToCbor();
         com_array<hstring> CheckErrors();
+        void Prettify();
 
       private:
         static void EscapeCborBuf(nlohmann::json &doc);

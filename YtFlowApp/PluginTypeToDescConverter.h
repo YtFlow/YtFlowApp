@@ -15,9 +15,7 @@ namespace winrt::YtFlowApp::implementation
                                                       Windows::UI::Xaml::Interop::TypeName const &targetType,
                                                       Windows::Foundation::IInspectable const &parameter,
                                                       hstring const &language);
-
-      private:
-        inline static std::map<hstring, Windows::Foundation::IInspectable> const descMap{
+        inline static std::map<hstring, Windows::Foundation::IInspectable> const DescMap{
             {L"reject", box_value(L"Silently reject any incoming requests.")},
             {L"null", box_value(L"Silently drop any outgoing requests.")},
             {L"ip-stack", box_value(L"Handle TCP or UDP connections from a TUN.")},

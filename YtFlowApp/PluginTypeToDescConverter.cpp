@@ -13,8 +13,8 @@ namespace winrt::YtFlowApp::implementation
                                                     hstring const & /* language */)
     {
         auto const pluginType{unbox_value<hstring>(value)};
-        auto const it{descMap.find(pluginType)};
-        if (it == descMap.end())
+        auto const it{DescMap.find(pluginType)};
+        if (it == DescMap.end())
         {
             return value;
         }

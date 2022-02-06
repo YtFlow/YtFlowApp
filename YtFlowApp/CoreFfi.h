@@ -4,6 +4,7 @@
 
 namespace winrt::YtFlowApp::implementation
 {
+    constexpr const uint32_t INVALID_DB_ID = 0xFFFFFFFF;
     struct FfiNoop
     {
         inline static std::pair<void *, uintptr_t> from_ffi(void *ptr, uintptr_t meta)
@@ -64,11 +65,11 @@ namespace winrt::YtFlowApp::implementation
     }
     struct FfiPlugin
     {
-        uint32_t id;
+        uint32_t id{INVALID_DB_ID};
         std::string name;
         std::string desc;
         std::string plugin;
-        uint16_t plugin_version;
+        uint16_t plugin_version{0};
         std::vector<uint8_t> param;
 
         static FfiPluginVerifyResult verify(char const *plugin, uint16_t plugin_version, uint8_t const *param,

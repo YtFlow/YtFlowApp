@@ -44,6 +44,11 @@ namespace winrt::YtFlowApp::implementation
         }
         return {};
     }
+    void RawEditorParam::Prettify()
+    {
+        auto doc{json::parse(winrt::to_string(m_rawJson))};
+        m_rawJson = to_hstring(doc.dump(2));
+    }
 
     void RawEditorParam::EscapeCborBuf(json &doc)
     {
