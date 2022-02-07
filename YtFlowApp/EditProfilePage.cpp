@@ -112,6 +112,52 @@ namespace winrt::YtFlowApp::implementation
         });
         return editPluginModel;
     }
+    fire_and_forget EditProfilePage::OnNavigatingFrom(
+        Windows::UI::Xaml::Navigation::NavigatingCancelEventArgs const &args)
+    {
+        auto const navArgs{args};
+        auto const lifetime{get_strong()};
+        bool forceQuit{false};
+        std::swap(forceQuit, m_forceQuit);
+        if (forceQuit)
+        {
+            co_return;
+        }
+
+        hstring unsavedPluginNames;
+        for (auto const &model : m_pluginModels)
+        {
+            if (model->IsDirty())
+            {
+                unsavedPluginNames = unsavedPluginNames + L"\r\n" + model->Plugin().Name();
+            }
+        }
+        if (unsavedPluginNames == L"")
+        {
+            co_return;
+        }
+
+        UnsavedPluginDialogText().Text(std::move(unsavedPluginNames));
+        args.Cancel(true);
+        if (co_await QuitWithUnsavedDialog().ShowAsync() != ContentDialogResult::Primary)
+        {
+            co_return;
+        }
+
+        m_forceQuit = true;
+        switch (navArgs.NavigationMode())
+        {
+        case NavigationMode::Back:
+            Frame().GoBack();
+            break;
+        case NavigationMode::Forward:
+            Frame().GoForward();
+            break;
+        default:
+            Frame().Navigate(navArgs.SourcePageType(), navArgs.NavigationTransitionInfo());
+            break;
+        }
+    }
 
     void EditProfilePage::ProfileNameBox_KeyDown(IInspectable const & /* sender */, KeyRoutedEventArgs const &e)
     {
@@ -511,7 +557,7 @@ namespace winrt::YtFlowApp::implementation
             }
         }
 
-        auto const editPluginModel{CreateEditPluginModel(ffiPlugin, false)};
+        auto editPluginModel{CreateEditPluginModel(ffiPlugin, false)};
         m_pluginModels.push_back(std::move(editPluginModel));
 
         RefreshTreeView();

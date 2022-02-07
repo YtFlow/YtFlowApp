@@ -20,6 +20,7 @@ namespace winrt::YtFlowApp::implementation
         EditProfilePage();
 
         fire_and_forget OnNavigatedTo(Windows::UI::Xaml::Navigation::NavigationEventArgs const &args);
+        fire_and_forget OnNavigatingFrom(Windows::UI::Xaml::Navigation::NavigatingCancelEventArgs const &args);
         void OnNavigatedFrom(Windows::UI::Xaml::Navigation::NavigationEventArgs const &args);
         void CheckRenamingPlugin(EditPluginModel *editPluginModel) const &;
         com_ptr<YtFlowApp::implementation::EditPluginModel> CreateEditPluginModel(FfiPlugin const &plugin,
@@ -56,6 +57,7 @@ namespace winrt::YtFlowApp::implementation
         void LoadTreeNodesByDependency();
         void LoadTreeNodesByCategory();
 
+        bool m_forceQuit{false};
         com_ptr<ProfileModel> m_profile{nullptr};
         std::vector<com_ptr<YtFlowApp::implementation::EditPluginModel>> m_pluginModels;
         SortType m_sortType{appData.LocalSettings()

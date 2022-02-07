@@ -220,6 +220,24 @@
                 />
             </StackPanel>
         </ContentDialog>
+        <ContentDialog
+            x:Name="QuitWithUnsavedDialog"
+            Grid.ColumnSpan="2"
+            Grid.RowSpan="3"
+            CloseButtonText="Cancel"
+            PrimaryButtonText="Discard"
+            DefaultButton="Primary"
+            Title="Unsaved Changes"
+        >
+            <ScrollViewer>
+                <StackPanel>
+                    <TextBlock Style="{ThemeResource BaseTextBlockStyle}" Margin="0, 0, 0, 8">
+                        The following plugins have unsaved changes. Discard and continue?
+                    </TextBlock>
+                    <TextBlock x:Name="UnsavedPluginDialogText" />
+                </StackPanel>
+            </ScrollViewer>
+        </ContentDialog>
 
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup>
