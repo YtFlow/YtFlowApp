@@ -15,11 +15,10 @@ namespace winrt::YtFlowApp::implementation
         com_array<uint8_t> ToCbor();
         com_array<hstring> CheckErrors();
         void Prettify();
-
-      private:
         static void EscapeCborBuf(nlohmann::json &doc);
         static void UnescapeCborBuf(nlohmann::json &doc);
 
+      private:
         hstring m_rawJson;
     };
 }

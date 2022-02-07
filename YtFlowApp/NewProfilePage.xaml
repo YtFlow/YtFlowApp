@@ -38,6 +38,16 @@
             >
                 Create Profile
             </ContentControl>
+            <ContentControl
+                x:Name="WelcomeHeaderControl"
+                Grid.Row="0"
+                Grid.ColumnSpan="2"
+                Margin="0"
+                Height="80"
+                Style="{StaticResource NavigationViewTitleHeaderContentControlTextStyle}"
+            >
+                Create a new Profile to get started
+            </ContentControl>
 
             <StackPanel x:Name="LeftPanel" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Stretch">
                 <TextBlock Margin="{StaticResource SubheaderMargin}" Style="{ThemeResource BaseTextBlockStyle}">
@@ -47,7 +57,7 @@
                 <TextBlock Margin="{StaticResource SubheaderMargin}" Style="{ThemeResource BaseTextBlockStyle}">
                     Additional Inbound ports
                 </TextBlock>
-                <CheckBox>
+                <CheckBox IsEnabled="False">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch">
                         <TextBlock VerticalAlignment="Center" Margin="0, 0, 10, 0">SOCKS5</TextBlock>
                         <TextBox PlaceholderText="Port" Text="9080" InputScope="Number" MaxLength="5" />
@@ -93,6 +103,8 @@
                         <Setter Target="RightCol.Width" Value="1*" />
                         <Setter Target="HeaderControl.Margin" Value="0, 40, 0, 0" />
                         <Setter Target="HeaderControl.Height" Value="80" />
+                        <Setter Target="WelcomeHeaderControl.Margin" Value="0, 40, 0, 0" />
+                        <Setter Target="WelcomeHeaderControl.Height" Value="80" />
                         <Setter Target="MiddlePanel.(Grid.Column)" Value="1" />
                         <Setter Target="MiddlePanel.(Grid.Row)" Value="1" />
                         <Setter Target="RightPanel.(Grid.Column)" Value="2" />

@@ -74,7 +74,7 @@ namespace winrt::YtFlowApp::implementation
         }
         auto const bin{doc.get_binary()};
 
-        int32_t offset{0};
+        size_t offset{0};
         UChar32 outChar{0};
         while (offset < bin.size() && outChar >= 0)
         {

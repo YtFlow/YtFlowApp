@@ -42,8 +42,10 @@ namespace winrt::YtFlowApp::implementation
             model.EditorParam(editorParam);
         }
         Bindings->StopTracking();
-        Model(std::move(model));
+        Model(model);
+        bool isDirty{model.IsDirty()};
         Bindings->Update();
+        model.IsDirty(isDirty);
         m_paramEditTextChangedStage = 0;
         ParamEdit().Document().SetText(TextSetOptions::None, editorParam.RawJson());
     }

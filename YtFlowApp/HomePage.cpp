@@ -62,6 +62,11 @@ namespace winrt::YtFlowApp::implementation
         std::transform(profiles.begin(), profiles.end(), std::back_inserter(profileModels),
                        [](auto const &p) { return winrt::make<YtFlowApp::implementation::ProfileModel>(p); });
         co_await resume_foreground(Dispatcher());
+        if (profileModels.empty() && Frame().CurrentSourcePageType().Name == xaml_typename<YtFlowApp::HomePage>().Name)
+        {
+            Frame().Navigate(xaml_typename<YtFlowApp::NewProfilePage>(), box_value(true));
+            co_return;
+        }
         m_profiles = winrt::single_threaded_observable_vector(std::move(profileModels));
         auto mainContainer = MainContainer();
         m_connStatusChangeSubscription =
