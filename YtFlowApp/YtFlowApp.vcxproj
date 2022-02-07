@@ -96,18 +96,23 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <IncludePath>..\YtFlowCore\ytflow-ffi\include;$(IncludePath)</IncludePath>
+    <LibraryPath>..\YtFlowCore\target\thumbv7a-uwp-windows-msvc\release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <IncludePath>..\YtFlowCore\ytflow-ffi\include;$(IncludePath)</IncludePath>
+    <LibraryPath>..\YtFlowCore\target\aarch64-uwp-windows-msvc\debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <IncludePath>..\YtFlowCore\ytflow-ffi\include;$(IncludePath)</IncludePath>
+    <LibraryPath>..\YtFlowCore\target\aarch64-uwp-windows-msvc\release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>..\YtFlowCore\ytflow-ffi\include;$(IncludePath)</IncludePath>
+    <LibraryPath>..\YtFlowCore\target\i686-uwp-windows-msvc\debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>..\YtFlowCore\ytflow-ffi\include;$(IncludePath)</IncludePath>
+    <LibraryPath>..\YtFlowCore\target\i686-uwp-windows-msvc\release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>..\YtFlowCore\ytflow-ffi\include;$(IncludePath)</IncludePath>
@@ -115,6 +120,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>..\YtFlowCore\ytflow-ffi\include;$(IncludePath)</IncludePath>
+    <LibraryPath>..\YtFlowCore\target\x86_64-uwp-windows-msvc\release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
