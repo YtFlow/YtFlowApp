@@ -43,20 +43,20 @@ steps:
 - task: Cache@2
   condition: eq(variables.cleanBuild, 'false')
   inputs:
-    key: 'cargo | "$(Agent.OS)" | YtFlowCore/Cargo.lock | YtFlowCore/rust-toolchain.toml'
+    key: 'target | "$(Agent.OS)" | YtFlowCore/Cargo.lock | YtFlowCore/rust-toolchain.toml'
     restoreKeys: |
-      cargo | "$(Agent.OS)" | YtFlowCore/Cargo.lock | YtFlowCore/rust-toolchain.toml
-      cargo
+      target | "$(Agent.OS)" | YtFlowCore/Cargo.lock | YtFlowCore/rust-toolchain.toml
+      target
     path: YtFlowCore/target
   displayName: Cache YtFlowCore target directory
 
 - task: Cache@2
   condition: eq(variables.cleanBuild, 'false')
   inputs:
-    key: 'cargo | "$(Agent.OS)" | YtFlowCore/Cargo.lock | YtFlowCore/rust-toolchain.toml'
+    key: 'rustup | "$(Agent.OS)" | YtFlowCore/Cargo.lock | YtFlowCore/rust-toolchain.toml'
     restoreKeys: |
-      cargo | "$(Agent.OS)" | YtFlowCore/Cargo.lock | YtFlowCore/rust-toolchain.toml
-      cargo
+      rustup | "$(Agent.OS)" | YtFlowCore/Cargo.lock | YtFlowCore/rust-toolchain.toml
+      rustup
     path: "$(UserProfile)/.rustup"
   displayName: Cache rustup toolchains
 
