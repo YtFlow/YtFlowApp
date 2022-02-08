@@ -29,9 +29,9 @@ steps:
 - task: Cache@2
   condition: eq(variables.cleanBuild, 'false')
   inputs:
-    key: 'nuget | "$(Agent.OS)" | **/*.csproj | **/*.vcxproj'
+    key: 'nuget | "$(Agent.OS)" | **/*.vcxproj'
     restoreKeys: |
-      nuget | "$(Agent.OS)“ | **/*.csproj | **/*.vcxproj
+      nuget | "$(Agent.OS)“ | **/*.vcxproj
       nuget
     path: $(NUGET_PACKAGES)
   displayName: Cache NuGet packages
@@ -45,8 +45,8 @@ steps:
   inputs:
     key: 'cargo | "$(Agent.OS)" | YtFlowCore/Cargo.lock | YtFlowCore/rust-toolchain.toml | YtFlowCore/.cargo/publish.config.toml'
     restoreKeys: |
-      nuget | "$(Agent.OS)“ | **/*.csproj | **/*.vcxproj
-      nuget
+      cargo | "$(Agent.OS)" | YtFlowCore/Cargo.lock | YtFlowCore/rust-toolchain.toml | YtFlowCore/.cargo/publish.config.toml
+      cargo
     path: YtFlowCore/target
   displayName: Cache YtFlowCore target directory
 
