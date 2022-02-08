@@ -2,6 +2,8 @@
 #include "MainPage.h"
 #include "MainPage.g.cpp"
 #include "RxDispatcherScheduler.h"
+
+#include <winrt/Windows.System.Profile.h>
 #include <winrt/Windows.UI.ViewManagement.h>
 
 using namespace std::chrono_literals;
@@ -31,6 +33,16 @@ namespace winrt::YtFlowApp::implementation
 
         // Register a handler for when the window changes focus
         Window::Current().Activated({this, &MainPage::Current_Activated});
+    }
+
+    void MainPage::Page_Loaded(IInspectable const & /* sender */, RoutedEventArgs const & /* e */)
+    {
+        if (Windows::System::Profile::AnalyticsInfo::VersionInfo().DeviceFamily() == L"Windows.Mobile")
+        {
+            Thickness margin{};
+            margin.Top = -80;
+            ContentFrame().Margin(margin);
+        }
     }
 
     void MainPage::NavigationViewControl_DisplayModeChanged(

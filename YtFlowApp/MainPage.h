@@ -19,6 +19,8 @@ namespace winrt::YtFlowApp::implementation
     {
         MainPage();
 
+        void Page_Loaded(winrt::Windows::Foundation::IInspectable const &sender,
+                         winrt::Windows::UI::Xaml::RoutedEventArgs const &e);
         void NavigationViewControl_DisplayModeChanged(muxc::NavigationView const &sender,
                                                       muxc::NavigationViewDisplayModeChangedEventArgs const &args);
         void CoreTitleBar_IsVisibleChanged(CoreApplicationViewTitleBar const &sender, IInspectable const &args);

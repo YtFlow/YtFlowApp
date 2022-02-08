@@ -26,6 +26,8 @@ namespace winrt::YtFlowApp::implementation
         com_ptr<YtFlowApp::implementation::EditPluginModel> CreateEditPluginModel(FfiPlugin const &plugin,
                                                                                   bool isEntry);
 
+        void AdaptiveWidth_StateChanged(Windows::Foundation::IInspectable const &sender,
+                                        Windows::UI::Xaml::VisualStateChangedEventArgs const &e);
         void ProfileNameBox_KeyDown(IInspectable const &sender, Windows::UI::Xaml::Input::KeyRoutedEventArgs const &e);
         void ProfileNameBox_LostFocus(IInspectable const &sender, Windows::UI::Xaml::RoutedEventArgs const &e);
         void PluginTreeView_ItemInvoked(Microsoft::UI::Xaml::Controls::TreeView const &sender,

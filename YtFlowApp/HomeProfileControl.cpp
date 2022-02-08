@@ -61,6 +61,11 @@ namespace winrt::YtFlowApp::implementation
     {
         m_editRequested(*this, *this);
     }
+    void HomeProfileControl::EditButton_Click(IInspectable const & /* sender */,
+                                              Windows::UI::Xaml::RoutedEventArgs const & /* e */)
+    {
+        m_editRequested(*this, *this);
+    }
     void HomeProfileControl::DeleteButton_Click(IInspectable const & /* sender */,
                                                 Windows::UI::Xaml::RoutedEventArgs const & /* e */)
     {

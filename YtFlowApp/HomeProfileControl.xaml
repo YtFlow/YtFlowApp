@@ -68,6 +68,7 @@
             </StackPanel>
             <muxc:SplitButton.Flyout>
                 <MenuFlyout x:Name="MoreActionsFlyout" Placement="Bottom">
+                    <MenuFlyoutItem Icon="Edit" Text="Edit" Click="EditButton_Click" />
                     <MenuFlyoutItem Icon="Delete" Text="Delete" Click="DeleteButton_Click" />
                 </MenuFlyout>
             </muxc:SplitButton.Flyout>

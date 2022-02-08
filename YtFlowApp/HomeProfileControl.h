@@ -28,6 +28,8 @@ namespace winrt::YtFlowApp::implementation
                                  winrt::Windows::UI::Xaml::RoutedEventArgs const &e);
         void EditButton_Click(winrt::Windows::Foundation::IInspectable const &sender,
                                  winrt::Microsoft::UI::Xaml::Controls::SplitButtonClickEventArgs const &e);
+        void EditButton_Click(winrt::Windows::Foundation::IInspectable const &sender,
+                                 winrt::Windows::UI::Xaml::RoutedEventArgs const &e);
         void DeleteButton_Click(winrt::Windows::Foundation::IInspectable const &sender,
                                  winrt::Windows::UI::Xaml::RoutedEventArgs const &e);
 

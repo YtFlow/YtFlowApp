@@ -97,7 +97,7 @@
                             </TextBlock>
                         </StackPanel>
                     </Button>
-                    <Button HorizontalAlignment="Stretch" Height="48" Margin="0, 10, 0, 0">
+                    <Button HorizontalAlignment="Stretch" Height="48" Margin="0, 10, 0, 0" IsEnabled="False">
                         <StackPanel Orientation="Horizontal">
                             <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE7B8;" />
                             <TextBlock Margin="8, 0, 0, 0">
@@ -107,8 +107,8 @@
                     </Button>
 
                     <TextBlock Style="{ThemeResource SubtitleTextBlockStyle}" Margin="4, 26, 0, 16">Getting Help</TextBlock>
-                    <HyperlinkButton>YtFlow Wiki</HyperlinkButton>
-                    <HyperlinkButton>YtFlowCore Book</HyperlinkButton>
+                    <HyperlinkButton NavigateUri="https://github.com/YtFlow/YtFlowApp/wiki">YtFlowApp Wiki</HyperlinkButton>
+                    <HyperlinkButton NavigateUri="https://ytflow.github.io/core-book">YtFlowCore Book</HyperlinkButton>
                 </StackPanel>
             </Grid>
 

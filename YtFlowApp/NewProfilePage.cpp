@@ -29,9 +29,10 @@ namespace winrt::YtFlowApp::implementation
 
     void NewProfilePage::OnNavigatingFrom(Windows::UI::Xaml::Navigation::NavigatingCancelEventArgs const &args)
     {
-        if (WelcomeHeaderControl().Visibility() == Visibility::Visible && NewProfileNameText().IsEnabled())
+        if ((!SaveButton().IsEnabled() || WelcomeHeaderControl().Visibility() == Visibility::Visible) &&
+            NewProfileNameText().IsEnabled())
         {
-            args.Cancel();
+            args.Cancel(true);
             return;
         }
     }

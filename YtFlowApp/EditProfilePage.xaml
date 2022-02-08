@@ -240,8 +240,8 @@
         </ContentDialog>
 
         <VisualStateManager.VisualStateGroups>
-            <VisualStateGroup>
-                <VisualState>
+            <VisualStateGroup x:Name="AdaptiveWidthVisualStateGroup" CurrentStateChanged="AdaptiveWidth_StateChanged">
+                <VisualState x:Name="MediumWidthState">
                     <VisualState.StateTriggers>
                         <AdaptiveTrigger MinWindowWidth="{StaticResource MediumAdaptiveWidth}" />
                     </VisualState.StateTriggers>
@@ -249,6 +249,18 @@
                         <Setter Target="MasterCol.Width" Value="300" />
                         <Setter Target="DetailCol.Width" Value="*" />
                         <Setter Target="PluginTreeView.Margin" Value="0, 0, 0, 0" />
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="MasterState">
+                    <VisualState.Setters>
+                        <Setter Target="MasterCol.Width" Value="*" />
+                        <Setter Target="DetailCol.Width" Value="0" />
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="DetailState">
+                    <VisualState.Setters>
+                        <Setter Target="MasterCol.Width" Value="0" />
+                        <Setter Target="DetailCol.Width" Value="*" />
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>

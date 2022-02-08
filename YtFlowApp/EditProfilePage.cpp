@@ -22,9 +22,10 @@ namespace winrt::YtFlowApp::implementation
     EditProfilePage::EditProfilePage()
     {
         InitializeComponent();
+        VisualStateManager::GoToState(*this, L"MasterState", false);
 
         auto const weak{get_weak()};
-        m_depChangeSubject$.get_observable().debounce(500ms, ObserveOnDispatcher()).subscribe([=](bool) {
+        m_depChangeSubject$.get_observable().debounce(3s, ObserveOnDispatcher()).subscribe([=](bool) {
             if (auto self{weak.get()})
             {
                 self->RefreshTreeView();
@@ -115,6 +116,13 @@ namespace winrt::YtFlowApp::implementation
     fire_and_forget EditProfilePage::OnNavigatingFrom(
         Windows::UI::Xaml::Navigation::NavigatingCancelEventArgs const &args)
     {
+        auto const currState{AdaptiveWidthVisualStateGroup().CurrentState()};
+        if (currState != nullptr && currState.Name() == L"DetailState")
+        {
+            VisualStateManager::GoToState(*this, L"MasterState", true);
+            args.Cancel(true);
+            co_return;
+        }
         auto const navArgs{args};
         auto const lifetime{get_strong()};
         bool forceQuit{false};
@@ -156,6 +164,25 @@ namespace winrt::YtFlowApp::implementation
         default:
             Frame().Navigate(navArgs.SourcePageType(), navArgs.NavigationTransitionInfo());
             break;
+        }
+    }
+
+    void EditProfilePage::AdaptiveWidth_StateChanged(IInspectable const & /* sender */,
+                                                     VisualStateChangedEventArgs const &e)
+    {
+        auto const newState{e.NewState()};
+        if (newState != nullptr || newState == MediumWidthState())
+        {
+            return;
+        }
+
+        if (EditorFrame().Content() == nullptr)
+        {
+            VisualStateManager::GoToState(*this, L"MasterState", true);
+        }
+        else
+        {
+            VisualStateManager::GoToState(*this, L"DetailState", true);
         }
     }
 
@@ -362,6 +389,11 @@ namespace winrt::YtFlowApp::implementation
         EditorFrame().BackStack().Clear();
         EditorFrame().Navigate(xaml_typename<RawEditorPage>(), editPluginModel,
                                Media::Animation::EntranceNavigationTransitionInfo{});
+        auto const currState{AdaptiveWidthVisualStateGroup().CurrentState()};
+        if (currState != nullptr && currState.Name() == L"MasterState")
+        {
+            VisualStateManager::GoToState(*this, L"DetailState", true);
+        }
     }
 
     void EditProfilePage::SortByItem_Click(IInspectable const &sender, RoutedEventArgs const & /* e */)
