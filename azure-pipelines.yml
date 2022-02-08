@@ -43,12 +43,32 @@ steps:
 - task: Cache@2
   condition: eq(variables.cleanBuild, 'false')
   inputs:
-    key: 'cargo | "$(Agent.OS)" | YtFlowCore/Cargo.lock | YtFlowCore/rust-toolchain.toml | YtFlowCore/.cargo/publish.config.toml'
+    key: 'cargo | "$(Agent.OS)" | YtFlowCore/Cargo.lock | YtFlowCore/rust-toolchain.toml
     restoreKeys: |
-      cargo | "$(Agent.OS)" | YtFlowCore/Cargo.lock | YtFlowCore/rust-toolchain.toml | YtFlowCore/.cargo/publish.config.toml
+      cargo | "$(Agent.OS)" | YtFlowCore/Cargo.lock | YtFlowCore/rust-toolchain.toml
       cargo
     path: YtFlowCore/target
   displayName: Cache YtFlowCore target directory
+
+- task: Cache@2
+  condition: eq(variables.cleanBuild, 'false')
+  inputs:
+    key: 'cargo | "$(Agent.OS)" | YtFlowCore/Cargo.lock | YtFlowCore/rust-toolchain.toml
+    restoreKeys: |
+      cargo | "$(Agent.OS)" | YtFlowCore/Cargo.lock | YtFlowCore/rust-toolchain.toml
+      cargo
+    path: "$(UserProfile)/.rustup"
+  displayName: Cache rustup toolchains
+
+- task: Cache@2
+  condition: eq(variables.cleanBuild, 'false')
+  inputs:
+    key: 'cargo | "$(Agent.OS)" | YtFlowCore/Cargo.lock | YtFlowCore/rust-toolchain.toml
+    restoreKeys: |
+      cargo | "$(Agent.OS)" | YtFlowCore/Cargo.lock | YtFlowCore/rust-toolchain.toml
+      cargo
+    path: "$(UserProfile)/.cargo"
+  displayName: Cache Cargo packages
 
 - task: CmdLine@2
   inputs:
