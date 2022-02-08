@@ -43,7 +43,7 @@ steps:
 - task: Cache@2
   condition: eq(variables.cleanBuild, 'false')
   inputs:
-    key: 'cargo | "$(Agent.OS)" | YtFlowCore/Cargo.lock | YtFlowCore/rust-toolchain.toml
+    key: 'cargo | "$(Agent.OS)" | YtFlowCore/Cargo.lock | YtFlowCore/rust-toolchain.toml'
     restoreKeys: |
       cargo | "$(Agent.OS)" | YtFlowCore/Cargo.lock | YtFlowCore/rust-toolchain.toml
       cargo
@@ -53,7 +53,7 @@ steps:
 - task: Cache@2
   condition: eq(variables.cleanBuild, 'false')
   inputs:
-    key: 'cargo | "$(Agent.OS)" | YtFlowCore/Cargo.lock | YtFlowCore/rust-toolchain.toml
+    key: 'cargo | "$(Agent.OS)" | YtFlowCore/Cargo.lock | YtFlowCore/rust-toolchain.toml'
     restoreKeys: |
       cargo | "$(Agent.OS)" | YtFlowCore/Cargo.lock | YtFlowCore/rust-toolchain.toml
       cargo
@@ -63,7 +63,7 @@ steps:
 - task: Cache@2
   condition: eq(variables.cleanBuild, 'false')
   inputs:
-    key: 'cargo | "$(Agent.OS)" | YtFlowCore/Cargo.lock | YtFlowCore/rust-toolchain.toml
+    key: 'cargo | "$(Agent.OS)" | YtFlowCore/Cargo.lock | YtFlowCore/rust-toolchain.toml'
     restoreKeys: |
       cargo | "$(Agent.OS)" | YtFlowCore/Cargo.lock | YtFlowCore/rust-toolchain.toml
       cargo
