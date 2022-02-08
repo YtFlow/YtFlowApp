@@ -27,7 +27,7 @@ steps:
 - task: NuGetToolInstaller@1
 
 - task: Cache@2
-  condition: not(variables.cleanBuild)
+  condition: not(eq(variables.cleanBuild, 'false'))
   inputs:
     key: 'nuget | "$(Agent.OS)" | **/*.csproj | **/*.vcxproj'
     restoreKeys: |
@@ -41,7 +41,7 @@ steps:
     restoreSolution: '$(solution)'
 
 - task: Cache@2
-  condition: not(variables.cleanBuild)
+  condition: not(eq(variables.cleanBuild, 'false'))
   inputs:
     key: 'cargo | "$(Agent.OS)" | YtFlowCore/Cargo.lock | YtFlowCore/rust-toolchain.toml | YtFlowCore/.cargo/publish.config.toml'
     restoreKeys: |
