@@ -73,8 +73,7 @@ namespace winrt::YtFlowApp::implementation
             ConnectionState::Instance->ConnectStatusChange$.observe_on(ObserveOnDispatcher())
                 .subscribe([=](auto state) {
                     auto localSettings = appData.LocalSettings().Values();
-                    auto coreError =
-                        appData.LocalSettings().Values().TryLookup(YTFLOW_CORE_ERROR_LOAD).try_as<hstring>();
+                    auto coreError = localSettings.TryLookup(YTFLOW_CORE_ERROR_LOAD).try_as<hstring>();
                     if (coreError.has_value())
                     {
                         localSettings.Remove(YTFLOW_CORE_ERROR_LOAD);
@@ -89,6 +88,20 @@ namespace winrt::YtFlowApp::implementation
                         VisualStateManager::GoToState(*lifetime, L"Disconnecting", true);
                         break;
                     case VpnManagementConnectionStatus::Connected:
+                        lifetime->CurrentProfileNameRun().Text(([&]() {
+                            if (auto id{localSettings.TryLookup(L"YTFLOW_PROFILE_ID").try_as<uint32_t>()};
+                                id.has_value())
+                            {
+                                for (auto const p : lifetime->m_profiles)
+                                {
+                                    if (p.Id() == *id)
+                                    {
+                                        return p.Name();
+                                    }
+                                }
+                            }
+                            return hstring{};
+                        })());
                         VisualStateManager::GoToState(*lifetime, L"Connected", true);
                         break;
                     case VpnManagementConnectionStatus::Connecting:

@@ -37,10 +37,34 @@
                 x:Name="ConnectedView"
                 Visibility="Collapsed"
                 Orientation="Vertical"
+                Margin="20, 0, 20, 0"
             >
-                <Button Click="DisconnectButton_Click">
-                    Disconnect
-                </Button>
+                <Grid
+                    Padding="18"
+                    Background="{ThemeResource LayerFillColorDefaultBrush}"
+                    CornerRadius="8"
+                    BorderThickness="1"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                >
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="YtFlow Connected" FontWeight="SemiBold" FontSize="16" />
+                    <TextBlock Grid.Row="1" Grid.Column="0" Foreground="{ThemeResource SystemControlForegroundAccentBrush}">
+                        <Run>Running Profile: </Run>
+                        <Run x:Name="CurrentProfileNameRun"></Run>
+                    </TextBlock>
+
+                    <Button Grid.RowSpan="2" Grid.Column="1" Click="DisconnectButton_Click">
+                        Disconnect
+                    </Button>
+                </Grid>
             </StackPanel>
 
 
@@ -108,7 +132,7 @@
 
                     <TextBlock Style="{ThemeResource SubtitleTextBlockStyle}" Margin="4, 26, 0, 16">Getting Help</TextBlock>
                     <HyperlinkButton NavigateUri="https://github.com/YtFlow/YtFlowApp/wiki">YtFlowApp Wiki</HyperlinkButton>
-                    <HyperlinkButton NavigateUri="https://ytflow.github.io/core-book">YtFlowCore Book</HyperlinkButton>
+                    <HyperlinkButton NavigateUri="https://ytflow.github.io/ytflow-book">YtFlowCore Book</HyperlinkButton>
                 </StackPanel>
             </Grid>
 
@@ -146,6 +170,7 @@
                         <Setter Target="SidePanel.(Grid.Column)" Value="1" />
                         <Setter Target="SidePanel.Margin" Value="0, 0, 16, 0" />
                         <Setter Target="ProfileListView.Margin" Value="28, 0, 20, 0" />
+                        <Setter Target="ConnectedView.Margin" Value="40, 0, 40, 0" />
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>

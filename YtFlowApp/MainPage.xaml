@@ -40,8 +40,12 @@
             <muxc:NavigationView.MenuItems>
                 <muxc:NavigationViewItem Icon="Home" Content="Home" Tag="home" />
                 <!-- muxc:NavigationViewItem Icon="Library" Content="Assets"/ -->
-                <muxc:NavigationViewItem Icon="Find" Content="Diagnostic" />
-                <muxc:NavigationViewItem Icon="Repair" Content="Tools" />
+                <muxc:NavigationViewItem Icon="Library" Content="Assets" IsEnabled="False" />
+                <muxc:NavigationViewItem Icon="Repair" Content="Tools">
+                    <muxc:NavigationViewItem.MenuItems>
+                        <muxc:NavigationViewItem Icon="Help" Content="About" />
+                    </muxc:NavigationViewItem.MenuItems>
+                </muxc:NavigationViewItem>
             </muxc:NavigationView.MenuItems>
             <Grid>
                 <Frame x:Name="ContentFrame" CacheSize="20">
