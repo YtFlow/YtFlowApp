@@ -1,7 +1,7 @@
 ﻿#include "pch.h"
 #include "MainPage.h"
 #include "MainPage.g.cpp"
-#include "RxDispatcherScheduler.h"
+#include "WinrtScheduler.h"
 
 #include <winrt/Windows.System.Profile.h>
 #include <winrt/Windows.UI.ViewManagement.h>

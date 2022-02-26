@@ -3,11 +3,6 @@
 #include "HomePage.h"
 #include "MainPage.g.h"
 #include "ConnectionState.h"
-#include <rxcpp/rx.hpp>
-#include <winrt/Windows.ApplicationModel.Core.h>
-#include <winrt/Windows.UI.Core.h>
-#include <winrt/Windows.UI.Input.h>
-#include <winrt/Windows.UI.Xaml.Media.h>
 
 using namespace winrt::Windows::ApplicationModel::Core;
 using winrt::Windows::UI::Core::WindowActivatedEventArgs;

@@ -1,8 +1,6 @@
 #pragma once
 #include "EditPluginTreeViewItemTemplateSelector.g.h"
 
-#include <winrt/Windows.UI.Xaml.h>
-
 namespace winrt::YtFlowApp::implementation
 {
     struct EditPluginTreeViewItemTemplateSelector

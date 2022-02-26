@@ -2,7 +2,6 @@
 #include "PluginModel.g.h"
 
 #include "CoreFfi.h"
-#include <set>
 
 namespace winrt::YtFlowApp::implementation
 {

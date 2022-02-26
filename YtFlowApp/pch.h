@@ -1,14 +1,24 @@
 ﻿#pragma once
+#include <mutex>
+#include <format>
+#include <set>
+
 #include <windows.h>
 #include <unknwn.h>
 #include <restrictederrorinfo.h>
 #include <hstring.h>
+#include <pplawait.h>
 #include <winrt/Windows.Foundation.h>
 #include <winrt/Windows.Foundation.Collections.h>
 #include <winrt/Windows.Foundation.Metadata.h>
 #include <winrt/Windows.ApplicationModel.Activation.h>
+#include <winrt/Windows.ApplicationModel.Core.h>
+#include <winrt/Windows.Networking.Sockets.h>
+#include <winrt/Windows.Networking.Vpn.h>
 #include <winrt/Windows.Storage.h>
+#include <winrt/Windows.Storage.Streams.h>
 #include <winrt/Windows.UI.Core.h>
+#include <winrt/Windows.UI.Input.h>
 #include <winrt/Windows.UI.Text.h>
 #include <winrt/Windows.UI.Xaml.h>
 #include <winrt/Windows.UI.Xaml.Controls.h>
@@ -28,4 +38,7 @@
 #include "winrt/Microsoft.UI.Xaml.Controls.Primitives.h"
 #include "winrt/Microsoft.UI.Xaml.Media.h"
 #include "winrt/Microsoft.UI.Xaml.XamlTypeInfo.h"
+
+#include <rxcpp/rx.hpp>
+#include <nlohmann/json.hpp>
 

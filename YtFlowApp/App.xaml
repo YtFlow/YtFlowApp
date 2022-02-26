@@ -10,6 +10,14 @@
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
                 <ResourceDictionary>
                     <x:Double x:Key="MediumAdaptiveWidth">600</x:Double>
+                    <Thickness x:Key="PluginWidgetIconMargin">10, 25, 20, 25</Thickness>
+                    <Style x:Key="PluginWidgetPluginNameStyle" TargetType="TextBlock">
+                        <Setter Property="VerticalAlignment" Value="Bottom" />
+                    </Style>
+                    <Style x:Key="PluginWidgetPluginDescStyle" TargetType="TextBlock">
+                        <Setter Property="VerticalAlignment" Value="Top" />
+                        <Setter Property="Foreground" Value="{ThemeResource SystemControlPageTextBaseMediumBrush}" />
+                    </Style>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>

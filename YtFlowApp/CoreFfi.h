@@ -1,5 +1,4 @@
 #pragma once
-#include <nlohmann/json.hpp>
 #include <ytflow_core.h>
 
 namespace winrt::YtFlowApp::implementation

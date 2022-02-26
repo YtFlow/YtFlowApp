@@ -1,8 +1,6 @@
 #pragma once
 #include "RawEditorParam.g.h"
 
-#include <nlohmann/json.hpp>
-
 namespace winrt::YtFlowApp::implementation
 {
     struct RawEditorParam : RawEditorParamT<RawEditorParam>

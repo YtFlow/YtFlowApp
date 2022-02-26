@@ -33,13 +33,24 @@
                 <Button Margin="0, 40, 0, 0" Click="ConnectCancelButton_Click" HorizontalAlignment="Center">Cancel</Button>
             </StackPanel>
 
-            <StackPanel
+            <Grid
                 x:Name="ConnectedView"
                 Visibility="Collapsed"
-                Orientation="Vertical"
                 Margin="20, 0, 20, 0"
             >
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="4*" />
+                    <ColumnDefinition x:Name="ConnectedViewSideCol" Width="0" />
+                </Grid.ColumnDefinitions>
                 <Grid
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
                     Padding="18"
                     Background="{ThemeResource LayerFillColorDefaultBrush}"
                     CornerRadius="8"
@@ -65,7 +76,17 @@
                         Disconnect
                     </Button>
                 </Grid>
-            </StackPanel>
+
+                <StackPanel
+                    x:Name="PluginWidgetPanel"
+                    Grid.Column="0"
+                    Grid.Row="2"
+                    Margin="0, 20, 0, 0"
+                    Orientation="Vertical"
+                >
+                </StackPanel>
+                <StackPanel x:Name="ConnectedViewSidePanel" Grid.Row="1" Grid.Column="0" />
+            </Grid>
 
 
             <Grid x:Name="DisconnectedView" Visibility="Collapsed">
@@ -171,6 +192,10 @@
                         <Setter Target="SidePanel.Margin" Value="0, 0, 16, 0" />
                         <Setter Target="ProfileListView.Margin" Value="28, 0, 20, 0" />
                         <Setter Target="ConnectedView.Margin" Value="40, 0, 40, 0" />
+                        <Setter Target="ConnectedViewSideCol.Width" Value="3*" />
+                        <Setter Target="PluginWidgetPanel.(Grid.Row)" Value="1" />
+                        <Setter Target="ConnectedViewSidePanel.(Grid.Row)" Value="1" />
+                        <Setter Target="ConnectedViewSidePanel.(Grid.Column)" Value="1" />
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>

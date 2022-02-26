@@ -1,9 +1,7 @@
 #include "pch.h"
 #include "UI.h"
 
-#include "RxDispatcherScheduler.h"
-#include <winrt/Windows.Foundation.Metadata.h>
-#include <winrt/Windows.UI.Xaml.Input.h>
+#include "WinrtScheduler.h"
 
 using namespace winrt::Windows::Foundation::Metadata;
 using namespace winrt::Windows::UI::Xaml::Input;
@@ -11,18 +9,25 @@ using namespace winrt::Windows::UI::Xaml::Controls;
 
 namespace winrt::YtFlowApp::implementation
 {
-    void NotifyUser(hstring msg, hstring title)
+    void NotifyUser(hstring msg, hstring title, Windows::UI::Core::CoreDispatcher inputDispatcher)
     {
-        static auto dispatcher = Windows::UI::Xaml::Window::Current().Dispatcher();
+        static Windows::UI::Core::CoreDispatcher dispatcher{nullptr};
+        if (inputDispatcher != nullptr)
+        {
+            dispatcher = std::move(inputDispatcher);
+            return;
+        }
         static std::vector<std::pair<hstring, hstring>> messages{};
         dispatcher.RunAsync(Windows::UI::Core::CoreDispatcherPriority::Normal,
                             [msg = std::move(msg), title = std::move(title)]() -> winrt::fire_and_forget {
                                 messages.push_back(std::make_pair(msg, title));
-                                if (messages.size() > 1)
+
+                                static bool isQueueRunning{false};
+                                if (std::exchange(isQueueRunning, true))
                                 {
-                                    // Some other task will display all messages
                                     co_return;
                                 }
+
                                 // Display all messages until the queue is drained.
                                 while (messages.size() > 0)
                                 {
@@ -51,6 +56,7 @@ namespace winrt::YtFlowApp::implementation
 
                                     co_await dialog.ShowAsync();
                                 }
+                                isQueueRunning = false;
                             });
     }
 }

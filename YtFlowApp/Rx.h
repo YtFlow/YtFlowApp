@@ -1,7 +1,5 @@
 #pragma once
 
-#include <rxcpp/rx.hpp>
-
 namespace winrt::YtFlowApp::implementation
 {
     struct Rx

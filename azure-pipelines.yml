@@ -7,13 +7,14 @@
 trigger:
 - next
 - next-ci
+- main
 
 pool:
   vmImage: 'windows-2022'
 
 variables:
   solution: 'YtFlowApp.sln'
-  buildPlatform: 'x86|x64|ARM'
+  buildPlatform: 'x64|ARM'
   buildConfiguration: 'Release'
   appxPackageDir: '$(build.artifactStagingDirectory)\AppxPackages\\'
   keyFile: 'YtFlowApp_TemporaryKey.pfx'
@@ -85,20 +86,12 @@ steps:
     retryCount: '2'
 
 - task: VSBuild@1
-  displayName: Build x64
+  displayName: Build App Bundle
   inputs:
-    platform: 'x64'
+    platform: 'x86'
     solution: '$(solution)'
     configuration: '$(buildConfiguration)'
-    msbuildArgs: '/p:AppxBundlePlatforms="x64" /p:AppxPackageDir="$(appxPackageDir)" /p:AppxBundle=Never /p:PackageCertificateKeyFile="$(secureKeyFile.secureFilePath)" /p:PackageCertificateThumbprint="" /p:UapAppxPackageBuildMode=SideloadOnly /p:PlatformToolset=v143'
-
-- task: VSBuild@1
-  displayName: Build ARM
-  inputs:
-    platform: 'ARM'
-    solution: '$(solution)'
-    configuration: '$(buildConfiguration)'
-    msbuildArgs: '/restore /p:AppxBundlePlatforms="ARM" /p:AppxPackageDir="$(appxPackageDir)" /p:AppxBundle=Never /p:PackageCertificateKeyFile="$(secureKeyFile.secureFilePath)" /p:PackageCertificateThumbprint="" /p:UapAppxPackageBuildMode=SideloadOnly /p:PlatformToolset=v143'
+    msbuildArgs: '/p:AppxBundlePlatforms="$(buildPlatform)" /p:AppxPackageDir="$(appxPackageDir)" /p:AppxBundle=Always /p:PackageCertificateKeyFile="$(secureKeyFile.secureFilePath)" /p:PackageCertificateThumbprint="" /p:UapAppxPackageBuildMode=SideloadOnly /p:PlatformToolset=v143'
 
 - task: PublishPipelineArtifact@1
   inputs:

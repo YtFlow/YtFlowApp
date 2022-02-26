@@ -6,18 +6,21 @@
 
 #include "ConnectionState.h"
 #include "CoreFfi.h"
+#include "CoreRpc.h"
 #include "EditProfilePage.h"
 #include "FirstTimePage.h"
+#include "NetifHomeWidget.h"
 #include "NewProfilePage.h"
 #include "ProfileModel.h"
-#include "RxDispatcherScheduler.h"
+#include "Rx.h"
 #include "UI.h"
-#include <format>
+#include "WinrtScheduler.h"
 
 using namespace winrt;
 using namespace Windows::UI::Xaml;
 using namespace Windows::UI::Xaml::Controls;
 using namespace std::literals::chrono_literals;
+namespace muxc = winrt::Microsoft::UI::Xaml::Controls;
 
 namespace winrt::YtFlowApp::implementation
 {
@@ -69,7 +72,7 @@ namespace winrt::YtFlowApp::implementation
         }
         m_profiles = winrt::single_threaded_observable_vector(std::move(profileModels));
         auto mainContainer = MainContainer();
-        m_connStatusChangeSubscription =
+        m_connStatusChangeSubscription$ =
             ConnectionState::Instance->ConnectStatusChange$.observe_on(ObserveOnDispatcher())
                 .subscribe([=](auto state) {
                     auto localSettings = appData.LocalSettings().Values();
@@ -82,12 +85,14 @@ namespace winrt::YtFlowApp::implementation
                     switch (state)
                     {
                     case VpnManagementConnectionStatus::Disconnected:
+                        m_refreshPluginStatus$.unsubscribe();
                         VisualStateManager::GoToState(*lifetime, L"Disconnected", true);
                         break;
                     case VpnManagementConnectionStatus::Disconnecting:
                         VisualStateManager::GoToState(*lifetime, L"Disconnecting", true);
                         break;
                     case VpnManagementConnectionStatus::Connected:
+                        lifetime->SubscribeRefreshPluginStatus();
                         lifetime->CurrentProfileNameRun().Text(([&]() {
                             if (auto id{localSettings.TryLookup(L"YTFLOW_PROFILE_ID").try_as<uint32_t>()};
                                 id.has_value())
@@ -112,9 +117,103 @@ namespace winrt::YtFlowApp::implementation
         Bindings->Update();
     }
 
+    void HomePage::SubscribeRefreshPluginStatus()
+    {
+        m_refreshPluginStatus$.unsubscribe();
+        PluginWidgetPanel().Children().Clear();
+        m_widgets.clear();
+        m_refreshPluginStatus$ =
+            rxcpp::observable<>::create<CoreRpc>([](rxcpp::subscriber<CoreRpc> s) {
+                auto rpc{CoreRpc::Connect()};
+                s.add([=]() { rpc.m_socket.Close(); });
+                s.on_next(std::move(rpc));
+            })
+                .flat_map([](auto rpc) {
+                    auto const focus${ObserveApplicationLeavingBackground()};
+                    auto const unfocus${ObserveApplicationEnteredBackground()};
+                    auto hashcodes{std::make_shared<std::map<uint32_t, uint32_t>>()};
+                    return focus$.start_with(true).flat_map([=](auto) {
+                        return rxcpp::observable<>::interval(1s)
+                            .map([=](auto) {
+                                auto const info{rpc.CollectAllPluginInfo(*hashcodes)};
+                                for (auto const &p : info)
+                                {
+                                    (*hashcodes)[p.id] = p.hashcode;
+                                }
+                                return info;
+                            })
+                            .tap([](auto const &) {},
+                                 [](auto ex) {
+                                     try
+                                     {
+                                         std::rethrow_exception(ex);
+                                     }
+                                     catch (RpcException const &e)
+                                     {
+                                         NotifyUser(to_hstring(e.msg), L"RPC Error");
+                                     }
+                                 })
+                            .subscribe_on(ObserveOnWinrtThreadPool())
+                            .take_until(unfocus$);
+                    });
+                })
+                .on_error_resume_next([](auto) {
+                    return rxcpp::observable<>::timer(3s).flat_map([](auto) {
+                        return rxcpp::sources::error<std::vector<RpcPluginInfo>>("Retry connecting Core RPC");
+                    });
+                })
+                .retry()
+                .subscribe_on(ObserveOnWinrtThreadPool())
+                .observe_on(ObserveOnDispatcher())
+                .subscribe(
+                    [weak{get_weak()}](auto info) {
+                        OutputDebugString((to_hstring(info.size()) + L" plugins received").data());
+                        auto const self{weak.get()};
+                        if (!self)
+                        {
+                            return;
+                        }
+                        for (auto const &plugin : info)
+                        {
+                            // Append/update only. No deletion required at this moment.
+                            auto it = self->m_widgets.find(plugin.id);
+                            if (it == self->m_widgets.end())
+                            {
+                                auto handle{self->CreateWidgetHandle(plugin)};
+                                if (!handle.has_value())
+                                {
+                                    continue;
+                                }
+                                it = self->m_widgets.emplace(std::make_pair(plugin.id, std::move(*handle))).first;
+                            }
+                            *it->second.info = plugin.info;
+                            if (auto const widget{it->second.widget.get()})
+                            {
+                                widget.UpdateInfo();
+                            }
+                        }
+                    },
+                    [](auto ex) {
+                        try
+                        {
+                            if (ex)
+                            {
+                                std::rethrow_exception(ex);
+                            }
+                        }
+                        catch (const std::exception &e)
+                        {
+                            NotifyUser(to_hstring(e.what()), L"RPC Error");
+                        }
+                    });
+    }
+
     void HomePage::OnNavigatedFrom(Windows::UI::Xaml::Navigation::NavigationEventArgs const & /* args */)
     {
-        m_connStatusChangeSubscription.unsubscribe();
+        m_connStatusChangeSubscription$.unsubscribe();
+        m_refreshPluginStatus$.unsubscribe();
+        PluginWidgetPanel().Children().Clear();
+        m_widgets.clear();
     }
 
     IAsyncAction HomePage::EnsureDatabase()
@@ -131,6 +230,23 @@ namespace winrt::YtFlowApp::implementation
         appData.LocalSettings().Values().Insert(L"YTFLOW_DB_PATH", box_value(dbPath));
 
         FfiDbInstance = std::move(FfiDb::Open(dbPath));
+    }
+
+    std::optional<HomePage::WidgetHandle> HomePage::CreateWidgetHandle(RpcPluginInfo const &info)
+    {
+        HomePage::WidgetHandle handle;
+        handle.info = std::make_shared<std::vector<uint8_t>>();
+        if (info.plugin == "netif")
+        {
+            auto widget{winrt::make<NetifHomeWidget>(to_hstring(info.name), handle.info)};
+            handle.widget = widget;
+            PluginWidgetPanel().Children().Append(std::move(widget));
+        }
+        else
+        {
+            return {std::nullopt};
+        }
+        return handle;
     }
 
     Windows::Foundation::Collections::IObservableVector<YtFlowApp::ProfileModel> HomePage::Profiles() const

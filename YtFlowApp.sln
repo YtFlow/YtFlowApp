@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.31912.275
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.1738
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "YtFlowApp", "YtFlowApp\YtFlowApp.vcxproj", "{883445AA-B600-485B-849A-8DCE47664139}"
 EndProject
@@ -20,7 +20,6 @@ Global
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{883445AA-B600-485B-849A-8DCE47664139}.Debug|ARM.ActiveCfg = Debug|ARM
-		{883445AA-B600-485B-849A-8DCE47664139}.Debug|ARM.Build.0 = Debug|ARM
 		{883445AA-B600-485B-849A-8DCE47664139}.Debug|ARM.Deploy.0 = Debug|ARM
 		{883445AA-B600-485B-849A-8DCE47664139}.Debug|ARM64.ActiveCfg = Debug|ARM64
 		{883445AA-B600-485B-849A-8DCE47664139}.Debug|ARM64.Build.0 = Debug|ARM64
@@ -44,7 +43,6 @@ Global
 		{883445AA-B600-485B-849A-8DCE47664139}.Release|x86.Build.0 = Release|Win32
 		{883445AA-B600-485B-849A-8DCE47664139}.Release|x86.Deploy.0 = Release|Win32
 		{0FF7FCA4-9A30-4CD1-8D17-94E1ACE4BAC8}.Debug|ARM.ActiveCfg = Debug|ARM
-		{0FF7FCA4-9A30-4CD1-8D17-94E1ACE4BAC8}.Debug|ARM.Build.0 = Debug|ARM
 		{0FF7FCA4-9A30-4CD1-8D17-94E1ACE4BAC8}.Debug|ARM64.ActiveCfg = Debug|ARM64
 		{0FF7FCA4-9A30-4CD1-8D17-94E1ACE4BAC8}.Debug|ARM64.Build.0 = Debug|ARM64
 		{0FF7FCA4-9A30-4CD1-8D17-94E1ACE4BAC8}.Debug|x64.ActiveCfg = Debug|x64

@@ -2,8 +2,8 @@
 
 #include "App.h"
 #include "MainPage.h"
-#include "RxDispatcherScheduler.h"
 #include "UI.h"
+#include "WinrtScheduler.h"
 
 using namespace winrt;
 using namespace Windows::ApplicationModel;
@@ -48,7 +48,9 @@ App::App()
 /// <param name="e">Details about the launch request and process.</param>
 void App::OnLaunched(LaunchActivatedEventArgs const &e)
 {
-    ObserveOnDispatcher(Window::Current().Dispatcher());
+    auto const dispatcher{Window::Current().Dispatcher()};
+    ObserveOnDispatcher(dispatcher);
+    NotifyUser({}, {}, std::move(dispatcher));
 
     Frame rootFrame{nullptr};
     auto content = Window::Current().Content();

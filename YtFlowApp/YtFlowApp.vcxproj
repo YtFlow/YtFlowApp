@@ -82,8 +82,8 @@
     <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
     <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <GenerateTestArtifacts>True</GenerateTestArtifacts>
-    <AppxBundle>Auto</AppxBundle>
-    <AppxBundlePlatforms>arm</AppxBundlePlatforms>
+    <AppxBundle>Always</AppxBundle>
+    <AppxBundlePlatforms>x64|arm</AppxBundlePlatforms>
     <GenerateTemporaryStoreCertificate>True</GenerateTemporaryStoreCertificate>
     <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
     <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
@@ -132,10 +132,10 @@
       <!--Temporarily disable cppwinrt heap enforcement to work around xaml compiler generated std::shared_ptr use -->
       <AdditionalOptions Condition="'$(CppWinRTHeapEnforcement)'==''">/DWINRT_NO_MAKE_DETECTION %(AdditionalOptions)</AdditionalOptions>
       <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;WINRT_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">../RxCpp/Rx/v2/src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">../RxCpp/Rx/v2/src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../RxCpp/Rx/v2/src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../RxCpp/Rx/v2/src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">../RxCpp/Rx/v2/src;../tinycbor/src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">../RxCpp/Rx/v2/src;../tinycbor/src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../RxCpp/Rx/v2/src;../tinycbor/src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../RxCpp/Rx/v2/src;../tinycbor/src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">stdcpplatest</LanguageStandard>
       <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">stdcpplatest</LanguageStandard>
       <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdcpplatest</LanguageStandard>
@@ -167,19 +167,19 @@
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">/IGNORE:4099 %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <ClCompile>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">../RxCpp/Rx/v2/src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">../RxCpp/Rx/v2/src;../tinycbor/src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">stdcpplatest</LanguageStandard>
     </ClCompile>
     <ClCompile>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">../RxCpp/Rx/v2/src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">../RxCpp/Rx/v2/src;../tinycbor/src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">stdcpplatest</LanguageStandard>
     </ClCompile>
     <ClCompile>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../RxCpp/Rx/v2/src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../RxCpp/Rx/v2/src;../tinycbor/src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdcpplatest</LanguageStandard>
     </ClCompile>
     <ClCompile>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../RxCpp/Rx/v2/src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../RxCpp/Rx/v2/src;../tinycbor/src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Release|x64'">stdcpplatest</LanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
@@ -187,6 +187,7 @@
     <ClInclude Include="base64.h" />
     <ClInclude Include="BoolToFontWeightConverter.h" />
     <ClInclude Include="CoreFfi.h" />
+    <ClInclude Include="CoreRpc.h" />
     <ClInclude Include="EditPluginModel.h" />
     <ClInclude Include="EditPluginTreeViewItemTemplateSelector.h" />
     <ClInclude Include="EditProfilePage.h">
@@ -203,6 +204,10 @@
     </ClInclude>
     <ClInclude Include="HomeProfileControl.h">
       <DependentUpon>HomeProfileControl.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </ClInclude>
+    <ClInclude Include="NetifHomeWidget.h">
+      <DependentUpon>NetifHomeWidget.xaml</DependentUpon>
       <SubType>Code</SubType>
     </ClInclude>
     <ClInclude Include="NewProfilePage.h">
@@ -223,11 +228,12 @@
       <SubType>Code</SubType>
     </ClInclude>
     <ClInclude Include="RawEditorParam.h" />
-    <ClInclude Include="RxDispatcherScheduler.h" />
+    <ClInclude Include="WinrtScheduler.h" />
     <ClInclude Include="Rx.h" />
     <ClInclude Include="ConnectionState.h" />
     <ClInclude Include="UI.h" />
     <ClInclude Include="ProfileModel.h" />
+    <ClInclude Include="VectorBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -246,6 +252,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="MainPage.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="NetifHomeWidget.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Include="NewProfilePage.xaml">
@@ -313,9 +322,52 @@
     <Image Include="Assets\Wide310x150Logo.scale-400.png" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="../tinycbor/src/cborerrorstrings.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="../tinycbor/src/cborencoder.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="../tinycbor/src/cborencoder_close_container_checked.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="../tinycbor/src/cborencoder_float.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="../tinycbor/src/cborparser.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="../tinycbor/src/cborparser_dup_string.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="../tinycbor/src/cborparser_float.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="../tinycbor/src/cborpretty.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="../tinycbor/src/cborpretty_stdio.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="../tinycbor/src/cborvalidation.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
     <ClCompile Include="base64.cpp" />
     <ClCompile Include="BoolToFontWeightConverter.cpp" />
     <ClCompile Include="CoreFfi.cpp" />
+    <ClCompile Include="CoreRpc.cpp" />
     <ClCompile Include="EditPluginModel.cpp" />
     <ClCompile Include="EditPluginTreeViewItemTemplateSelector.cpp" />
     <ClCompile Include="EditProfilePage.cpp">
@@ -332,6 +384,10 @@
     </ClCompile>
     <ClCompile Include="HomeProfileControl.cpp">
       <DependentUpon>HomeProfileControl.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </ClCompile>
+    <ClCompile Include="NetifHomeWidget.cpp">
+      <DependentUpon>NetifHomeWidget.xaml</DependentUpon>
       <SubType>Code</SubType>
     </ClCompile>
     <ClCompile Include="NewProfilePage.cpp">
@@ -356,10 +412,11 @@
       <SubType>Code</SubType>
     </ClCompile>
     <ClCompile Include="RawEditorParam.cpp" />
-    <ClCompile Include="RxDispatcherScheduler.cpp" />
+    <ClCompile Include="WinrtScheduler.cpp" />
     <ClCompile Include="Rx.cpp" />
     <ClCompile Include="ConnectionState.cpp" />
     <ClCompile Include="UI.cpp" />
+    <ClCompile Include="VectorBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Midl Include="App.idl">

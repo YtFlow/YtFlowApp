@@ -6,7 +6,7 @@
 
 #include "PluginModel.h"
 #include "PluginTypeToDescConverter.h"
-#include "RxDispatcherScheduler.h"
+#include "WinrtScheduler.h"
 
 using namespace std::chrono_literals;
 using namespace winrt;
@@ -60,9 +60,7 @@ namespace winrt::YtFlowApp::implementation
         PluginTreeView().RootNodes().Clear();
         m_profile = nullptr;
         m_pluginModels = {};
-        event_token treeViewExpanding;
-        std::swap(treeViewExpanding, m_treeViewExpanding);
-        if (treeViewExpanding)
+        if (event_token treeViewExpanding{std::exchange(m_treeViewExpanding, {})})
         {
             PluginTreeView().Expanding(treeViewExpanding);
         }
@@ -125,9 +123,7 @@ namespace winrt::YtFlowApp::implementation
         }
         auto const navArgs{args};
         auto const lifetime{get_strong()};
-        bool forceQuit{false};
-        std::swap(forceQuit, m_forceQuit);
-        if (forceQuit)
+        if (std::exchange(m_forceQuit, false))
         {
             co_return;
         }
@@ -219,9 +215,7 @@ namespace winrt::YtFlowApp::implementation
     {
         PluginTreeView().RootNodes().Clear();
 
-        event_token treeViewExpanding{};
-        std::swap(treeViewExpanding, m_treeViewExpanding);
-        if (treeViewExpanding)
+        if (event_token treeViewExpanding{std::exchange(m_treeViewExpanding, {})})
         {
             PluginTreeView().Expanding(treeViewExpanding);
         }

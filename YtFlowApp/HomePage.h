@@ -1,13 +1,19 @@
 ﻿#pragma once
 
 #include "HomePage.g.h"
-#include <rxcpp/rx.hpp>
+
+#include "CoreRpc.h"
 
 namespace winrt::YtFlowApp::implementation
 {
     constexpr wchar_t YTFLOW_CORE_ERROR_LOAD[23] = L"YTFLOW_CORE_ERROR_LOAD";
     struct HomePage : HomePageT<HomePage>
     {
+        struct WidgetHandle
+        {
+            weak_ref<IHomeWidget> widget;
+            std::shared_ptr<std::vector<uint8_t>> info;
+        };
         HomePage();
 
         fire_and_forget OnNavigatedTo(Windows::UI::Xaml::Navigation::NavigationEventArgs const &args);
@@ -17,15 +23,15 @@ namespace winrt::YtFlowApp::implementation
         void OnConnectRequested(Windows::Foundation::IInspectable const &sender,
                                 YtFlowApp::HomeProfileControl const &control);
         void OnEditRequested(Windows::Foundation::IInspectable const &sender,
-                                YtFlowApp::HomeProfileControl const &control);
+                             YtFlowApp::HomeProfileControl const &control);
         fire_and_forget OnDeleteRequested(Windows::Foundation::IInspectable const &sender,
-                                YtFlowApp::HomeProfileControl const &control);
+                                          YtFlowApp::HomeProfileControl const &control);
         void ConnectCancelButton_Click(Windows::Foundation::IInspectable const &sender,
                                        Windows::UI::Xaml::RoutedEventArgs const &e);
         void DisconnectButton_Click(Windows::Foundation::IInspectable const &sender,
                                     Windows::UI::Xaml::RoutedEventArgs const &e);
         void CreateProfileButton_Click(Windows::Foundation::IInspectable const &sender,
-                                    Windows::UI::Xaml::RoutedEventArgs const &e);
+                                       Windows::UI::Xaml::RoutedEventArgs const &e);
 
         Windows::Foundation::Collections::IObservableVector<YtFlowApp::ProfileModel> Profiles() const;
 
@@ -34,7 +40,12 @@ namespace winrt::YtFlowApp::implementation
 
         static Windows::Foundation::IAsyncAction connectToProfile(uint32_t id);
 
-        rxcpp::composite_subscription m_connStatusChangeSubscription;
+        void SubscribeRefreshPluginStatus();
+        std::optional<WidgetHandle> CreateWidgetHandle(RpcPluginInfo const &info);
+
+        rxcpp::composite_subscription m_connStatusChangeSubscription$;
+        rxcpp::composite_subscription m_refreshPluginStatus$;
+        std::map<uint32_t, WidgetHandle> m_widgets;
         winrt::Windows::Foundation::Collections::IObservableVector<YtFlowApp::ProfileModel> m_profiles{nullptr};
         Windows::Foundation::IAsyncAction m_vpnTask{nullptr};
     };

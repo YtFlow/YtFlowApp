@@ -25,6 +25,9 @@
     <Page Include="RawEditorPage.xaml">
       <Filter>Pages\Editor</Filter>
     </Page>
+    <Page Include="NetifHomeWidget.xaml">
+      <Filter>Controls\HomeWidget</Filter>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Midl Include="App.idl" />
@@ -46,7 +49,7 @@
     <ClCompile Include="Rx.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="RxDispatcherScheduler.cpp">
+    <ClCompile Include="WinrtScheduler.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
     <ClCompile Include="UI.cpp">
@@ -73,6 +76,40 @@
     <ClCompile Include="base64.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
+    <ClCompile Include="CoreRpc.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="VectorBuffer.cpp" />
+    <ClCompile Include="../tinycbor/src/cborencoder.c">
+      <Filter>3rdparty\tinycbor</Filter>
+    </ClCompile>
+    <ClCompile Include="../tinycbor/src/cborencoder_close_container_checked.c">
+      <Filter>3rdparty\tinycbor</Filter>
+    </ClCompile>
+    <ClCompile Include="../tinycbor/src/cborencoder_float.c">
+      <Filter>3rdparty\tinycbor</Filter>
+    </ClCompile>
+    <ClCompile Include="../tinycbor/src/cborerrorstrings.c">
+      <Filter>3rdparty\tinycbor</Filter>
+    </ClCompile>
+    <ClCompile Include="../tinycbor/src/cborparser.c">
+      <Filter>3rdparty\tinycbor</Filter>
+    </ClCompile>
+    <ClCompile Include="../tinycbor/src/cborparser_dup_string.c">
+      <Filter>3rdparty\tinycbor</Filter>
+    </ClCompile>
+    <ClCompile Include="../tinycbor/src/cborparser_float.c">
+      <Filter>3rdparty\tinycbor</Filter>
+    </ClCompile>
+    <ClCompile Include="../tinycbor/src/cborpretty.c">
+      <Filter>3rdparty\tinycbor</Filter>
+    </ClCompile>
+    <ClCompile Include="../tinycbor/src/cborpretty_stdio.c">
+      <Filter>3rdparty\tinycbor</Filter>
+    </ClCompile>
+    <ClCompile Include="../tinycbor/src/cborvalidation.c">
+      <Filter>3rdparty\tinycbor</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -88,7 +125,7 @@
     <ClInclude Include="Rx.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="RxDispatcherScheduler.h">
+    <ClInclude Include="WinrtScheduler.h">
       <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="UI.h">
@@ -113,6 +150,12 @@
       <Filter>Models\PluginEditorParam</Filter>
     </ClInclude>
     <ClInclude Include="base64.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="CoreRpc.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="VectorBuffer.h">
       <Filter>Utils</Filter>
     </ClInclude>
   </ItemGroup>
@@ -301,6 +344,15 @@
     </Filter>
     <Filter Include="Models\PluginEditorParam">
       <UniqueIdentifier>{44319004-09eb-4f67-9511-22650ad04300}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3rdparty">
+      <UniqueIdentifier>{f6624465-6e19-4e3d-a813-0f5852c7b2bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3rdparty\tinycbor">
+      <UniqueIdentifier>{93117159-5379-44b7-bf7f-018a274fc688}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Controls\HomeWidget">
+      <UniqueIdentifier>{54efd356-4437-43c4-8ef1-a39a712d312d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

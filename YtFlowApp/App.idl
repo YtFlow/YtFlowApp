@@ -1,10 +1,12 @@
 namespace YtFlowApp
 {
-    interface IPluginEditorParam
-    {
+    interface IHomeWidget {
+        void UpdateInfo();
+    };
+    interface IPluginEditorParam {
         UInt8[] ToCbor();
         String[] CheckErrors();
-    }
+    };
 
     [default_interface] runtimeclass RawEditorParam : IPluginEditorParam
     {
@@ -75,6 +77,11 @@ namespace YtFlowApp
         event Windows.Foundation.EventHandler<HomeProfileControl> ConnectRequested;
         event Windows.Foundation.EventHandler<HomeProfileControl> EditRequested;
         event Windows.Foundation.EventHandler<HomeProfileControl> DeleteRequested;
+    }
+
+    [default_interface] runtimeclass NetifHomeWidget : Windows.UI.Xaml.Controls.UserControl, IHomeWidget
+    {
+        NetifHomeWidget();
     }
 
     runtimeclass ProfileModel : Windows.UI.Xaml.Data.INotifyPropertyChanged

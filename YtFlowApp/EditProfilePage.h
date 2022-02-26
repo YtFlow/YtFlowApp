@@ -4,7 +4,6 @@
 
 #include "EditPluginModel.h"
 #include "ProfileModel.h"
-#include "rxcpp/rx.hpp"
 
 namespace winrt::YtFlowApp::implementation
 {

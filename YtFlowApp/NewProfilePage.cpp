@@ -6,7 +6,6 @@
 
 #include "CoreFfi.h"
 #include "RawEditorParam.h"
-#include "nlohmann/json.hpp"
 
 using namespace nlohmann;
 using namespace winrt;

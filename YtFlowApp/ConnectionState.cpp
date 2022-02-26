@@ -5,7 +5,7 @@
 #include <ytflow_core.h>
 
 #include <Rx.h>
-#include <RxDispatcherScheduler.h>
+#include <WinrtScheduler.h>
 
 using namespace std::chrono_literals;
 
@@ -31,8 +31,8 @@ namespace winrt::YtFlowApp::implementation
 
     ConnectionState::ConnectionState(VpnPlugInProfile profile) : m_profile(profile)
     {
-        const auto focus$ = ObserveApplicationLeavingBackground();
-        const auto unfocus$ = ObserveApplicationEnteredBackground();
+        auto const focus${ObserveApplicationLeavingBackground()};
+        auto const unfocus${ObserveApplicationEnteredBackground()};
 
         ConnectStatusChange$ = ManualManagement$.get_observable()
                                    .merge(focus$.start_with(true).flat_map([=](bool) {
