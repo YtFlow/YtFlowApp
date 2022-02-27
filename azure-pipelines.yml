@@ -54,9 +54,9 @@ steps:
 - task: Cache@2
   condition: eq(variables.cleanBuild, 'false')
   inputs:
-    key: 'rustup | "$(Agent.OS)" | YtFlowCore/Cargo.lock | YtFlowCore/rust-toolchain.toml'
+    key: 'rustup | "$(Agent.OS)" | YtFlowCore/rust-toolchain.toml'
     restoreKeys: |
-      rustup | "$(Agent.OS)" | YtFlowCore/Cargo.lock | YtFlowCore/rust-toolchain.toml
+      rustup | "$(Agent.OS)" | YtFlowCore/rust-toolchain.toml
       rustup
     path: "$(UserProfile)/.rustup"
   displayName: Cache rustup toolchains
@@ -88,7 +88,7 @@ steps:
 - task: VSBuild@1
   displayName: Build App Bundle
   inputs:
-    platform: 'x86'
+    platform: '$(buildPlatform)'
     solution: '$(solution)'
     configuration: '$(buildConfiguration)'
     msbuildArgs: '/p:AppxBundlePlatforms="$(buildPlatform)" /p:AppxPackageDir="$(appxPackageDir)" /p:AppxBundle=Always /p:PackageCertificateKeyFile="$(secureKeyFile.secureFilePath)" /p:PackageCertificateThumbprint="" /p:UapAppxPackageBuildMode=SideloadOnly /p:PlatformToolset=v143'
