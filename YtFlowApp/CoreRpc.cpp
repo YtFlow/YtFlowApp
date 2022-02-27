@@ -38,7 +38,7 @@ namespace winrt::YtFlowApp::implementation
         uint32_t readLen{4};
         while (readLen > 0)
         {
-            auto const len{reader.LoadAsync(4).get()};
+            auto const len{reader.LoadAsync(readLen).get()};
             if (len == 0)
             {
                 RpcException ex;
