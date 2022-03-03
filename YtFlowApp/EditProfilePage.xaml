@@ -200,6 +200,7 @@
                     <x:String>socket-listener</x:String>
                     <x:String>socks5-client</x:String>
                     <x:String>socks5-server</x:String>
+                    <x:String>switch</x:String>
                     <x:String>system-resolver</x:String>
                     <x:String>tls-client</x:String>
                     <x:String>trojan-client</x:String>

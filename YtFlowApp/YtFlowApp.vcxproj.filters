@@ -28,6 +28,9 @@
     <Page Include="NetifHomeWidget.xaml">
       <Filter>Controls\HomeWidget</Filter>
     </Page>
+    <Page Include="SwitchHomeWidget.xaml">
+      <Filter>Controls\HomeWidget</Filter>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Midl Include="App.idl" />
@@ -110,6 +113,9 @@
     <ClCompile Include="../tinycbor/src/cborvalidation.c">
       <Filter>3rdparty\tinycbor</Filter>
     </ClCompile>
+    <ClCompile Include="SwitchChoiceItem.cpp">
+      <Filter>Models</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -157,6 +163,9 @@
     </ClInclude>
     <ClInclude Include="VectorBuffer.h">
       <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="SwitchChoiceItem.h">
+      <Filter>Models</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

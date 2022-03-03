@@ -84,6 +84,11 @@ namespace YtFlowApp
         NetifHomeWidget();
     }
 
+    [default_interface] runtimeclass SwitchHomeWidget : Windows.UI.Xaml.Controls.UserControl, IHomeWidget
+    {
+        SwitchHomeWidget();
+    }
+
     runtimeclass ProfileModel : Windows.UI.Xaml.Data.INotifyPropertyChanged
     {
         ProfileModel();
@@ -167,6 +172,26 @@ namespace YtFlowApp
             set;
         };
         IPluginEditorParam EditorParam
+        {
+            get;
+            set;
+        };
+    }
+    runtimeclass SwitchChoiceItem : Windows.UI.Xaml.Data.INotifyPropertyChanged
+    {
+        SwitchChoiceItem();
+
+        String Name
+        {
+            get;
+            set;
+        };
+        String Description
+        {
+            get;
+            set;
+        };
+        Boolean IsActive
         {
             get;
             set;

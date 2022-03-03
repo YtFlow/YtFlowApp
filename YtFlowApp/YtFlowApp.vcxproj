@@ -228,6 +228,11 @@
       <SubType>Code</SubType>
     </ClInclude>
     <ClInclude Include="RawEditorParam.h" />
+    <ClInclude Include="SwitchChoiceItem.h" />
+    <ClInclude Include="SwitchHomeWidget.h">
+      <DependentUpon>SwitchHomeWidget.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </ClInclude>
     <ClInclude Include="WinrtScheduler.h" />
     <ClInclude Include="Rx.h" />
     <ClInclude Include="ConnectionState.h" />
@@ -261,6 +266,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="RawEditorPage.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="SwitchHomeWidget.xaml">
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
@@ -412,6 +420,11 @@
       <SubType>Code</SubType>
     </ClCompile>
     <ClCompile Include="RawEditorParam.cpp" />
+    <ClCompile Include="SwitchChoiceItem.cpp" />
+    <ClCompile Include="SwitchHomeWidget.cpp">
+      <DependentUpon>SwitchHomeWidget.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </ClCompile>
     <ClCompile Include="WinrtScheduler.cpp" />
     <ClCompile Include="Rx.cpp" />
     <ClCompile Include="ConnectionState.cpp" />

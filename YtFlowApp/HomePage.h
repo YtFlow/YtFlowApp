@@ -45,9 +45,11 @@ namespace winrt::YtFlowApp::implementation
 
         rxcpp::composite_subscription m_connStatusChangeSubscription$;
         rxcpp::composite_subscription m_refreshPluginStatus$;
+        rxcpp::subjects::subject<bool> m_triggerInfoUpdate$;
         std::map<uint32_t, WidgetHandle> m_widgets;
         winrt::Windows::Foundation::Collections::IObservableVector<YtFlowApp::ProfileModel> m_profiles{nullptr};
         Windows::Foundation::IAsyncAction m_vpnTask{nullptr};
+        std::atomic<std::shared_ptr<CoreRpc>> m_rpc;
     };
 }
 

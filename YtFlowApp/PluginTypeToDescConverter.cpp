@@ -23,6 +23,7 @@ namespace winrt::YtFlowApp::implementation
         {L"system-resolver",
          box_value(L"Resolve real IP addresses by calling system functions. This is the recommended resolver for "
                    L"simple proxy scenarios for both client and server.")},
+        {L"switch", box_value(L"Handle incoming connections using runtime-selected handlers from a pre-defined list.")},
         {L"dns-server",
          box_value(L"Respond to DNS request messages using results returned by the specified resolver.")},
         {L"socks5-server", box_value(L"SOCKS5 server.")},

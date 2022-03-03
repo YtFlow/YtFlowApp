@@ -9,12 +9,14 @@
 #include "CoreRpc.h"
 #include "EditProfilePage.h"
 #include "FirstTimePage.h"
-#include "NetifHomeWidget.h"
 #include "NewProfilePage.h"
 #include "ProfileModel.h"
 #include "Rx.h"
 #include "UI.h"
 #include "WinrtScheduler.h"
+
+#include "NetifHomeWidget.h"
+#include "SwitchHomeWidget.h"
 
 using namespace winrt;
 using namespace Windows::UI::Xaml;
@@ -123,17 +125,28 @@ namespace winrt::YtFlowApp::implementation
         PluginWidgetPanel().Children().Clear();
         m_widgets.clear();
         m_refreshPluginStatus$ =
-            rxcpp::observable<>::create<CoreRpc>([](rxcpp::subscriber<CoreRpc> s) {
+            rxcpp::observable<>::create<CoreRpc>([weak{get_weak()}](rxcpp::subscriber<CoreRpc> s) {
                 auto rpc{CoreRpc::Connect()};
+                if (auto self{weak.get()}; self)
+                {
+                    self->m_rpc = std::make_shared<CoreRpc>(rpc);
+                }
                 s.add([=]() { rpc.m_socket.Close(); });
                 s.on_next(std::move(rpc));
             })
-                .flat_map([](auto rpc) {
+                .flat_map([weak{get_weak()}](auto rpc) {
                     auto const focus${ObserveApplicationLeavingBackground()};
                     auto const unfocus${ObserveApplicationEnteredBackground()};
                     auto hashcodes{std::make_shared<std::map<uint32_t, uint32_t>>()};
                     return focus$.start_with(true).flat_map([=](auto) {
+                        auto const self{weak.get()};
+                        if (!self)
+                        {
+                            throw std::runtime_error("Cannot subscribe when HomePage disposed");
+                        }
                         return rxcpp::observable<>::interval(1s)
+                            .map([](auto) { return true; })
+                            .merge(self->m_triggerInfoUpdate$.get_observable())
                             .map([=](auto) {
                                 auto const info{rpc.CollectAllPluginInfo(*hashcodes)};
                                 for (auto const &p : info)
@@ -167,7 +180,6 @@ namespace winrt::YtFlowApp::implementation
                 .observe_on(ObserveOnDispatcher())
                 .subscribe(
                     [weak{get_weak()}](auto info) {
-                        OutputDebugString((to_hstring(info.size()) + L" plugins received").data());
                         auto const self{weak.get()};
                         if (!self)
                         {
@@ -239,6 +251,18 @@ namespace winrt::YtFlowApp::implementation
         if (info.plugin == "netif")
         {
             auto widget{winrt::make<NetifHomeWidget>(to_hstring(info.name), handle.info)};
+            handle.widget = widget;
+            PluginWidgetPanel().Children().Append(std::move(widget));
+        }
+        else if (info.plugin == "switch")
+        {
+            auto widget{winrt::make<SwitchHomeWidget>(
+                to_hstring(info.name), handle.info, [weak{get_weak()}, id{info.id}](auto func, auto param) {
+                    auto self{weak.get()};
+                    auto const ret{self->m_rpc.load()->SendRequestToPlugin(id, func, std::move(param))};
+                    self->m_triggerInfoUpdate$.get_subscriber().on_next(true);
+                    return ret;
+                })};
             handle.widget = widget;
             PluginWidgetPanel().Children().Append(std::move(widget));
         }

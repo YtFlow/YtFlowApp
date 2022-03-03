@@ -21,7 +21,6 @@
 
     <muxc:Expander
         x:Name="MainExpander"
-        IsExpanded="True"
         HorizontalAlignment="Stretch"
         HorizontalContentAlignment="Stretch"
     >

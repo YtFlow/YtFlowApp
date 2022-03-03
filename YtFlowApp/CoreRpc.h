@@ -31,6 +31,8 @@ namespace winrt::YtFlowApp::implementation
         static CoreRpc Connect();
 
         std::vector<RpcPluginInfo> CollectAllPluginInfo(std::map<uint32_t, uint32_t> const &hashcodes) const &;
+        std::vector<uint8_t> SendRequestToPlugin(uint32_t pluginId, std::string_view func,
+                                                 std::vector<uint8_t> params) const &;
 
         Windows::Networking::Sockets::StreamSocket m_socket{nullptr};
 

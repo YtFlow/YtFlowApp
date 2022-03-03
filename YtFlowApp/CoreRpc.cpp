@@ -108,7 +108,7 @@ namespace winrt::YtFlowApp::implementation
         writeStream.FlushAsync().get();
 
         auto const resData{ReadChunk(std::move(readStream))};
-        auto const res{json::from_cbor(resData)};
+        auto res{json::from_cbor(resData)};
         if (res["c"] != "Ok")
         {
             RpcException ex;
@@ -118,6 +118,42 @@ namespace winrt::YtFlowApp::implementation
 
         std::vector<RpcPluginInfo> const ret = std::move(res["d"]);
         return ret;
+    }
+
+    std::vector<uint8_t> CoreRpc::SendRequestToPlugin(uint32_t pluginId, std::string_view func,
+                                                      std::vector<uint8_t> params) const &
+    {
+        auto const writeStream{m_socket.OutputStream()};
+        auto readStream{m_socket.InputStream()};
+        auto const ioLock{m_ioLock};
+
+        std::lock_guard _scope{*ioLock};
+
+        json reqDoc{"{ \"p\": {} }"_json};
+        auto &reqDocInner{reqDoc["p"]};
+        reqDocInner["id"] = pluginId;
+        reqDocInner["fn"] = func;
+        reqDocInner["p"] = json::binary_t{std::move(params)};
+        auto reqData{json::to_cbor(reqDoc)};
+
+        auto const reqDataLen{reqData.size()};
+        reqData.insert(reqData.begin(), {static_cast<uint8_t>(reqDataLen >> 24), static_cast<uint8_t>(reqDataLen >> 16),
+                                         static_cast<uint8_t>(reqDataLen >> 8), static_cast<uint8_t>(reqDataLen)});
+        auto reqBuf{winrt::make<VectorBuffer>(std::move(reqData))};
+        get_self<VectorBuffer>(reqBuf)->m_length = static_cast<uint32_t>(reqDataLen + 4);
+        writeStream.WriteAsync(std::move(reqBuf)).get();
+        writeStream.FlushAsync().get();
+
+        auto const resData{ReadChunk(std::move(readStream))};
+        auto res{json::from_cbor(resData)};
+        if (res["c"] != "Ok")
+        {
+            RpcException ex;
+            ex.msg = res["e"];
+            throw ex;
+        }
+
+        return res["d"].get_binary();
     }
 
 }
