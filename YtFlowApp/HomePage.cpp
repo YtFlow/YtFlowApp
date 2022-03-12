@@ -76,46 +76,61 @@ namespace winrt::YtFlowApp::implementation
         auto mainContainer = MainContainer();
         m_connStatusChangeSubscription$ =
             ConnectionState::Instance->ConnectStatusChange$.observe_on(ObserveOnDispatcher())
-                .subscribe([=](auto state) {
-                    auto localSettings = appData.LocalSettings().Values();
-                    auto coreError = localSettings.TryLookup(YTFLOW_CORE_ERROR_LOAD).try_as<hstring>();
-                    if (coreError.has_value())
-                    {
-                        localSettings.Remove(YTFLOW_CORE_ERROR_LOAD);
-                        NotifyUser(hstring{std::format(L"YtFlow Core failed to start. {}", *coreError)}, L"Core Error");
-                    }
-                    switch (state)
-                    {
-                    case VpnManagementConnectionStatus::Disconnected:
-                        m_refreshPluginStatus$.unsubscribe();
-                        VisualStateManager::GoToState(*lifetime, L"Disconnected", true);
-                        break;
-                    case VpnManagementConnectionStatus::Disconnecting:
-                        VisualStateManager::GoToState(*lifetime, L"Disconnecting", true);
-                        break;
-                    case VpnManagementConnectionStatus::Connected:
-                        lifetime->SubscribeRefreshPluginStatus();
-                        lifetime->CurrentProfileNameRun().Text(([&]() {
-                            if (auto id{localSettings.TryLookup(L"YTFLOW_PROFILE_ID").try_as<uint32_t>()};
-                                id.has_value())
-                            {
-                                for (auto const p : lifetime->m_profiles)
+                .subscribe(
+                    [=](auto state) {
+                        auto localSettings = appData.LocalSettings().Values();
+                        auto coreError = localSettings.TryLookup(YTFLOW_CORE_ERROR_LOAD).try_as<hstring>();
+                        if (coreError.has_value())
+                        {
+                            localSettings.Remove(YTFLOW_CORE_ERROR_LOAD);
+                            NotifyUser(hstring{std::format(L"YtFlow Core failed to start. {}", *coreError)},
+                                       L"Core Error");
+                        }
+                        switch (state)
+                        {
+                        case VpnManagementConnectionStatus::Disconnected:
+                            m_refreshPluginStatus$.unsubscribe();
+                            VisualStateManager::GoToState(*lifetime, L"Disconnected", true);
+                            break;
+                        case VpnManagementConnectionStatus::Disconnecting:
+                            VisualStateManager::GoToState(*lifetime, L"Disconnecting", true);
+                            break;
+                        case VpnManagementConnectionStatus::Connected:
+                            lifetime->SubscribeRefreshPluginStatus();
+                            lifetime->CurrentProfileNameRun().Text(([&]() {
+                                if (auto id{localSettings.TryLookup(L"YTFLOW_PROFILE_ID").try_as<uint32_t>()};
+                                    id.has_value())
                                 {
-                                    if (p.Id() == *id)
+                                    for (auto const p : lifetime->m_profiles)
                                     {
-                                        return p.Name();
+                                        if (p.Id() == *id)
+                                        {
+                                            return p.Name();
+                                        }
                                     }
                                 }
+                                return hstring{};
+                            })());
+                            VisualStateManager::GoToState(*lifetime, L"Connected", true);
+                            break;
+                        case VpnManagementConnectionStatus::Connecting:
+                            VisualStateManager::GoToState(*lifetime, L"Connecting", true);
+                            break;
+                        }
+                    },
+                    [](auto ex) {
+                        try
+                        {
+                            if (ex)
+                            {
+                                std::rethrow_exception(ex);
                             }
-                            return hstring{};
-                        })());
-                        VisualStateManager::GoToState(*lifetime, L"Connected", true);
-                        break;
-                    case VpnManagementConnectionStatus::Connecting:
-                        VisualStateManager::GoToState(*lifetime, L"Connecting", true);
-                        break;
-                    }
-                });
+                        }
+                        catch (const std::exception &e)
+                        {
+                            NotifyUser(to_hstring(e.what()), L"Profile Error");
+                        }
+                    });
         Bindings->Update();
     }
 
