@@ -42,7 +42,7 @@ namespace winrt::YtFlowApp::implementation
     }
     struct FfiProfile
     {
-        uint32_t id;
+        uint32_t id{};
         std::string name;
         std::string locale;
     };

@@ -102,6 +102,8 @@
             Grid.Row="1"
             Margin="16, 0, 0, 0"
             SelectionMode="None"
+            CanDragItems="False"
+            CanReorderItems="False"
             ScrollViewer.VerticalScrollMode="Disabled"
             ItemTemplateSelector="{StaticResource TreeItemSelector}"
             ItemInvoked="PluginTreeView_ItemInvoked"
