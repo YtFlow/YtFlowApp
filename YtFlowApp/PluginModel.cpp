@@ -88,7 +88,7 @@ namespace winrt::YtFlowApp::implementation
     }
     void PluginModel::SetAsEntry() const &
     {
-        auto const conn{FfiDbInstance.Connect()};
+        auto conn{FfiDbInstance.Connect()};
         try
         {
             conn.SetPluginAsEntry(m_id, m_profileId);
@@ -100,7 +100,7 @@ namespace winrt::YtFlowApp::implementation
     }
     void PluginModel::UnsetAsEntry() const &
     {
-        auto const conn{FfiDbInstance.Connect()};
+        auto conn{FfiDbInstance.Connect()};
         try
         {
             conn.UnsetPluginAsEntry(m_id, m_profileId);
@@ -112,7 +112,7 @@ namespace winrt::YtFlowApp::implementation
     }
     void PluginModel::Update() const &
     {
-        auto const conn{FfiDbInstance.Connect()};
+        auto conn{FfiDbInstance.Connect()};
         conn.UpdatePlugin(m_id, m_profileId, winrt::to_string(m_name).data(), winrt::to_string(m_desc).data(),
                           winrt::to_string(m_plugin).data(), m_pluginVersion, m_param.data(), m_param.size());
     }

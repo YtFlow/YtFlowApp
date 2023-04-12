@@ -78,61 +78,71 @@ namespace winrt::YtFlowApp::implementation
         return unwrap_ffi_result<FfiConn>(ytflow_core::ytflow_db_conn_new(db_ptr));
     }
 
-    FfiConn::FfiConn(FfiConn &&that) noexcept : conn_ptr(that.conn_ptr)
+    FfiConn::FfiConn(FfiConn &&that) noexcept : conn_ptr(std::exchange(that.conn_ptr, nullptr))
     {
-        that.conn_ptr = nullptr;
     }
-    std::vector<FfiProfile> FfiConn::GetProfiles() const &
+    std::vector<FfiProfile> FfiConn::GetProfiles() &
     {
+        std::lock_guard _guard(conn_mu);
         return unwrap_ffi_buffer<std::vector<FfiProfile>>(ytflow_core::ytflow_profiles_get_all(conn_ptr));
     }
-    uint32_t FfiConn::CreateProfile(const char *name, const char *locale) const &
+    uint32_t FfiConn::CreateProfile(const char *name, const char *locale) &
     {
+        std::lock_guard _guard(conn_mu);
         const auto [ptrRaw, metaRaw] =
             unwrap_ffi_result<FfiNoop>(ytflow_core::ytflow_profile_create(name, locale, conn_ptr));
         return (uint32_t)((uintptr_t)ptrRaw & 0xFFFFFFFF);
     }
-    void FfiConn::DeleteProfile(uint32_t id) const &
+    void FfiConn::DeleteProfile(uint32_t id) &
     {
+        std::lock_guard _guard(conn_mu);
         unwrap_ffi_result<FfiNoop>(ytflow_core::ytflow_profile_delete(id, conn_ptr));
     }
-    void FfiConn::UpdateProfile(uint32_t id, const char *name, const char *locale) const &
+    void FfiConn::UpdateProfile(uint32_t id, const char *name, const char *locale) &
     {
+        std::lock_guard _guard(conn_mu);
         unwrap_ffi_result<FfiNoop>(ytflow_core::ytflow_profile_update(id, name, locale, conn_ptr));
     }
-    std::vector<FfiPlugin> FfiConn::GetEntryPluginsByProfile(uint32_t profileId) const &
+    std::vector<FfiPlugin> FfiConn::GetEntryPluginsByProfile(uint32_t profileId) &
     {
+        std::lock_guard _guard(conn_mu);
         return unwrap_ffi_buffer<std::vector<FfiPlugin>>(ytflow_core::ytflow_plugins_get_entry(profileId, conn_ptr));
     }
-    std::vector<FfiPlugin> FfiConn::GetPluginsByProfile(uint32_t profileId) const &
+    std::vector<FfiPlugin> FfiConn::GetPluginsByProfile(uint32_t profileId) &
     {
+        std::lock_guard _guard(conn_mu);
         return unwrap_ffi_buffer<std::vector<FfiPlugin>>(
             ytflow_core::ytflow_plugins_get_by_profile(profileId, conn_ptr));
     }
-    void FfiConn::SetPluginAsEntry(uint32_t pluginId, uint32_t profileId) const &
+    void FfiConn::SetPluginAsEntry(uint32_t pluginId, uint32_t profileId) &
     {
+        std::lock_guard _guard(conn_mu);
         unwrap_ffi_result<FfiNoop>(ytflow_core::ytflow_plugin_set_as_entry(pluginId, profileId, conn_ptr));
     }
-    void FfiConn::UnsetPluginAsEntry(uint32_t pluginId, uint32_t profileId) const &
+    void FfiConn::UnsetPluginAsEntry(uint32_t pluginId, uint32_t profileId) &
     {
+        std::lock_guard _guard(conn_mu);
         unwrap_ffi_result<FfiNoop>(ytflow_core::ytflow_plugin_unset_as_entry(pluginId, profileId, conn_ptr));
     }
-    void FfiConn::DeletePlugin(uint32_t id) const &
+    void FfiConn::DeletePlugin(uint32_t id) &
     {
+        std::lock_guard _guard(conn_mu);
         unwrap_ffi_result<FfiNoop>(ytflow_core::ytflow_plugin_delete(id, conn_ptr));
     }
     uint32_t FfiConn::CreatePlugin(uint32_t profileId, char const *name, char const *desc, char const *plugin,
-                                   uint16_t pluginVersion, uint8_t const *param, size_t paramLen) const &
+                                   uint16_t pluginVersion, uint8_t const *param, size_t paramLen) &
     {
+        std::lock_guard _guard(conn_mu);
         const auto [ptrRaw, metaRaw] = unwrap_ffi_result<FfiNoop>(
             ytflow_core::ytflow_plugin_create(profileId, name, desc, plugin, pluginVersion, param, paramLen, conn_ptr));
         return (uint32_t)((uintptr_t)ptrRaw & 0xFFFFFFFF);
     }
     void FfiConn::UpdatePlugin(uint32_t id, uint32_t profileId, char const *name, char const *desc, char const *plugin,
-                               uint16_t pluginVersion, uint8_t const *param, size_t paramLen) const &
+                               uint16_t pluginVersion, uint8_t const *param, size_t paramLen) &
     {
-        unwrap_ffi_result<FfiNoop>(ytflow_core::ytflow_plugin_update(
-            id, profileId, name, desc, plugin, pluginVersion, param, paramLen, conn_ptr));
+        std::lock_guard _guard(conn_mu);
+        unwrap_ffi_result<FfiNoop>(ytflow_core::ytflow_plugin_update(id, profileId, name, desc, plugin, pluginVersion,
+                                                                     param, paramLen, conn_ptr));
     }
 
     FfiConn FfiConn::from_ffi(void *ptr1, uintptr_t)

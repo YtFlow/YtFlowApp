@@ -53,7 +53,7 @@ namespace winrt::YtFlowApp::implementation
 
         co_await resume_background();
 
-        const auto conn{FfiDbInstance.Connect()};
+        auto conn{FfiDbInstance.Connect()};
         for (const auto &profile : conn.GetProfiles())
         {
             if (profile.name == newProfileName)
@@ -309,7 +309,7 @@ namespace winrt::YtFlowApp::implementation
             doc["main-forward"]["param"]["tcp_next"] = "trojan-client.tcp";
         }
 
-        auto const conn{FfiDbInstance.Connect()};
+        auto conn{FfiDbInstance.Connect()};
         for (auto const &[pluginName, pluginDoc] : doc.items())
         {
             std::string const &desc = pluginDoc["desc"];

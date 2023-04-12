@@ -41,7 +41,7 @@ namespace winrt::YtFlowApp::implementation
         EditorFrame().Content(nullptr);
 
         co_await resume_background();
-        const auto conn{FfiDbInstance.Connect()};
+        auto conn{FfiDbInstance.Connect()};
         const auto plugins{conn.GetPluginsByProfile(m_profile->Id())};
         const auto entryPlugins{conn.GetEntryPluginsByProfile(m_profile->Id())};
 
@@ -206,7 +206,7 @@ namespace winrt::YtFlowApp::implementation
 
         co_await resume_background();
 
-        const auto conn{FfiDbInstance.Connect()};
+        auto conn{FfiDbInstance.Connect()};
         conn.UpdateProfile(profile->Id(), winrt::to_string(newProfileName).data(),
                            winrt::to_string(profile->Locale()).data());
     }
@@ -533,7 +533,7 @@ namespace winrt::YtFlowApp::implementation
             co_return;
         }
         co_await resume_background();
-        auto const conn{FfiDbInstance.Connect()};
+        auto conn{FfiDbInstance.Connect()};
         conn.DeletePlugin(model.Plugin().Id());
         co_await resume_foreground(Dispatcher());
         deleting = false;
@@ -569,7 +569,7 @@ namespace winrt::YtFlowApp::implementation
         ffiPlugin.param = std::vector<uint8_t>{0xf6}; // TODO: param?
 
         co_await resume_background();
-        auto const conn{FfiDbInstance.Connect()};
+        auto conn{FfiDbInstance.Connect()};
         ffiPlugin.id =
             conn.CreatePlugin(m_profile->Id(), ffiPlugin.name.data(), ffiPlugin.desc.data(), ffiPlugin.plugin.data(),
                               ffiPlugin.plugin_version, ffiPlugin.param.data(), ffiPlugin.param.size());

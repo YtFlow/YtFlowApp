@@ -86,24 +86,25 @@ namespace winrt::YtFlowApp::implementation
         FfiConn(const FfiConn &) = delete;
         FfiConn &operator=(const FfiConn &) = delete;
 
-        std::vector<FfiProfile> GetProfiles() const &;
-        void DeleteProfile(uint32_t id) const &;
-        uint32_t CreateProfile(const char *name, const char *locale) const &;
-        void UpdateProfile(uint32_t id, const char *name, const char *locale) const &;
-        std::vector<FfiPlugin> GetPluginsByProfile(uint32_t profileId) const &;
-        std::vector<FfiPlugin> GetEntryPluginsByProfile(uint32_t profileId) const &;
-        void SetPluginAsEntry(uint32_t pluginId, uint32_t profileId) const &;
-        void UnsetPluginAsEntry(uint32_t pluginId, uint32_t profileId) const &;
-        void DeletePlugin(uint32_t id) const &;
+        std::vector<FfiProfile> GetProfiles() &;
+        void DeleteProfile(uint32_t id) &;
+        uint32_t CreateProfile(const char *name, const char *locale) &;
+        void UpdateProfile(uint32_t id, const char *name, const char *locale) &;
+        std::vector<FfiPlugin> GetPluginsByProfile(uint32_t profileId) &;
+        std::vector<FfiPlugin> GetEntryPluginsByProfile(uint32_t profileId) &;
+        void SetPluginAsEntry(uint32_t pluginId, uint32_t profileId) &;
+        void UnsetPluginAsEntry(uint32_t pluginId, uint32_t profileId) &;
+        void DeletePlugin(uint32_t id) &;
         uint32_t CreatePlugin(uint32_t profileId, char const *name, char const *desc, char const *plugin,
-                              uint16_t pluginVersion, uint8_t const *param, size_t paramLen) const &;
+                              uint16_t pluginVersion, uint8_t const *param, size_t paramLen) &;
         void UpdatePlugin(uint32_t id, uint32_t profileId, char const *name, char const *desc, char const *plugin,
-                          uint16_t pluginVersion, uint8_t const *param, size_t paramLen) const &;
+                          uint16_t pluginVersion, uint8_t const *param, size_t paramLen) &;
 
         static FfiConn from_ffi(void *ptr1, uintptr_t);
         ~FfiConn();
 
       private:
+        std::mutex conn_mu{};
         ytflow_core::Connection *conn_ptr{nullptr};
     };
     struct FfiDb final

@@ -327,7 +327,7 @@ namespace winrt::YtFlowApp::implementation
             co_return;
         }
         co_await resume_background();
-        const auto conn{FfiDbInstance.Connect()};
+        auto conn{FfiDbInstance.Connect()};
         conn.DeleteProfile(profile.Id());
         co_await resume_foreground(Dispatcher());
         deleting = false;
