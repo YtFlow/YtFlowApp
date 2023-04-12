@@ -46,12 +46,14 @@ namespace winrt::YtFlowApp::implementation
         std::string name;
         std::string locale;
     };
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(FfiProfile, id, name, locale)
     struct FfiPluginDescriptor
     {
         std::string descriptor;
         // TODO: bitflags Serializing
         // std::string type;
     };
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(FfiPluginDescriptor, descriptor)
     struct FfiPluginVerifyResult
     {
         std::vector<FfiPluginDescriptor> required;
@@ -74,8 +76,6 @@ namespace winrt::YtFlowApp::implementation
         static FfiPluginVerifyResult verify(char const *plugin, uint16_t plugin_version, uint8_t const *param,
                                             size_t param_len);
     };
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(FfiPluginDescriptor, descriptor)
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(FfiProfile, id, name, locale)
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(FfiPlugin, id, name, desc, plugin, plugin_version, param)
     struct FfiConn final
     {
