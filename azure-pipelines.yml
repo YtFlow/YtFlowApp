@@ -19,6 +19,7 @@ variables:
   appxPackageDir: '$(build.artifactStagingDirectory)\AppxPackages\\'
   keyFile: 'YtFlowApp_TemporaryKey.pfx'
   NUGET_PACKAGES: $(Pipeline.Workspace)/.nuget/packages
+  vcpkgGitCommitId: 203383666e2422ed31e1faebe6efa6e306bd126d
   cleanBuild: false
 
 steps:
@@ -71,12 +72,32 @@ steps:
     path: "$(UserProfile)/.cargo"
   displayName: Cache Cargo packages
 
+- task: Cache@2
+  condition: eq(variables.cleanBuild, 'false')
+  inputs:
+    key: 'vcpkg | "$(vcpkgGitCommitId)" | "$(Agent.OS)"'
+    restoreKeys: |
+      vcpkg | "$(vcpkgGitCommitId)" | "$(Agent.OS)"
+      vcpkg
+    path: "$(Build.BinariesDirectory)/vcpkg"
+  displayName: Cache vcpkg
+
+- task: run-vcpkg@0
+  name: runVcpkg
+  displayName: 'Run vcpkg'
+  inputs:
+    vcpkgArguments: 'openssl:x64-uwp openssl:arm-uwp'
+    vcpkgGitCommitId: $(vcpkgGitCommitId)
+
 - task: CmdLine@2
   inputs:
     workingDirectory: YtFlowCore
     script: |
       cargo build -p ytflow-uwp-plugin -Z build-std=std,panic_abort --target x86_64-uwp-windows-msvc --release
       cargo build -p ytflow-uwp-plugin -Z build-std=std,panic_abort --target thumbv7a-uwp-windows-msvc --release
+  env:
+    X86_64_UWP_WINDOWS_MSVC_OPENSSL_DIR: "$(runVcpkg.RUNVCPKG_VCPKG_ROOT_OUT)\\installed\\x64-uwp"
+    THUMBV7A_UWP_WINDOWS_MSVC_OPENSSL_DIR: "$(runVcpkg.RUNVCPKG_VCPKG_ROOT_OUT)\\installed\\arm-uwp"
   displayName: Build YtFlowCore for UWP
 
 - task: DownloadSecureFile@1
