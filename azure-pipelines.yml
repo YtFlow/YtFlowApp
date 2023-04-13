@@ -33,7 +33,7 @@ steps:
   inputs:
     key: 'nuget | "$(Agent.OS)" | **/*.vcxproj'
     restoreKeys: |
-      nuget | "$(Agent.OS)“ | **/*.vcxproj
+      nuget | "$(Agent.OS)"
       nuget
     path: $(NUGET_PACKAGES)
   displayName: Cache NuGet packages
@@ -45,9 +45,9 @@ steps:
 - task: Cache@2
   condition: eq(variables.cleanBuild, 'false')
   inputs:
-    key: 'target | "$(Agent.OS)" | YtFlowCore/Cargo.lock | YtFlowCore/rust-toolchain.toml'
+    key: 'target | "$(Agent.OS)" | YtFlowCore/rust-toolchain.toml | YtFlowCore/Cargo.lock'
     restoreKeys: |
-      target | "$(Agent.OS)" | YtFlowCore/Cargo.lock | YtFlowCore/rust-toolchain.toml
+      target | "$(Agent.OS)" | YtFlowCore/rust-toolchain.toml
       target
     path: YtFlowCore/target
   displayName: Cache YtFlowCore target directory
@@ -56,18 +56,15 @@ steps:
   condition: eq(variables.cleanBuild, 'false')
   inputs:
     key: 'rustup | "$(Agent.OS)" | YtFlowCore/rust-toolchain.toml'
-    restoreKeys: |
-      rustup | "$(Agent.OS)" | YtFlowCore/rust-toolchain.toml
-      rustup
     path: "$(UserProfile)/.rustup"
   displayName: Cache rustup toolchains
 
 - task: Cache@2
   condition: eq(variables.cleanBuild, 'false')
   inputs:
-    key: 'cargo | "$(Agent.OS)" | YtFlowCore/Cargo.lock | YtFlowCore/rust-toolchain.toml'
+    key: 'cargo | "$(Agent.OS)" | YtFlowCore/Cargo.lock'
     restoreKeys: |
-      cargo | "$(Agent.OS)" | YtFlowCore/Cargo.lock | YtFlowCore/rust-toolchain.toml
+      cargo | "$(Agent.OS)"
       cargo
     path: "$(UserProfile)/.cargo"
   displayName: Cache Cargo packages
@@ -75,10 +72,7 @@ steps:
 - task: Cache@2
   condition: eq(variables.cleanBuild, 'false')
   inputs:
-    key: 'vcpkg | "$(vcpkgGitCommitId)" | "$(Agent.OS)"'
-    restoreKeys: |
-      vcpkg | "$(vcpkgGitCommitId)" | "$(Agent.OS)"
-      vcpkg
+    key: 'vcpkg | "$(Agent.OS)" | "$(vcpkgGitCommitId)"'
     path: "$(Build.BinariesDirectory)/vcpkg"
   displayName: Cache vcpkg
 
@@ -112,7 +106,7 @@ steps:
     platform: 'x64'
     solution: '$(solution)'
     configuration: '$(buildConfiguration)'
-    msbuildArgs: '/p:AppxBundlePlatforms="$(buildPlatform)" /p:AppxPackageDir="$(appxPackageDir)" /p:AppxBundle=Always /p:PackageCertificateKeyFile="$(secureKeyFile.secureFilePath)" /p:PackageCertificateThumbprint="" /p:UapAppxPackageBuildMode=SideloadOnly /p:PlatformToolset=v143'
+    msbuildArgs: '/p:AppxBundlePlatforms="$(buildPlatform)" /p:AppxPackageDir="$(appxPackageDir)" /p:AppxBundle=Always /p:PackageCertificateKeyFile="$(secureKeyFile.secureFilePath)" /p:PackageCertificateThumbprint="" /p:UapAppxPackageBuildMode=SideloadOnly /p:PlatformToolset=v143 /p:PreferredToolArchitecture=x64'
 
 - task: PublishPipelineArtifact@1
   inputs:
