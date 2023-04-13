@@ -33,105 +33,121 @@ namespace winrt::YtFlowApp::implementation
 
     fire_and_forget HomePage::OnNavigatedTo(Windows::UI::Xaml::Navigation::NavigationEventArgs const & /* args */)
     {
-        static IAsyncAction loadDbTask = {nullptr};
-        if (loadDbTask == nullptr)
+        try
         {
-            loadDbTask = std::move(EnsureDatabase());
-        }
-        const auto lifetime{get_strong()};
-
-        if (!ConnectionState::Instance.has_value())
-        {
-            // Ensure profile exists
-            const auto &profile = co_await ConnectionState::GetInstalledVpnProfile();
-            if (profile == nullptr)
+            static IAsyncAction loadDbTask = {nullptr};
+            if (loadDbTask == nullptr)
             {
-                co_await 400ms;
-                co_await resume_foreground(Dispatcher());
-                Frame().Navigate(xaml_typename<YtFlowApp::FirstTimePage>());
+                loadDbTask = std::move(EnsureDatabase());
+            }
+            const auto lifetime{get_strong()};
+
+            if (!ConnectionState::Instance.has_value())
+            {
+                // Ensure profile exists
+                const auto &profile = co_await ConnectionState::GetInstalledVpnProfile();
+                if (profile == nullptr)
+                {
+                    co_await 400ms;
+                    co_await resume_foreground(Dispatcher());
+                    Frame().Navigate(xaml_typename<YtFlowApp::FirstTimePage>());
+                    co_return;
+                }
+                else
+                {
+                    ConnectionState::Instance.emplace(profile);
+                }
+            }
+            if (loadDbTask.Status() != AsyncStatus::Completed)
+            {
+                co_await loadDbTask;
+            }
+            auto conn = FfiDbInstance.Connect();
+            auto profiles = conn.GetProfiles();
+            std::vector<YtFlowApp::ProfileModel> profileModels;
+            profileModels.reserve(profiles.size());
+            std::transform(profiles.begin(), profiles.end(), std::back_inserter(profileModels),
+                           [](auto const &p) { return winrt::make<YtFlowApp::implementation::ProfileModel>(p); });
+            co_await resume_foreground(Dispatcher());
+            if (profileModels.empty() &&
+                Frame().CurrentSourcePageType().Name == xaml_typename<YtFlowApp::HomePage>().Name)
+            {
+                Frame().Navigate(xaml_typename<YtFlowApp::NewProfilePage>(), box_value(true));
                 co_return;
             }
-            else
-            {
-                ConnectionState::Instance.emplace(profile);
-            }
-        }
-        if (loadDbTask.Status() != AsyncStatus::Completed)
-        {
-            co_await loadDbTask;
-        }
-        auto conn = FfiDbInstance.Connect();
-        auto profiles = conn.GetProfiles();
-        std::vector<YtFlowApp::ProfileModel> profileModels;
-        profileModels.reserve(profiles.size());
-        std::transform(profiles.begin(), profiles.end(), std::back_inserter(profileModels),
-                       [](auto const &p) { return winrt::make<YtFlowApp::implementation::ProfileModel>(p); });
-        co_await resume_foreground(Dispatcher());
-        if (profileModels.empty() && Frame().CurrentSourcePageType().Name == xaml_typename<YtFlowApp::HomePage>().Name)
-        {
-            Frame().Navigate(xaml_typename<YtFlowApp::NewProfilePage>(), box_value(true));
-            co_return;
-        }
-        m_profiles = winrt::single_threaded_observable_vector(std::move(profileModels));
-        auto mainContainer = MainContainer();
-        m_connStatusChangeSubscription$ =
-            ConnectionState::Instance->ConnectStatusChange$.observe_on(ObserveOnDispatcher())
-                .subscribe(
-                    [=](auto state) {
-                        auto localSettings = appData.LocalSettings().Values();
-                        auto coreError = localSettings.TryLookup(YTFLOW_CORE_ERROR_LOAD).try_as<hstring>();
-                        if (coreError.has_value())
-                        {
-                            localSettings.Remove(YTFLOW_CORE_ERROR_LOAD);
-                            NotifyUser(hstring{std::format(L"YtFlow Core failed to start. {}", *coreError)},
-                                       L"Core Error");
-                        }
-                        switch (state)
-                        {
-                        case VpnManagementConnectionStatus::Disconnected:
-                            m_refreshPluginStatus$.unsubscribe();
-                            VisualStateManager::GoToState(*lifetime, L"Disconnected", true);
-                            break;
-                        case VpnManagementConnectionStatus::Disconnecting:
-                            VisualStateManager::GoToState(*lifetime, L"Disconnecting", true);
-                            break;
-                        case VpnManagementConnectionStatus::Connected:
-                            lifetime->SubscribeRefreshPluginStatus();
-                            lifetime->CurrentProfileNameRun().Text(([&]() {
-                                if (auto id{localSettings.TryLookup(L"YTFLOW_PROFILE_ID").try_as<uint32_t>()};
-                                    id.has_value())
-                                {
-                                    for (auto const p : lifetime->m_profiles)
-                                    {
-                                        if (p.Id() == *id)
-                                        {
-                                            return p.Name();
-                                        }
-                                    }
-                                }
-                                return hstring{};
-                            })());
-                            VisualStateManager::GoToState(*lifetime, L"Connected", true);
-                            break;
-                        case VpnManagementConnectionStatus::Connecting:
-                            VisualStateManager::GoToState(*lifetime, L"Connecting", true);
-                            break;
-                        }
-                    },
-                    [](auto ex) {
-                        try
-                        {
-                            if (ex)
+            m_profiles = winrt::single_threaded_observable_vector(std::move(profileModels));
+            auto mainContainer = MainContainer();
+            m_connStatusChangeSubscription$ =
+                ConnectionState::Instance->ConnectStatusChange$.observe_on(ObserveOnDispatcher())
+                    .subscribe(
+                        [=](auto state) {
+                            try
                             {
-                                std::rethrow_exception(ex);
+                                auto const localSettings = appData.LocalSettings().Values();
+                                auto const coreError =
+                                    localSettings.TryLookup(YTFLOW_CORE_ERROR_LOAD).try_as<hstring>();
+                                if (coreError.has_value())
+                                {
+                                    localSettings.Remove(YTFLOW_CORE_ERROR_LOAD);
+                                    NotifyUser(hstring{std::format(L"YtFlow Core failed to start. {}", *coreError)},
+                                               L"Core Error");
+                                }
+                                switch (state)
+                                {
+                                case VpnManagementConnectionStatus::Disconnected:
+                                    m_refreshPluginStatus$.unsubscribe();
+                                    VisualStateManager::GoToState(*lifetime, L"Disconnected", true);
+                                    break;
+                                case VpnManagementConnectionStatus::Disconnecting:
+                                    VisualStateManager::GoToState(*lifetime, L"Disconnecting", true);
+                                    break;
+                                case VpnManagementConnectionStatus::Connected:
+                                    lifetime->SubscribeRefreshPluginStatus();
+                                    lifetime->CurrentProfileNameRun().Text(([&]() {
+                                        if (auto id{localSettings.TryLookup(L"YTFLOW_PROFILE_ID").try_as<uint32_t>()};
+                                            id.has_value())
+                                        {
+                                            for (auto const p : lifetime->m_profiles)
+                                            {
+                                                if (p.Id() == *id)
+                                                {
+                                                    return p.Name();
+                                                }
+                                            }
+                                        }
+                                        return hstring{};
+                                    })());
+                                    VisualStateManager::GoToState(*lifetime, L"Connected", true);
+                                    break;
+                                case VpnManagementConnectionStatus::Connecting:
+                                    VisualStateManager::GoToState(*lifetime, L"Connecting", true);
+                                    break;
+                                }
                             }
-                        }
-                        catch (const std::exception &e)
-                        {
-                            NotifyUser(to_hstring(e.what()), L"Profile Error");
-                        }
-                    });
-        Bindings->Update();
+                            catch (...)
+                            {
+                                NotifyException(L"HomePage ConnectStatusChange subscribe");
+                            }
+                        },
+                        [](auto ex) {
+                            try
+                            {
+                                if (ex)
+                                {
+                                    std::rethrow_exception(ex);
+                                }
+                            }
+                            catch (...)
+                            {
+                                NotifyException(L"HomePage ConnectStatusChange subscribe error");
+                            }
+                        });
+            Bindings->Update();
+        }
+        catch (...)
+        {
+            NotifyException(L"HomePage NavigatedTo");
+        }
     }
 
     void HomePage::SubscribeRefreshPluginStatus()
@@ -195,29 +211,36 @@ namespace winrt::YtFlowApp::implementation
                 .observe_on(ObserveOnDispatcher())
                 .subscribe(
                     [weak{get_weak()}](auto info) {
-                        auto const self{weak.get()};
-                        if (!self)
+                        try
                         {
-                            return;
-                        }
-                        for (auto const &plugin : info)
-                        {
-                            // Append/update only. No deletion required at this moment.
-                            auto it = self->m_widgets.find(plugin.id);
-                            if (it == self->m_widgets.end())
+                            auto const self{weak.get()};
+                            if (!self)
                             {
-                                auto handle{self->CreateWidgetHandle(plugin)};
-                                if (!handle.has_value())
+                                return;
+                            }
+                            for (auto const &plugin : info)
+                            {
+                                // Append/update only. No deletion required at this moment.
+                                auto it = self->m_widgets.find(plugin.id);
+                                if (it == self->m_widgets.end())
                                 {
-                                    continue;
+                                    auto handle{self->CreateWidgetHandle(plugin)};
+                                    if (!handle.has_value())
+                                    {
+                                        continue;
+                                    }
+                                    it = self->m_widgets.emplace(std::make_pair(plugin.id, std::move(*handle))).first;
                                 }
-                                it = self->m_widgets.emplace(std::make_pair(plugin.id, std::move(*handle))).first;
+                                *it->second.info = plugin.info;
+                                if (auto const widget{it->second.widget.get()})
+                                {
+                                    widget.UpdateInfo();
+                                }
                             }
-                            *it->second.info = plugin.info;
-                            if (auto const widget{it->second.widget.get()})
-                            {
-                                widget.UpdateInfo();
-                            }
+                        }
+                        catch (...)
+                        {
+                            NotifyException(L"Plugin status RPC subscribe");
                         }
                     },
                     [](auto ex) {
@@ -228,9 +251,9 @@ namespace winrt::YtFlowApp::implementation
                                 std::rethrow_exception(ex);
                             }
                         }
-                        catch (const std::exception &e)
+                        catch (...)
                         {
-                            NotifyUser(to_hstring(e.what()), L"RPC Error");
+                            NotifyException(L"Plugin status RPC subscribe error");
                         }
                     });
     }
@@ -250,8 +273,8 @@ namespace winrt::YtFlowApp::implementation
             co_return;
         }
 
-        const auto &localFolder = appData.LocalFolder();
-        const auto &dbFolder =
+        const auto localFolder = appData.LocalFolder();
+        const auto dbFolder =
             co_await localFolder.CreateFolderAsync(L"db", Windows::Storage::CreationCollisionOption::OpenIfExists);
         hstring dbPath = dbFolder.Path() + L"\\main.db";
         appData.LocalSettings().Values().Insert(L"YTFLOW_DB_PATH", box_value(dbPath));
@@ -296,11 +319,18 @@ namespace winrt::YtFlowApp::implementation
     void HomePage::OnConnectRequested(Windows::Foundation::IInspectable const & /* sender */,
                                       winrt::YtFlowApp::HomeProfileControl const &control)
     {
-        if (m_vpnTask != nullptr)
+        try
         {
-            m_vpnTask.Cancel();
+            if (m_vpnTask != nullptr)
+            {
+                m_vpnTask.Cancel();
+            }
+            m_vpnTask = connectToProfile(control.Profile().Id());
         }
-        m_vpnTask = connectToProfile(control.Profile().Id());
+        catch (...)
+        {
+            NotifyException(L"Connect request");
+        }
     }
     void HomePage::OnEditRequested(Windows::Foundation::IInspectable const & /* sender */,
                                    winrt::YtFlowApp::HomeProfileControl const &control)
@@ -311,33 +341,40 @@ namespace winrt::YtFlowApp::implementation
     fire_and_forget HomePage::OnDeleteRequested(Windows::Foundation::IInspectable const & /* sender */,
                                                 winrt::YtFlowApp::HomeProfileControl const &control)
     {
-        static bool deleting = false;
-        if (deleting)
+        try
         {
-            co_return;
-        }
-        deleting = true;
-        const auto lifetime{get_strong()};
-        auto const profile = control.Profile();
-        ConfirmProfileDeleteDialog().Content(profile);
-        const auto ret{co_await ConfirmProfileDeleteDialog().ShowAsync()};
-        if (ret != ContentDialogResult::Primary)
-        {
+            static bool deleting = false;
+            if (deleting)
+            {
+                co_return;
+            }
+            deleting = true;
+            auto const lifetime{get_strong()};
+            auto const profile = control.Profile();
+            ConfirmProfileDeleteDialog().Content(profile);
+            auto const ret{co_await ConfirmProfileDeleteDialog().ShowAsync()};
+            if (ret != ContentDialogResult::Primary)
+            {
+                deleting = false;
+                co_return;
+            }
+            co_await resume_background();
+            auto conn{FfiDbInstance.Connect()};
+            conn.DeleteProfile(profile.Id());
+            co_await resume_foreground(Dispatcher());
             deleting = false;
-            co_return;
+            ConfirmProfileDeleteDialog().Content(nullptr);
+            uint32_t index;
+            if (!m_profiles.IndexOf(profile, index))
+            {
+                co_return;
+            }
+            m_profiles.RemoveAt(index);
         }
-        co_await resume_background();
-        auto conn{FfiDbInstance.Connect()};
-        conn.DeleteProfile(profile.Id());
-        co_await resume_foreground(Dispatcher());
-        deleting = false;
-        ConfirmProfileDeleteDialog().Content(nullptr);
-        uint32_t index;
-        if (!m_profiles.IndexOf(profile, index))
+        catch (...)
         {
-            co_return;
+            NotifyException(L"Deleting profile");
         }
-        m_profiles.RemoveAt(index);
     }
     IAsyncAction HomePage::connectToProfile(uint32_t id)
     {
@@ -384,7 +421,7 @@ namespace winrt::YtFlowApp::implementation
         {
             m_vpnTask.Cancel();
         }
-        m_vpnTask = ([]() -> IAsyncAction { co_await ConnectionState::Instance->Disconnect(); })();
+        m_vpnTask = []() -> IAsyncAction { co_await ConnectionState::Instance->Disconnect(); }();
     }
     void HomePage::CreateProfileButton_Click(IInspectable const & /* sender */,
                                              winrt::Windows::UI::Xaml::RoutedEventArgs const & /* e */)

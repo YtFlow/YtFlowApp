@@ -4,8 +4,9 @@
 #include "FirstTimePage.g.cpp"
 #endif
 
-#include "HomePage.h"
 #include "ConnectionState.h"
+#include "HomePage.h"
+#include "UI.h"
 
 using namespace winrt;
 using namespace Windows::UI::Xaml;
@@ -31,25 +32,32 @@ namespace winrt::YtFlowApp::implementation
     }
     fire_and_forget FirstTimePage::Current_Activated(IInspectable const &, WindowActivatedEventArgs const &args)
     {
-        if (args.WindowActivationState() == CoreWindowActivationState::Deactivated)
+        try
         {
-            co_return;
-        }
+            if (args.WindowActivationState() == CoreWindowActivationState::Deactivated)
+            {
+                co_return;
+            }
 
-        const auto &profile = co_await ConnectionState::GetInstalledVpnProfile();
-        if (profile == nullptr)
-        {
-            co_return;
-        }
-        ConnectionState::Instance.emplace(profile);
+            auto const profile = co_await ConnectionState::GetInstalledVpnProfile();
+            if (profile == nullptr)
+            {
+                co_return;
+            }
+            ConnectionState::Instance.emplace(profile);
 
-        if (Frame().CanGoBack())
-        {
-            Frame().GoBack();
+            if (Frame().CanGoBack())
+            {
+                Frame().GoBack();
+            }
+            else
+            {
+                Frame().Navigate(xaml_typename<YtFlowApp::HomePage>());
+            }
         }
-        else
+        catch (...)
         {
-            Frame().Navigate(xaml_typename<YtFlowApp::HomePage>());
+            NotifyException(L"FirstTimePage activated");
         }
     }
 }

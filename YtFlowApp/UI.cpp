@@ -59,4 +59,25 @@ namespace winrt::YtFlowApp::implementation
                                 isQueueRunning = false;
                             });
     }
+
+    void NotifyUser(char const *msg, hstring title)
+    {
+        NotifyUser(to_hstring(msg), std::move(title));
+    }
+
+    void NotifyException(std::wstring_view const context)
+    {
+        try
+        {
+            throw;
+        }
+        catch (hresult_error const &hr)
+        {
+            NotifyUser(hr.message(), hstring{L"Error occurred: "} + context);
+        }
+        catch (std::exception const &ex)
+        {
+            NotifyUser(ex.what(), hstring{L"Unexpected exception: "} + context);
+        }
+    }
 }
