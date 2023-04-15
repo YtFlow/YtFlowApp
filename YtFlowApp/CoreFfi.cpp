@@ -144,6 +144,33 @@ namespace winrt::YtFlowApp::implementation
         unwrap_ffi_result<FfiNoop>(ytflow_core::ytflow_plugin_update(id, profileId, name, desc, plugin, pluginVersion,
                                                                      param, paramLen, conn_ptr));
     }
+    std::vector<FfiProxyGroup> FfiConn::GetProxyGroups() &
+    {
+        std::lock_guard _guard(conn_mu);
+        return unwrap_ffi_buffer<std::vector<FfiProxyGroup>>(ytflow_core::ytflow_proxy_group_get_all(conn_ptr));
+    }
+    FfiProxyGroup FfiConn::GetProxyGroupById(uint32_t id) &
+    {
+        std::lock_guard _guard(conn_mu);
+        return unwrap_ffi_buffer<FfiProxyGroup>(ytflow_core::ytflow_proxy_group_get_by_id(id, conn_ptr));
+    }
+    void FfiConn::RenameProxyGroup(uint32_t id, char const *name) &
+    {
+        std::lock_guard _guard(conn_mu);
+        unwrap_ffi_result<FfiNoop>(ytflow_core::ytflow_proxy_group_rename(id, name, conn_ptr));
+    }
+    void FfiConn::DeleteProxyGroup(uint32_t id) &
+    {
+        std::lock_guard _guard(conn_mu);
+        unwrap_ffi_result<FfiNoop>(ytflow_core::ytflow_proxy_group_delete(id, conn_ptr));
+    }
+    uint32_t FfiConn::CreateProxyGroup(char const *name, char const *type) &
+    {
+        std::lock_guard _guard(conn_mu);
+        const auto [ptrRaw, metaRaw] =
+            unwrap_ffi_result<FfiNoop>(ytflow_core::ytflow_proxy_group_create(name, type, conn_ptr));
+        return (uint32_t)((uintptr_t)ptrRaw & 0xFFFFFFFF);
+    }
 
     FfiConn FfiConn::from_ffi(void *ptr1, uintptr_t)
     {

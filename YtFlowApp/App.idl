@@ -1,9 +1,11 @@
 namespace YtFlowApp
 {
-    interface IHomeWidget {
+    interface IHomeWidget
+    {
         void UpdateInfo();
     };
-    interface IPluginEditorParam {
+    interface IPluginEditorParam
+    {
         UInt8[] ToCbor();
         String[] CheckErrors();
     };
@@ -60,6 +62,19 @@ namespace YtFlowApp
         };
 
         Windows.UI.Xaml.Media.SolidColorBrush PluginNameColor(Boolean hasNamingConflict);
+    }
+    [default_interface] runtimeclass LibraryPage : Windows.UI.Xaml.Controls.Page
+    {
+        LibraryPage();
+
+        AssetModel Model
+        {
+            get;
+        };
+        Windows.UI.Xaml.Controls.GridView ProxyGroupGridView
+        {
+            get;
+        };
     }
 
     [default_interface] runtimeclass HomeProfileControl : Windows.UI.Xaml.Controls.UserControl
@@ -195,6 +210,49 @@ namespace YtFlowApp
         {
             get;
             set;
+        };
+    }
+    runtimeclass ProxyGroupModel : Windows.UI.Xaml.Data.INotifyPropertyChanged
+    {
+        UInt32 Id
+        {
+            get;
+        };
+        String Name
+        {
+            get;
+            set;
+        };
+        String Type
+        {
+            get;
+            set;
+        };
+        String DisplayType
+        {
+            get;
+        };
+        String DisplayTypeIcon
+        {
+            get;
+        };
+        String TooltipText
+        {
+            get;
+        };
+    }
+    runtimeclass AssetModel : Windows.UI.Xaml.Data.INotifyPropertyChanged
+    {
+        AssetModel();
+
+        Windows.Foundation.Collections.IObservableVector<ProxyGroupModel> ProxyGroups
+        {
+            get;
+            set;
+        };
+        Boolean IsProxyGroupsEmpty
+        {
+            get;
         };
     }
 

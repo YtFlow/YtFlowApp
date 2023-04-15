@@ -23,13 +23,16 @@
       <Filter>Pages</Filter>
     </Page>
     <Page Include="RawEditorPage.xaml">
-      <Filter>Pages\Editor</Filter>
+      <Filter>Pages\PluginEditor</Filter>
     </Page>
     <Page Include="NetifHomeWidget.xaml">
       <Filter>Controls\HomeWidget</Filter>
     </Page>
     <Page Include="SwitchHomeWidget.xaml">
       <Filter>Controls\HomeWidget</Filter>
+    </Page>
+    <Page Include="LibraryPage.xaml">
+      <Filter>Pages</Filter>
     </Page>
   </ItemGroup>
   <ItemGroup>
@@ -116,6 +119,12 @@
     <ClCompile Include="SwitchChoiceItem.cpp">
       <Filter>Models</Filter>
     </ClCompile>
+    <ClCompile Include="ProxyGroupModel.cpp">
+      <Filter>Models</Filter>
+    </ClCompile>
+    <ClCompile Include="AssetModel.cpp">
+      <Filter>Models</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -165,6 +174,12 @@
       <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="SwitchChoiceItem.h">
+      <Filter>Models</Filter>
+    </ClInclude>
+    <ClInclude Include="ProxyGroupModel.h">
+      <Filter>Models</Filter>
+    </ClInclude>
+    <ClInclude Include="AssetModel.h">
       <Filter>Models</Filter>
     </ClInclude>
   </ItemGroup>
@@ -348,9 +363,6 @@
     <Filter Include="Converter">
       <UniqueIdentifier>{2817d091-1cee-4b22-838b-026b2fc1ac2c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Pages\Editor">
-      <UniqueIdentifier>{aef98080-0efb-4f97-8d63-38acb20c4442}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Models\PluginEditorParam">
       <UniqueIdentifier>{44319004-09eb-4f67-9511-22650ad04300}</UniqueIdentifier>
     </Filter>
@@ -362,6 +374,9 @@
     </Filter>
     <Filter Include="Controls\HomeWidget">
       <UniqueIdentifier>{54efd356-4437-43c4-8ef1-a39a712d312d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Pages\PluginEditor">
+      <UniqueIdentifier>{aef98080-0efb-4f97-8d63-38acb20c4442}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

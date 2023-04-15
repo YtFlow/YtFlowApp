@@ -77,6 +77,22 @@ namespace winrt::YtFlowApp::implementation
                                             size_t param_len);
     };
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(FfiPlugin, id, name, desc, plugin, plugin_version, param)
+    struct FfiProxyGroup
+    {
+        uint32_t id{};
+        std::string name;
+        std::string type;
+    };
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(FfiProxyGroup, id, name, type)
+    struct FfiProxy
+    {
+        uint32_t id{};
+        std::string name;
+        int32_t order_num{};
+        std::vector<uint8_t> proxy;
+        uint16_t proxy_version{0};
+    };
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(FfiProxy, id, name, order_num, proxy, proxy_version)
     struct FfiConn final
     {
         FfiConn(ytflow_core::Connection *conn) noexcept : conn_ptr(conn)
@@ -99,6 +115,11 @@ namespace winrt::YtFlowApp::implementation
                               uint16_t pluginVersion, uint8_t const *param, size_t paramLen) &;
         void UpdatePlugin(uint32_t id, uint32_t profileId, char const *name, char const *desc, char const *plugin,
                           uint16_t pluginVersion, uint8_t const *param, size_t paramLen) &;
+        std::vector<FfiProxyGroup> GetProxyGroups() &;
+        FfiProxyGroup GetProxyGroupById(uint32_t id) &;
+        void RenameProxyGroup(uint32_t id, char const *name) &;
+        void DeleteProxyGroup(uint32_t id) &;
+        uint32_t CreateProxyGroup(char const *name, char const *type) &;
 
         static FfiConn from_ffi(void *ptr1, uintptr_t);
         ~FfiConn();
