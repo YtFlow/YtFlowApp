@@ -18,8 +18,8 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <muxc:TreeView x:Name="LibTreeView" Grid.Column="0">
-        </muxc:TreeView>
+        <!--muxc:TreeView x:Name="LibTreeView" Grid.Column="0">
+        </muxc:TreeView -->
         <ScrollViewer
             x:Name="AssetView"
             Margin="40, 0, 0, 0"
@@ -82,6 +82,7 @@
                                 HorizontalContentAlignment="Stretch"
                                 ContextFlyout="{StaticResource ManualProxyGroupMenuFlyout}"
                                 ToolTipService.ToolTip="{x:Bind TooltipText, Mode=OneWay}"
+                                Click="ProxyGroupItem_Click"
                             >
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                                     <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="{x:Bind DisplayTypeIcon}" Margin="0, 0, 8, 0" />
@@ -159,12 +160,41 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <CommandBar Grid.Row="0">
-                <AppBarButton Label="Add" Icon="Add" />
+            <CommandBar Grid.Row="0" DefaultLabelPosition="Right" IsSticky="True" VerticalContentAlignment="Center">
+                <CommandBar.PrimaryCommands>
+                    <AppBarButton Label="Delete" Icon="Delete" />
+                    <AppBarButton Label="Share" Icon="Share" />
+                    <AppBarSeparator />
+                    <AppBarButton
+                        Label="Add"
+                        Icon="Add"
+                        IsEnabled="{x:Bind Model.CurrentProxyGroupModel.IsManualGroup, Mode=OneWay, FallbackValue=true}"
+                    />
+                </CommandBar.PrimaryCommands>
+                <CommandBar.Content>
+                    <TextBlock
+                        Style="{ThemeResource SubtitleTextBlockStyle}"
+                        Text="{x:Bind Model.CurrentProxyGroupModel.TooltipText, Mode=OneWay}"
+                        Margin="20, 0, 0, 0"
+                    />
+                </CommandBar.Content>
             </CommandBar>
-            <ListView Grid.Row="1">
-                <x:String>Item1</x:String>
-                <x:String>Item2</x:String>
+            <ListView
+                Grid.Row="1"
+                ItemsSource="{x:Bind Model.CurrentProxyGroupModel.Proxies, Mode=OneWay, FallbackValue={x:Null}}"
+                SelectionMode="Extended"
+            >
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="local:ProxyModel">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1*" />
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Column="0" Text="{x:Bind Name}" />
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
             </ListView>
         </Grid>
         <VisualStateManager.VisualStateGroups>
@@ -175,7 +205,7 @@
                     </VisualState.StateTriggers>
 
                     <VisualState.Setters>
-                        <Setter Target="WideLeftColumn.Width" Value="200" />
+                        <!-- Setter Target="WideLeftColumn.Width" Value="200" / -->
                         <Setter Target="ProxyGroupView.(Grid.Column)" Value="1" />
                         <Setter Target="AssetView.(Grid.Column)" Value="1" />
                     </VisualState.Setters>
@@ -183,24 +213,19 @@
             </VisualStateGroup>
             <VisualStateGroup>
                 <VisualState x:Name="DisplayAssetView">
-                    <VisualState.Setters>
-                        <Setter Target="AssetView.Visibility" Value="Visible" />
-                        <Setter Target="ProxyGroupView.Visibility" Value="Collapsed" />
-                    </VisualState.Setters>
                     <VisualState.Storyboard>
                         <Storyboard>
-                            <DrillOutThemeAnimation EntranceTargetName="AssetView" ExitTargetName="GroupProxyView" />
+                            <DrillOutThemeAnimation EntranceTargetName="AssetView" ExitTargetName="ProxyGroupView" />
                         </Storyboard>
                     </VisualState.Storyboard>
                 </VisualState>
                 <VisualState x:Name="DisplayProxyGroupView">
                     <VisualState.Setters>
-                        <Setter Target="AssetView.Visibility" Value="Collapsed" />
                         <Setter Target="ProxyGroupView.Visibility" Value="Visible" />
                     </VisualState.Setters>
                     <VisualState.Storyboard>
                         <Storyboard>
-                            <DrillInThemeAnimation EntranceTargetName="GroupProxyView" ExitTargetName="AssetView" />
+                            <DrillInThemeAnimation EntranceTargetName="ProxyGroupView" ExitTargetName="AssetView" />
                         </Storyboard>
                     </VisualState.Storyboard>
                 </VisualState>

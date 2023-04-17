@@ -39,4 +39,14 @@ namespace winrt::YtFlowApp::implementation
     {
         m_propertyChanged.remove(token);
     }
+    ProxyGroupModel AssetModel::CurrentProxyGroupModel() const
+    {
+        return m_currentProxyModel;
+    }
+    void AssetModel::CurrentProxyGroupModel(ProxyGroupModel const &value)
+    {
+        m_currentProxyModel = value;
+        m_propertyChanged(*this, PropertyChangedEventArgs(L"CurrentProxyGroupModel"));
+    }
+
 }

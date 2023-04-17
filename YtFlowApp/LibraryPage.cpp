@@ -6,6 +6,7 @@
 
 #include "CoreFfi.h"
 #include "ProxyGroupModel.h"
+#include "ProxyModel.h"
 #include "UI.h"
 
 using namespace winrt;
@@ -49,6 +50,20 @@ namespace winrt::YtFlowApp::implementation
     YtFlowApp::AssetModel LibraryPage::Model() const
     {
         return *m_model;
+    }
+
+    void LibraryPage::OnNavigatingFrom(Navigation::NavigatingCancelEventArgs const &args)
+    {
+        if (args.Cancel())
+        {
+            return;
+        }
+        if (args.NavigationMode() == Navigation::NavigationMode::Back && isDetailedViewShown)
+        {
+            VisualStateManager::GoToState(*this, L"DisplayAssetView", true);
+            args.Cancel(true);
+            isDetailedViewShown = false;
+        }
     }
 
     fire_and_forget LibraryPage::ProxyGroupItemDelete_Click(IInspectable const &sender, RoutedEventArgs const &e)
@@ -154,6 +169,51 @@ namespace winrt::YtFlowApp::implementation
         catch (...)
         {
             NotifyException(L"Creating");
+        }
+    }
+
+    void LibraryPage::ProxyGroupItem_Click(IInspectable const &sender, RoutedEventArgs const &)
+    {
+        auto const source = sender.as<FrameworkElement>();
+        auto const model = source.DataContext().try_as<ProxyGroupModel>();
+        if (model == nullptr)
+        {
+            return;
+        }
+        LoadProxiesForProxyGroup(*model);
+        m_model->CurrentProxyGroupModel(*model);
+        VisualStateManager::GoToState(*this, L"DisplayProxyGroupView", true);
+        isDetailedViewShown = true;
+    }
+
+    fire_and_forget LibraryPage::LoadProxiesForProxyGroup(YtFlowApp::ProxyGroupModel const &model)
+    {
+        try
+        {
+            auto const lifetime = get_strong();
+            auto const modelLifetime = model;
+            auto const proxyGroup = modelLifetime.as<ProxyGroupModel>();
+            if (proxyGroup->Proxies() != nullptr)
+            {
+                co_return;
+            }
+            auto const proxyGroupId = proxyGroup->Id();
+
+            co_await resume_background();
+            auto conn = FfiDbInstance.Connect();
+            auto const ffiProxies = conn.GetProxiesByProxyGroup(proxyGroupId);
+            std::vector<YtFlowApp::ProxyModel> proxies;
+            proxies.reserve(ffiProxies.size());
+            std::transform(ffiProxies.begin(), ffiProxies.end(), std::back_inserter(proxies),
+                           [](auto const &ffiProxy) { return make<ProxyModel>(ffiProxy); });
+            auto const collection = single_threaded_observable_vector(std::move(proxies));
+            co_await resume_foreground(lifetime->Dispatcher());
+
+            proxyGroup->Proxies(std::move(collection));
+        }
+        catch (...)
+        {
+            NotifyException(L"Loading proxies for proxy group");
         }
     }
 

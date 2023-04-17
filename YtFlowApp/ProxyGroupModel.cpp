@@ -28,13 +28,18 @@ namespace winrt::YtFlowApp::implementation
     {
         m_type = value;
         m_propertyChanged(*this, PropertyChangedEventArgs(L"Type"));
+        m_propertyChanged(*this, PropertyChangedEventArgs(L"IsManualGroup"));
         m_propertyChanged(*this, PropertyChangedEventArgs(L"DisplayType"));
         m_propertyChanged(*this, PropertyChangedEventArgs(L"DisplayTypeIcon"));
         m_propertyChanged(*this, PropertyChangedEventArgs(L"TooltipText"));
     }
+    bool ProxyGroupModel::IsManualGroup() const
+    {
+        return m_type == L"manual";
+    }
     hstring ProxyGroupModel::DisplayType() const
     {
-        if (m_type == L"manual")
+        if (IsManualGroup())
         {
             return L"Local";
         }
@@ -54,7 +59,7 @@ namespace winrt::YtFlowApp::implementation
     }
     hstring ProxyGroupModel::TooltipText() const
     {
-        if (m_type == L"manual")
+        if (IsManualGroup())
         {
             return m_name + L" (Local)";
         }
@@ -63,6 +68,16 @@ namespace winrt::YtFlowApp::implementation
             return m_name + L" (Subscription)";
         }
         return m_name + L" (" + m_type + L")";
+    }
+
+    IObservableVector<ProxyModel> ProxyGroupModel::Proxies() const
+    {
+        return m_proxies;
+    }
+    void ProxyGroupModel::Proxies(IObservableVector<ProxyModel> const &value)
+    {
+        m_proxies = value;
+        m_propertyChanged(*this, PropertyChangedEventArgs(L"Proxies"));
     }
 
     winrt::event_token ProxyGroupModel::PropertyChanged(

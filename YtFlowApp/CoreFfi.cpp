@@ -171,6 +171,38 @@ namespace winrt::YtFlowApp::implementation
             unwrap_ffi_result<FfiNoop>(ytflow_core::ytflow_proxy_group_create(name, type, conn_ptr));
         return (uint32_t)((uintptr_t)ptrRaw & 0xFFFFFFFF);
     }
+    std::vector<FfiProxy> FfiConn::GetProxiesByProxyGroup(uint32_t proxyGroupId) &
+    {
+        std::lock_guard _guard(conn_mu);
+        return unwrap_ffi_buffer<std::vector<FfiProxy>>(
+            ytflow_core::ytflow_proxy_get_by_proxy_group(proxyGroupId, conn_ptr));
+    }
+    uint32_t FfiConn::CreateProxy(uint32_t proxyGroupId, char const *name, uint8_t const *proxy, size_t proxyLen,
+                                  uint16_t proxyVersion) &
+    {
+        std::lock_guard _guard(conn_mu);
+        const auto [ptrRaw, metaRaw] = unwrap_ffi_result<FfiNoop>(
+            ytflow_core::ytflow_proxy_create(proxyGroupId, name, proxy, proxyLen, proxyVersion, conn_ptr));
+        return (uint32_t)((uintptr_t)ptrRaw & 0xFFFFFFFF);
+    }
+    void FfiConn::UpdateProxy(uint32_t proxyId, char const *name, uint8_t const *proxy, size_t proxyLen,
+                              uint16_t proxyVersion) &
+    {
+        std::lock_guard _guard(conn_mu);
+        unwrap_ffi_result<FfiNoop>(
+            ytflow_core::ytflow_proxy_update(proxyId, name, proxy, proxyLen, proxyVersion, conn_ptr));
+    }
+    void FfiConn::DeleteProxy(uint32_t proxyId) &
+    {
+        std::lock_guard _guard(conn_mu);
+        unwrap_ffi_result<FfiNoop>(ytflow_core::ytflow_proxy_delete(proxyId, conn_ptr));
+    }
+    void FfiConn::ReorderProxy(uint32_t proxyGroupId, int32_t rangeStartOrder, int32_t rangeEndOrder, int32_t moves) &
+    {
+        std::lock_guard _guard(conn_mu);
+        unwrap_ffi_result<FfiNoop>(
+            ytflow_core::ytflow_proxy_reorder(proxyGroupId, rangeStartOrder, rangeEndOrder, moves, conn_ptr));
+    }
 
     FfiConn FfiConn::from_ffi(void *ptr1, uintptr_t)
     {

@@ -85,7 +85,6 @@
     <ClCompile Include="CoreRpc.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="VectorBuffer.cpp" />
     <ClCompile Include="../tinycbor/src/cborencoder.c">
       <Filter>3rdparty\tinycbor</Filter>
     </ClCompile>
@@ -124,6 +123,12 @@
     </ClCompile>
     <ClCompile Include="AssetModel.cpp">
       <Filter>Models</Filter>
+    </ClCompile>
+    <ClCompile Include="ProxyModel.cpp">
+      <Filter>Models</Filter>
+    </ClCompile>
+    <ClCompile Include="VectorBuffer.cpp">
+      <Filter>Utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -180,6 +185,9 @@
       <Filter>Models</Filter>
     </ClInclude>
     <ClInclude Include="AssetModel.h">
+      <Filter>Models</Filter>
+    </ClInclude>
+    <ClInclude Include="ProxyModel.h">
       <Filter>Models</Filter>
     </ClInclude>
   </ItemGroup>

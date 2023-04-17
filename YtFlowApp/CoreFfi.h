@@ -120,6 +120,13 @@ namespace winrt::YtFlowApp::implementation
         void RenameProxyGroup(uint32_t id, char const *name) &;
         void DeleteProxyGroup(uint32_t id) &;
         uint32_t CreateProxyGroup(char const *name, char const *type) &;
+        std::vector<FfiProxy> GetProxiesByProxyGroup(uint32_t proxyGroupId) &;
+        uint32_t CreateProxy(uint32_t proxyGroupId, char const *name, uint8_t const *proxy, size_t proxyLen,
+                             uint16_t proxyVersion) &;
+        void UpdateProxy(uint32_t proxyId, char const *name, uint8_t const *proxy, size_t proxyLen,
+                         uint16_t proxyVersion) &;
+        void DeleteProxy(uint32_t proxyId) &;
+        void ReorderProxy(uint32_t proxyGroupId, int32_t rangeStartOrder, int32_t rangeEndOrder, int32_t moves) &;
 
         static FfiConn from_ffi(void *ptr1, uintptr_t);
         ~FfiConn();

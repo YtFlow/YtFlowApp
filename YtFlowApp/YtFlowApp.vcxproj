@@ -229,6 +229,7 @@
     <ClInclude Include="PluginModel.h" />
     <ClInclude Include="PluginTypeToDescConverter.h" />
     <ClInclude Include="ProxyGroupModel.h" />
+    <ClInclude Include="ProxyModel.h" />
     <ClInclude Include="RawEditorPage.h">
       <DependentUpon>RawEditorPage.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -430,6 +431,7 @@
     </ClCompile>
     <ClCompile Include="$(GeneratedFilesDir)module.g.cpp" />
     <ClCompile Include="ProxyGroupModel.cpp" />
+    <ClCompile Include="ProxyModel.cpp" />
     <ClCompile Include="RawEditorPage.cpp">
       <DependentUpon>RawEditorPage.xaml</DependentUpon>
       <SubType>Code</SubType>

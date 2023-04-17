@@ -212,6 +212,28 @@ namespace YtFlowApp
             set;
         };
     }
+    runtimeclass ProxyModel : Windows.UI.Xaml.Data.INotifyPropertyChanged
+    {
+        UInt32 Id
+        {
+            get;
+        };
+        String Name
+        {
+            get;
+            set;
+        };
+        UInt8[] Proxy
+        {
+            get;
+            set;
+        };
+        UInt16 ProxyVersion
+        {
+            get;
+            set;
+        };
+    }
     runtimeclass ProxyGroupModel : Windows.UI.Xaml.Data.INotifyPropertyChanged
     {
         UInt32 Id
@@ -228,6 +250,10 @@ namespace YtFlowApp
             get;
             set;
         };
+        Boolean IsManualGroup
+        {
+            get;
+        };
         String DisplayType
         {
             get;
@@ -239,6 +265,11 @@ namespace YtFlowApp
         String TooltipText
         {
             get;
+        };
+        Windows.Foundation.Collections.IObservableVector<ProxyModel> Proxies
+        {
+            get;
+            set;
         };
     }
     runtimeclass AssetModel : Windows.UI.Xaml.Data.INotifyPropertyChanged
@@ -253,6 +284,11 @@ namespace YtFlowApp
         Boolean IsProxyGroupsEmpty
         {
             get;
+        };
+        ProxyGroupModel CurrentProxyGroupModel
+        {
+            get;
+            set;
         };
     }
 

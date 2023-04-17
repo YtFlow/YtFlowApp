@@ -5,6 +5,7 @@
 
 namespace winrt::YtFlowApp::implementation
 {
+    using Windows::Foundation::Collections::IObservableVector;
     struct ProxyGroupModel : ProxyGroupModelT<ProxyGroupModel>
     {
         ProxyGroupModel() = default;
@@ -18,9 +19,12 @@ namespace winrt::YtFlowApp::implementation
         void Name(hstring const &value);
         hstring Type() const;
         void Type(hstring const &value);
+        bool IsManualGroup() const;
         hstring DisplayType() const;
         hstring DisplayTypeIcon() const;
         hstring TooltipText() const;
+        IObservableVector<ProxyModel> Proxies() const;
+        void Proxies(IObservableVector<ProxyModel> const &value);
         winrt::event_token PropertyChanged(winrt::Windows::UI::Xaml::Data::PropertyChangedEventHandler const &handler);
         void PropertyChanged(winrt::event_token const &token) noexcept;
 
@@ -28,6 +32,7 @@ namespace winrt::YtFlowApp::implementation
         uint32_t m_id;
         hstring m_name;
         hstring m_type;
+        IObservableVector<ProxyModel> m_proxies{nullptr};
         winrt::event<Windows::UI::Xaml::Data::PropertyChangedEventHandler> m_propertyChanged;
     };
 }
