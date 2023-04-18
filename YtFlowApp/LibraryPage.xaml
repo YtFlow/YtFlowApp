@@ -126,7 +126,7 @@
                 <ContentDialog
                     x:Name="ProxyGroupDeleteDialog"
                     Title="Delete proxy group"
-                    contract7NotPresent:PrimaryButtonText="Rename"
+                    contract7NotPresent:PrimaryButtonText="Delete"
                     contract7NotPresent:SecondaryButtonText="Close"
                     DefaultButton="Primary">
                     <contract7Present:ContentDialog.PrimaryButtonCommand>
@@ -162,8 +162,14 @@
 
             <CommandBar Grid.Row="0" DefaultLabelPosition="Right" IsSticky="True" VerticalContentAlignment="Center">
                 <CommandBar.PrimaryCommands>
-                    <AppBarButton Label="Delete" Icon="Delete" />
-                    <AppBarButton Label="Share" Icon="Share" />
+                    <AppBarButton
+                        x:Name="ProxyGroupDeleteProxyButton"
+                        Label="Delete"
+                        Icon="Delete"
+                        IsEnabled="False"
+                        Click="ProxyGroupDeleteProxyButton_Click"
+                    />
+                    <AppBarButton x:Name="ProxyGroupShareProxyButton" Label="Share" Icon="Share" IsEnabled="False" />
                     <AppBarSeparator />
                     <AppBarButton
                         Label="Add"
@@ -181,8 +187,10 @@
             </CommandBar>
             <ListView
                 Grid.Row="1"
+                x:Name="ProxyGroupProxyList"
                 ItemsSource="{x:Bind Model.CurrentProxyGroupModel.Proxies, Mode=OneWay, FallbackValue={x:Null}}"
                 SelectionMode="Extended"
+                SelectionChanged="ProxyGroupProxyList_SelectionChanged"
             >
                 <ListView.ItemTemplate>
                     <DataTemplate x:DataType="local:ProxyModel">
@@ -196,6 +204,29 @@
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
+
+            <ContentDialog
+                Grid.RowSpan="2"
+                x:Name="ProxyGroupProxyDeleteDialog"
+                Title="Delete proxy"
+                contract7NotPresent:PrimaryButtonText="Delete"
+                contract7NotPresent:SecondaryButtonText="Close"
+                DefaultButton="Primary"
+            >
+                <contract7Present:ContentDialog.PrimaryButtonCommand>
+                    <contract7Present:StandardUICommand Kind="Delete"/>
+                </contract7Present:ContentDialog.PrimaryButtonCommand>
+                <contract7Present:ContentDialog.SecondaryButtonCommand>
+                    <contract7Present:StandardUICommand Kind="Close"/>
+                </contract7Present:ContentDialog.SecondaryButtonCommand>
+                <ContentDialog.Content>
+                    <TextBlock TextWrapping="Wrap">
+                            <Run>Do you want to delete</Run>
+                            <Run x:Name="ProxyGroupDeleteProxyPlaceholder" />
+                            <Run>? This operation cannot be undone.</Run>
+                    </TextBlock>
+                </ContentDialog.Content>
+            </ContentDialog>
         </Grid>
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup>

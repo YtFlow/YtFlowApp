@@ -76,14 +76,14 @@ namespace winrt::YtFlowApp::implementation
                 co_return;
             }
 
-            if (std::exchange(isProxyGroupDialogsShown, true))
+            if (std::exchange(isDialogsShown, true))
             {
                 co_return;
             }
             auto const lifetime = get_strong();
             ProxyGroupDeleteDialog().Content(*item);
             auto const dialogResult = co_await ProxyGroupDeleteDialog().ShowAsync();
-            lifetime->isProxyGroupDialogsShown = false;
+            lifetime->isDialogsShown = false;
             if (dialogResult != ContentDialogResult::Primary)
             {
                 co_return;
@@ -120,7 +120,7 @@ namespace winrt::YtFlowApp::implementation
     {
         try
         {
-            if (std::exchange(isProxyGroupDialogsShown, true))
+            if (std::exchange(isDialogsShown, true))
             {
                 co_return;
             }
@@ -129,7 +129,7 @@ namespace winrt::YtFlowApp::implementation
 
             ProxyGroupRenameDialogText().Text(item->Name());
             auto const dialogResult = co_await ProxyGroupRenameDialog().ShowAsync();
-            lifetime->isProxyGroupDialogsShown = false;
+            lifetime->isDialogsShown = false;
             if (dialogResult != ContentDialogResult::Primary)
             {
                 co_return;
@@ -214,6 +214,95 @@ namespace winrt::YtFlowApp::implementation
         catch (...)
         {
             NotifyException(L"Loading proxies for proxy group");
+        }
+    }
+
+    void LibraryPage::ProxyGroupProxyList_SelectionChanged(IInspectable const &sender,
+                                                           SelectionChangedEventArgs const &)
+    {
+        auto const isEmpty = sender.as<ListView>().SelectedItems().Size() == 0;
+        ProxyGroupShareProxyButton().IsEnabled(!isEmpty);
+        auto const currentProxyGroup = m_model->CurrentProxyGroupModel();
+        if (currentProxyGroup != nullptr)
+        {
+            ProxyGroupDeleteProxyButton().IsEnabled(currentProxyGroup.IsManualGroup() && !isEmpty);
+        }
+    }
+
+    fire_and_forget LibraryPage::ProxyGroupDeleteProxyButton_Click(IInspectable const &, RoutedEventArgs const &)
+    {
+        try
+        {
+            if (std::exchange(isDialogsShown, true))
+            {
+                co_return;
+            }
+            auto const lifetime = get_strong();
+            auto const selected = ProxyGroupProxyList().SelectedItems();
+            auto const proxyGroup = m_model->CurrentProxyGroupModel();
+            if (proxyGroup == nullptr)
+            {
+                co_return;
+            }
+
+            switch (selected.Size())
+            {
+            case 0:
+                co_return;
+            case 1: {
+                auto const proxy = selected.GetAt(0).try_as<ProxyModel>();
+                if (proxy == nullptr)
+                {
+                    co_return;
+                }
+                ProxyGroupDeleteProxyPlaceholder().Text(proxy->Name());
+            }
+            break;
+            default:
+                ProxyGroupDeleteProxyPlaceholder().Text(to_hstring(selected.Size()) + L" proxies");
+                break;
+            }
+            auto const dialogResult = co_await ProxyGroupProxyDeleteDialog().ShowAsync();
+            lifetime->isDialogsShown = false;
+            if (dialogResult != ContentDialogResult::Primary)
+            {
+                co_return;
+            }
+            std::set<uint32_t> proxyIds;
+            for (auto const selectedObj : selected)
+            {
+                auto const proxy = selectedObj.try_as<ProxyModel>();
+                if (proxy == nullptr)
+                {
+                    continue;
+                }
+                proxyIds.insert(proxy->Id());
+            }
+
+            co_await resume_background();
+            auto conn = FfiDbInstance.Connect();
+            for (auto const id : proxyIds)
+            {
+                conn.DeleteProxy(id);
+            }
+            co_await resume_foreground(lifetime->Dispatcher());
+
+            auto const existingProxies = get_self<ProxyGroupModel>(proxyGroup)->Proxies();
+            for (uint32_t i = 0; i < existingProxies.Size();)
+            {
+                if (proxyIds.contains(get_self<ProxyModel>(existingProxies.GetAt(i))->Id()))
+                {
+                    existingProxies.RemoveAt(i);
+                }
+                else
+                {
+                    i++;
+                }
+            }
+        }
+        catch (...)
+        {
+            NotifyException(L"Deleting proxies");
         }
     }
 
