@@ -48,7 +48,7 @@
                 </muxc:NavigationViewItem>
             </muxc:NavigationView.MenuItems>
             <Grid>
-                <Frame x:Name="ContentFrame" CacheSize="20">
+                <Frame x:Name="ContentFrame" CacheSize="20" Navigated="ContentFrame_Navigated">
                     <!-- StackPanel Orientation="Vertical" Margin="40,16,0,0">
                         <Border Width="600" Height="200" Background="{ThemeResource LayerFillColorDefaultBrush}"
                                 VerticalAlignment="Top" 

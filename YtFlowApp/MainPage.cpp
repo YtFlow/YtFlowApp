@@ -257,4 +257,36 @@ namespace winrt::YtFlowApp::implementation
     {
         m_connStatusChangeSubscription.unsubscribe();
     }
+
+    void MainPage::ContentFrame_Navigated(IInspectable const &, Navigation::NavigationEventArgs const &e)
+    {
+        auto const sourcePageName = std::move(e.SourcePageType().Name);
+        std::optional<std::reference_wrapper<std::wstring const>> pageTag;
+        for (auto const &[tag, page] : m_pages)
+        {
+            if (sourcePageName == page.Name)
+            {
+                pageTag = std::make_optional(std::ref(tag));
+                break;
+            }
+        }
+        if (!pageTag.has_value())
+        {
+            return;
+        }
+        for (auto const menuObj : NavigationViewControl().MenuItems())
+        {
+            auto const menuItem = menuObj.try_as<muxc::NavigationViewItem>();
+            if (menuItem == nullptr)
+            {
+                continue;
+            }
+            if (menuItem.Tag().try_as<hstring>() == pageTag.value())
+            {
+                NavigationViewControl().SelectedItem(menuObj);
+                break;
+            }
+        }
+    }
+
 }

@@ -38,6 +38,8 @@ namespace winrt::YtFlowApp::implementation
         void System_BackRequested(Windows::Foundation::IInspectable const & /* sender */,
                                   Windows::UI::Core::BackRequestedEventArgs const &args);
         bool TryGoBack();
+        void ContentFrame_Navigated(winrt::Windows::Foundation::IInspectable const &sender,
+                                    winrt::Windows::UI::Xaml::Navigation::NavigationEventArgs const &e);
 
       private:
         // Vector of std::pair holding the Navigation Tag and the relative Navigation Page.
