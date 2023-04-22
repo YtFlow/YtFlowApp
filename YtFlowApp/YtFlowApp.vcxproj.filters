@@ -85,36 +85,6 @@
     <ClCompile Include="CoreRpc.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="../tinycbor/src/cborencoder.c">
-      <Filter>3rdparty\tinycbor</Filter>
-    </ClCompile>
-    <ClCompile Include="../tinycbor/src/cborencoder_close_container_checked.c">
-      <Filter>3rdparty\tinycbor</Filter>
-    </ClCompile>
-    <ClCompile Include="../tinycbor/src/cborencoder_float.c">
-      <Filter>3rdparty\tinycbor</Filter>
-    </ClCompile>
-    <ClCompile Include="../tinycbor/src/cborerrorstrings.c">
-      <Filter>3rdparty\tinycbor</Filter>
-    </ClCompile>
-    <ClCompile Include="../tinycbor/src/cborparser.c">
-      <Filter>3rdparty\tinycbor</Filter>
-    </ClCompile>
-    <ClCompile Include="../tinycbor/src/cborparser_dup_string.c">
-      <Filter>3rdparty\tinycbor</Filter>
-    </ClCompile>
-    <ClCompile Include="../tinycbor/src/cborparser_float.c">
-      <Filter>3rdparty\tinycbor</Filter>
-    </ClCompile>
-    <ClCompile Include="../tinycbor/src/cborpretty.c">
-      <Filter>3rdparty\tinycbor</Filter>
-    </ClCompile>
-    <ClCompile Include="../tinycbor/src/cborpretty_stdio.c">
-      <Filter>3rdparty\tinycbor</Filter>
-    </ClCompile>
-    <ClCompile Include="../tinycbor/src/cborvalidation.c">
-      <Filter>3rdparty\tinycbor</Filter>
-    </ClCompile>
     <ClCompile Include="SwitchChoiceItem.cpp">
       <Filter>Models</Filter>
     </ClCompile>
@@ -128,6 +98,9 @@
       <Filter>Models</Filter>
     </ClCompile>
     <ClCompile Include="VectorBuffer.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="CoreProxy.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
   </ItemGroup>
@@ -189,6 +162,9 @@
     </ClInclude>
     <ClInclude Include="ProxyModel.h">
       <Filter>Models</Filter>
+    </ClInclude>
+    <ClInclude Include="CoreProxy.h">
+      <Filter>Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -377,9 +353,6 @@
     <Filter Include="3rdparty">
       <UniqueIdentifier>{f6624465-6e19-4e3d-a813-0f5852c7b2bb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="3rdparty\tinycbor">
-      <UniqueIdentifier>{93117159-5379-44b7-bf7f-018a274fc688}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Controls\HomeWidget">
       <UniqueIdentifier>{54efd356-4437-43c4-8ef1-a39a712d312d}</UniqueIdentifier>
     </Filter>
@@ -391,5 +364,7 @@
     <None Include="PropertySheet.props" />
     <None Include="packages.config" />
     <None Include="Package.StoreAssociation.xml" />
+    <None Include="Directory.Build.props" />
+    <None Include="Directory.Build.targets" />
   </ItemGroup>
 </Project>

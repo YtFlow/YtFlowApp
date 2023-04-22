@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "CoreRpc.h"
 
-#include <cbor.h>
+#include <tinycbor/cbor.h>
 
 #include "VectorBuffer.h"
 

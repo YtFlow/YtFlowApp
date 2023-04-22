@@ -7,11 +7,10 @@ namespace winrt::YtFlowApp::implementation
 {
     struct EditPluginModel : EditPluginModelT<EditPluginModel>
     {
-        EditPluginModel() : m_isEntry(false), m_isDirty(false)
+        EditPluginModel()
         {
         }
-        EditPluginModel(com_ptr<PluginModel> plugin, bool isEntry)
-            : m_isEntry(isEntry), m_isDirty(false), m_plugin(plugin)
+        EditPluginModel(com_ptr<PluginModel> plugin, bool isEntry) : m_plugin(std::move(plugin)), m_isEntry(isEntry)
         {
         }
 

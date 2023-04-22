@@ -169,12 +169,19 @@
                         IsEnabled="False"
                         Click="ProxyGroupDeleteProxyButton_Click"
                     />
-                    <AppBarButton x:Name="ProxyGroupShareProxyButton" Label="Share" Icon="Share" IsEnabled="False" />
+                    <AppBarButton
+                        x:Name="ProxyGroupShareProxyButton"
+                        Label="Share"
+                        Icon="Share"
+                        IsEnabled="False"
+                        Click="ProxyGroupShareProxyButton_Click"
+                    />
                     <AppBarSeparator />
                     <AppBarButton
                         Label="Add"
                         Icon="Add"
                         IsEnabled="{x:Bind Model.CurrentProxyGroupModel.IsManualGroup, Mode=OneWay, FallbackValue=true}"
+                        Click="ProxyGroupAddProxyButton_Click"
                     />
                 </CommandBar.PrimaryCommands>
                 <CommandBar.Content>
@@ -225,6 +232,51 @@
                             <Run x:Name="ProxyGroupDeleteProxyPlaceholder" />
                             <Run>? This operation cannot be undone.</Run>
                     </TextBlock>
+                </ContentDialog.Content>
+            </ContentDialog>
+            <ContentDialog
+                Grid.RowSpan="2"
+                x:Name="ProxyGroupProxyImportDialog"
+                Title="Import proxy"
+                PrimaryButtonText="Import"
+                contract7NotPresent:SecondaryButtonText="Close"
+                DefaultButton="Primary"
+            >
+                <contract7Present:ContentDialog.SecondaryButtonCommand>
+                    <contract7Present:StandardUICommand Kind="Close"/>
+                </contract7Present:ContentDialog.SecondaryButtonCommand>
+                <ContentDialog.Content>
+                    <TextBox
+                        x:Name="ProxyGroupProxyImportText"
+                        MaxHeight="250"
+                        Width="400"
+                        PlaceholderText="Enter proxy sharing URIs, one per line.&#x0d;&#x0a;Currently only ss:// (new format) is supported."
+                        InputScope="Url"
+                        IsSpellCheckEnabled="False"
+                        AcceptsReturn="True"
+                    >
+                    </TextBox>
+                </ContentDialog.Content>
+            </ContentDialog>
+            <ContentDialog
+                Grid.RowSpan="2"
+                x:Name="ProxyGroupProxyExportDialog"
+                Title="Export proxy"
+                contract7NotPresent:SecondaryButtonText="Close"
+                DefaultButton="Secondary"
+            >
+                <contract7Present:ContentDialog.SecondaryButtonCommand>
+                    <contract7Present:StandardUICommand Kind="Close"/>
+                </contract7Present:ContentDialog.SecondaryButtonCommand>
+                <ContentDialog.Content>
+                    <TextBox
+                        x:Name="ProxyGroupProxyExportText"
+                        MaxHeight="250"
+                        Width="400"
+                        IsSpellCheckEnabled="False"
+                        IsReadOnly="True"
+                        AcceptsReturn="True"
+                    />
                 </ContentDialog.Content>
             </ContentDialog>
         </Grid>

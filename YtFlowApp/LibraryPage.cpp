@@ -4,11 +4,15 @@
 #include "LibraryPage.g.cpp"
 #endif
 
+#include <ranges>
+
 #include "CoreFfi.h"
+#include "CoreProxy.h"
 #include "ProxyGroupModel.h"
 #include "ProxyModel.h"
 #include "UI.h"
 
+using namespace std::string_view_literals;
 using namespace winrt;
 using namespace Windows::UI::Xaml;
 using namespace Windows::UI::Xaml::Controls;
@@ -304,6 +308,115 @@ namespace winrt::YtFlowApp::implementation
         {
             NotifyException(L"Deleting proxies");
         }
+    }
+
+    fire_and_forget LibraryPage::ProxyGroupAddProxyButton_Click(IInspectable const &sender, RoutedEventArgs const &e)
+    {
+        try
+        {
+            if (std::exchange(isDialogsShown, true))
+            {
+                co_return;
+            }
+            auto const lifetime = get_strong();
+
+            ProxyGroupProxyImportText().Text(L"");
+            auto const dialogResult = co_await ProxyGroupProxyImportDialog().ShowAsync();
+            lifetime->isDialogsShown = false;
+            if (dialogResult != ContentDialogResult::Primary)
+            {
+                co_return;
+            }
+            auto const input = ProxyGroupProxyImportText().Text();
+            if (input.empty())
+            {
+                co_return;
+            }
+            auto const currentGroup = m_model->CurrentProxyGroupModel();
+            auto const groupId = currentGroup.Id();
+
+            co_await resume_background();
+            auto conn = FfiDbInstance.Connect();
+            int unrecognized = 0;
+            std::vector<uint32_t> newProxyIds;
+            for (auto const wline : std::ranges::views::split(input, L"\r"sv))
+            {
+                if (wline.empty())
+                {
+                    continue;
+                }
+                auto const line(to_string(std::wstring_view(wline.begin(), wline.end())));
+                auto proxy = ConvertShareLinkToProxy(line);
+                if (!proxy.has_value())
+                {
+                    unrecognized++;
+                    continue;
+                }
+
+                auto const [proxyName, proxyParam] = std::move(proxy).value();
+                auto const newProxyId =
+                    conn.CreateProxy(groupId, proxyName.c_str(), proxyParam.data(), proxyParam.size(), 0);
+                newProxyIds.push_back(newProxyId);
+            }
+
+            auto ffiProxies = conn.GetProxiesByProxyGroup(groupId);
+            std::map<uint32_t, FfiProxy> ffiProxySet;
+            std::ranges::transform(ffiProxies, std::inserter(ffiProxySet, ffiProxySet.end()), [](auto &&ffiProxy) {
+                auto const id = ffiProxy.id;
+                return std::make_pair(id, std::forward<FfiProxy>(ffiProxy));
+            });
+            auto newProxyModels =
+                std::views::transform(newProxyIds, [&](auto id) { return make<ProxyModel>(ffiProxySet[id]); });
+            co_await resume_foreground(lifetime->Dispatcher());
+
+            for (auto &&newProxyModel : newProxyModels)
+            {
+                currentGroup.Proxies().Append(std::forward<YtFlowApp::ProxyModel>(newProxyModel));
+            }
+            hstring unrecognizedMsg;
+            if (unrecognized > 0)
+            {
+                unrecognizedMsg = unrecognizedMsg + L" (skipped " + to_hstring(unrecognized) + L" unrecognized link)";
+            }
+            NotifyUser(hstring{L"Imported "} + to_hstring(newProxyIds.size()) + L" proxies." + unrecognizedMsg,
+                       L"Import proxy");
+        }
+        catch (...)
+        {
+            NotifyException(L"Importing proxies");
+        }
+    }
+
+    void LibraryPage::ProxyGroupShareProxyButton_Click(IInspectable const &, RoutedEventArgs const &)
+    {
+        auto linkRange =
+            std::views::transform(ProxyGroupProxyList().SelectedItems(),
+                                  [](auto const &obj) { return obj.try_as<ProxyModel>(); }) |
+            std::views::filter([](auto const &model) { return model != nullptr; }) |
+            std::views::transform([](auto const &model) {
+                auto const proxy = model->Proxy();
+                std::span<uint8_t const> const proxyView(proxy.begin(), proxy.size());
+                // TODO: count unrecognized
+                return ConvertProxyToShareLink(to_string(model->Name()), proxyView);
+            }) |
+            std::views::filter([](auto const &link) { return link.has_value(); }) |
+            std::views::transform([](auto &&link) { return std::forward<std::optional<std::string>>(link).value(); });
+        bool isFirst = true;
+        hstring text;
+        for (auto const link : linkRange)
+        {
+            if (isFirst)
+            {
+                isFirst = false;
+            }
+            else
+            {
+                text = text + L"\r\n";
+            }
+            text = text + to_hstring(link);
+        }
+        ProxyGroupProxyExportText().Text(std::move(text));
+        auto const _ = ProxyGroupProxyExportDialog().ShowAsync();
     }
 
 }

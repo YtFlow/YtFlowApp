@@ -26,7 +26,11 @@ namespace winrt::YtFlowApp::implementation
             winrt::Windows::Foundation::IInspectable const &sender,
             winrt::Windows::UI::Xaml::Controls::SelectionChangedEventArgs const &e);
         fire_and_forget ProxyGroupDeleteProxyButton_Click(winrt::Windows::Foundation::IInspectable const &sender,
-                                               winrt::Windows::UI::Xaml::RoutedEventArgs const &e);
+                                                          winrt::Windows::UI::Xaml::RoutedEventArgs const &e);
+        fire_and_forget ProxyGroupAddProxyButton_Click(winrt::Windows::Foundation::IInspectable const &sender,
+                                                       winrt::Windows::UI::Xaml::RoutedEventArgs const &e);
+        void ProxyGroupShareProxyButton_Click(winrt::Windows::Foundation::IInspectable const &sender,
+                                              winrt::Windows::UI::Xaml::RoutedEventArgs const &e);
 
       private:
         fire_and_forget LoadProxiesForProxyGroup(ProxyGroupModel const &model);
