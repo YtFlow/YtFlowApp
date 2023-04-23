@@ -19,7 +19,7 @@ variables:
   appxPackageDir: '$(build.artifactStagingDirectory)\AppxPackages\\'
   keyFile: 'YtFlowApp_TemporaryKey.pfx'
   NUGET_PACKAGES: $(Pipeline.Workspace)/.nuget/packages
-  vcpkgGitCommitId: 203383666e2422ed31e1faebe6efa6e306bd126d
+  vcpkgGitCommitId: 95252eadd63118201b0d0df0b4360fa613f0de84
   cleanBuild: false
 
 steps:
@@ -74,11 +74,11 @@ steps:
   inputs:
     key: 'vcpkg | "$(Agent.OS)" | "$(vcpkgGitCommitId)"'
     path: "$(Build.BinariesDirectory)/vcpkg"
-  displayName: Cache vcpkg
+  displayName: Cache vcpkg for YtFlowCore
 
 - task: run-vcpkg@0
   name: runVcpkg
-  displayName: 'Run vcpkg'
+  displayName: 'Run vcpkg for YtFlowCore'
   inputs:
     vcpkgArguments: 'openssl:x64-uwp openssl:arm-uwp'
     vcpkgGitCommitId: $(vcpkgGitCommitId)
@@ -99,6 +99,11 @@ steps:
   inputs:
     secureFile: '$(keyFile)'
     retryCount: '2'
+
+- task: CmdLine@2
+  inputs:
+    script: '.\vcpkg\bootstrap-vcpkg.bat'
+  displayName: Bootstrap vcpkg
 
 - task: VSBuild@1
   displayName: Build App Bundle
