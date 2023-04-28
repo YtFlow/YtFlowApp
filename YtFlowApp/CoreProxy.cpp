@@ -165,10 +165,10 @@ namespace winrt::YtFlowApp::implementation
         {
             auto const redirParam = nlohmann::json::from_cbor(redirectPlugin.param);
             auto const ssParam = nlohmann::json::from_cbor(protocolPlugin.param);
-            method = ssParam["method"];
-            password = ssParam["password"];
-            host = redirParam["dest"]["host"];
-            port = std::to_string(static_cast<int>(redirParam["dest"]["port"]));
+            method = ssParam.at("method");
+            password = ssParam.at("password");
+            host = redirParam.at("dest").at("host");
+            port = std::to_string(static_cast<int>(redirParam.at("dest").at("port")));
         }
         catch (...)
         {

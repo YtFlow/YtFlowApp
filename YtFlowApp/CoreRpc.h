@@ -1,5 +1,7 @@
 #pragma once
 
+#include "cppcoro/async_mutex.hpp"
+
 using namespace winrt::Windows::Foundation;
 
 namespace winrt::YtFlowApp::implementation
@@ -28,11 +30,12 @@ namespace winrt::YtFlowApp::implementation
         {
         }
 
-        static CoreRpc Connect();
+        static concurrency::task<CoreRpc> Connect();
 
-        std::vector<RpcPluginInfo> CollectAllPluginInfo(std::map<uint32_t, uint32_t> const &hashcodes) const &;
-        std::vector<uint8_t> SendRequestToPlugin(uint32_t pluginId, std::string_view func,
-                                                 std::vector<uint8_t> params) const &;
+        concurrency::task<std::vector<RpcPluginInfo>> CollectAllPluginInfo(
+            std::shared_ptr<std::map<uint32_t, uint32_t>> hashcodes) const &;
+        concurrency::task<std::vector<uint8_t>> SendRequestToPlugin(uint32_t pluginId, std::string_view func,
+                                                                    std::vector<uint8_t> params) const &;
 
         Windows::Networking::Sockets::StreamSocket m_socket{nullptr};
 
@@ -41,8 +44,8 @@ namespace winrt::YtFlowApp::implementation
         {
         }
 
-        static std::vector<uint8_t> ReadChunk(Windows::Storage::Streams::IInputStream stream);
+        static concurrency::task<std::vector<uint8_t>> ReadChunk(Windows::Storage::Streams::IInputStream stream);
 
-        std::shared_ptr<std::mutex> m_ioLock{std::make_shared<std::mutex>()};
+        std::shared_ptr<cppcoro::async_mutex> m_ioLock{std::make_shared<cppcoro::async_mutex>()};
     };
 }

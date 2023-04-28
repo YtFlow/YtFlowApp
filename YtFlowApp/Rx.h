@@ -24,14 +24,14 @@ namespace winrt::YtFlowApp::implementation
                 });
         }
 
-        template <typename I, typename R = decltype(std::declval<I>().GetResults())>
+        template <typename I, typename R = decltype(std::declval<I>().get())>
         static auto observe_awaitable(I &&awaitable)
         {
-            return rxcpp::observable<>::create<R>([awaitable = std::move(awaitable)](rxcpp::subscriber<R> s) mutable {
-                auto cb = [awaitable = std::move(awaitable), s = std::move(s)]() -> winrt::fire_and_forget {
+            return rxcpp::observable<>::create<R>([awaitable = std::forward<I>(awaitable)](rxcpp::subscriber<R> s) {
+                auto cb = [](auto awaitable, auto s) -> concurrency::task<void> {
                     try
                     {
-                        s.on_next(co_await awaitable);
+                        s.on_next(co_await std::move(awaitable));
                         s.on_completed();
                     }
                     catch (...)
@@ -39,19 +39,19 @@ namespace winrt::YtFlowApp::implementation
                         s.on_error(std::current_exception());
                     }
                 };
-                cb();
+                cb(awaitable, s);
             });
         }
 
-        template <typename I, typename R = decltype(std::declval<I>().GetResults()),
-                  typename _e = std::enable_if_t<std::is_void<R>()>>
+        template <typename I, typename R = decltype(std::declval<I>().get())>
+            requires std::is_void_v<R>
         static auto observe_awaitable(I &&awaitable)
         {
-            return rxcpp::observable<>::create<R>([awaitable = std::move(awaitable)](rxcpp::subscriber<R> s) {
-                auto cb = [awaitable = std::move(awaitable), s = std::move(s)]() -> winrt::fire_and_forget {
+            return rxcpp::observable<>::create<R>([awaitable = std::forward<I>(awaitable)](rxcpp::subscriber<R> s) {
+                auto cb = [](auto awaitable, auto s) -> concurrency::task<void> {
                     try
                     {
-                        s.on_next(co_await awaitable);
+                        s.on_next(co_await std::move(awaitable));
                         s.on_completed();
                     }
                     catch (...)
@@ -59,10 +59,9 @@ namespace winrt::YtFlowApp::implementation
                         s.on_error(std::current_exception());
                     }
                 };
-                cb();
+                cb(awaitable, s);
             });
         }
-
     };
     rxcpp::observable<bool> ObserveApplicationEnteredBackground();
     rxcpp::observable<bool> ObserveApplicationLeavingBackground();

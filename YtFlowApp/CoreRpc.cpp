@@ -13,6 +13,8 @@ using namespace Windows::Storage::Streams;
 
 namespace winrt::YtFlowApp::implementation
 {
+    using concurrency::task;
+
     const char *RpcException::what() const throw()
     {
         return msg.data();
@@ -23,39 +25,39 @@ namespace winrt::YtFlowApp::implementation
         return id == that.id && hashcode == that.hashcode;
     }
 
-    CoreRpc CoreRpc::Connect()
+    task<CoreRpc> CoreRpc::Connect()
     {
         StreamSocket socket;
         socket.Control().NoDelay(true);
-        socket.ConnectAsync(HostName{L"127.0.0.1"}, L"9097").get();
-        return CoreRpc(std::move(socket));
+        co_await socket.ConnectAsync(HostName{L"127.0.0.1"}, L"9097");
+        co_return CoreRpc(std::move(socket));
     }
 
-    std::vector<uint8_t> CoreRpc::ReadChunk(IInputStream stream)
+    task<std::vector<uint8_t>> CoreRpc::ReadChunk(IInputStream stream)
     {
-        Windows::Storage::Streams::DataReader reader{std::move(stream)};
+        DataReader const reader{std::move(stream)};
         reader.ByteOrder(ByteOrder::BigEndian);
         uint32_t readLen{4};
         while (readLen > 0)
         {
-            auto const len{reader.LoadAsync(readLen).get()};
+            auto const len = co_await reader.LoadAsync(readLen);
             if (len == 0)
             {
                 RpcException ex;
                 ex.msg = "RPC EOF";
-                throw ex;
+                throw std::move(ex);
             }
             readLen -= len;
         }
         uint32_t const chunkSize{reader.ReadUInt32()};
         while (readLen < chunkSize)
         {
-            auto const len{reader.LoadAsync(chunkSize - readLen).get()};
+            auto const len = co_await reader.LoadAsync(chunkSize - readLen);
             if (len == 0)
             {
                 RpcException ex;
                 ex.msg = "RPC EOF";
-                throw ex;
+                throw std::move(ex);
             }
             readLen += len;
         }
@@ -63,21 +65,22 @@ namespace winrt::YtFlowApp::implementation
         reader.ReadBytes(ret);
         reader.DetachStream();
         reader.Close();
-        return ret;
+        co_return ret;
     }
 
-    std::vector<RpcPluginInfo> CoreRpc::CollectAllPluginInfo(std::map<uint32_t, uint32_t> const &hashcodes) const &
+    task<std::vector<RpcPluginInfo>> CoreRpc::CollectAllPluginInfo(
+        std::shared_ptr<std::map<uint32_t, uint32_t>> hashcodes) const &
     {
         auto const writeStream{m_socket.OutputStream()};
         auto readStream{m_socket.InputStream()};
         auto const ioLock{m_ioLock};
 
-        std::lock_guard _scope{*ioLock};
+        auto const _scope = co_await ioLock->scoped_lock_async();
 
         // Use tinycbor instead of nlohmann/json here because the latter does
         // not support using a non-string value as key.
         CborEncoder enc, mainMapEnc, cMapEnc, hashMapEnc;
-        std::vector<uint8_t> reqData(hashcodes.size() * 10 + 16);
+        std::vector<uint8_t> reqData(hashcodes->size() * 10 + 16);
         cbor_encoder_init(&enc, reqData.data() + 4, reqData.size() - 4, 0);
         assert(cbor_encoder_create_map(&enc, &mainMapEnc, 1) == CborNoError);
         {
@@ -85,8 +88,8 @@ namespace winrt::YtFlowApp::implementation
             assert(cbor_encoder_create_map(&mainMapEnc, &cMapEnc, 1) == CborNoError);
             {
                 assert(cbor_encode_text_string(&cMapEnc, "h", 1) == CborNoError);
-                assert(cbor_encoder_create_map(&cMapEnc, &hashMapEnc, hashcodes.size()) == CborNoError);
-                for (auto const &[k, v] : hashcodes)
+                assert(cbor_encoder_create_map(&cMapEnc, &hashMapEnc, hashcodes->size()) == CborNoError);
+                for (auto const &[k, v] : *hashcodes)
                 {
                     assert(cbor_encode_int(&hashMapEnc, k) == CborNoError);
                     assert(cbor_encode_int(&hashMapEnc, v) == CborNoError);
@@ -104,30 +107,34 @@ namespace winrt::YtFlowApp::implementation
         reqData[3] = static_cast<uint8_t>(reqDataLen);
         auto reqBuf{winrt::make<VectorBuffer>(std::move(reqData))};
         get_self<VectorBuffer>(reqBuf)->m_length = static_cast<uint32_t>(reqDataLen + 4);
-        writeStream.WriteAsync(std::move(reqBuf)).get();
-        writeStream.FlushAsync().get();
+        co_await writeStream.WriteAsync(std::move(reqBuf));
+        co_await writeStream.FlushAsync();
 
-        auto const resData{ReadChunk(std::move(readStream))};
+        auto const resData = co_await ReadChunk(std::move(readStream));
         auto res{json::from_cbor(resData)};
-        if (res["c"] != "Ok")
+        if (res.at("c") != "Ok")
         {
             RpcException ex;
-            ex.msg = res["e"];
-            throw ex;
+            ex.msg = res.at("e");
+            throw std::move(ex);
         }
 
-        std::vector<RpcPluginInfo> const ret = std::move(res["d"]);
-        return ret;
+        std::vector<RpcPluginInfo> const ret = std::move(res.at("d"));
+        co_return ret;
     }
 
-    std::vector<uint8_t> CoreRpc::SendRequestToPlugin(uint32_t pluginId, std::string_view func,
-                                                      std::vector<uint8_t> params) const &
+    task<std::vector<uint8_t>> CoreRpc::SendRequestToPlugin(uint32_t pluginIdParam, std::string_view funcParam,
+                                                            std::vector<uint8_t> paramsParam) const &
     {
+        auto const pluginId = pluginIdParam;
+        auto const func = funcParam;
+        auto const params = std::move(paramsParam);
+
         auto const writeStream{m_socket.OutputStream()};
         auto readStream{m_socket.InputStream()};
         auto const ioLock{m_ioLock};
 
-        std::lock_guard _scope{*ioLock};
+        auto const _scope = co_await ioLock->scoped_lock_async();
 
         json reqDoc{"{ \"p\": {} }"_json};
         auto &reqDocInner{reqDoc["p"]};
@@ -141,19 +148,19 @@ namespace winrt::YtFlowApp::implementation
                                          static_cast<uint8_t>(reqDataLen >> 8), static_cast<uint8_t>(reqDataLen)});
         auto reqBuf{winrt::make<VectorBuffer>(std::move(reqData))};
         get_self<VectorBuffer>(reqBuf)->m_length = static_cast<uint32_t>(reqDataLen + 4);
-        writeStream.WriteAsync(std::move(reqBuf)).get();
-        writeStream.FlushAsync().get();
+        co_await writeStream.WriteAsync(std::move(reqBuf));
+        co_await writeStream.FlushAsync();
 
-        auto const resData{ReadChunk(std::move(readStream))};
+        auto const resData = co_await ReadChunk(std::move(readStream));
         auto res{json::from_cbor(resData)};
-        if (res["c"] != "Ok")
+        if (res.at("c") != "Ok")
         {
             RpcException ex;
-            ex.msg = res["e"];
-            throw ex;
+            ex.msg = res.at("e");
+            throw std::move(ex);
         }
 
-        return res["d"].get_binary();
+        co_return std::vector(std::move(res.at("d")).get_binary());
     }
 
 }

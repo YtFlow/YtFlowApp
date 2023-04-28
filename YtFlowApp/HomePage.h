@@ -14,6 +14,10 @@ namespace winrt::YtFlowApp::implementation
             weak_ref<IHomeWidget> widget;
             std::shared_ptr<std::vector<uint8_t>> info;
         };
+
+        using RequestSender =
+            std::function<concurrency::task<std::vector<uint8_t>>(std::string_view, std::vector<uint8_t>)>;
+
         HomePage();
 
         fire_and_forget OnNavigatedTo(Windows::UI::Xaml::Navigation::NavigationEventArgs const &args);
@@ -34,6 +38,7 @@ namespace winrt::YtFlowApp::implementation
                                        Windows::UI::Xaml::RoutedEventArgs const &e);
 
         Windows::Foundation::Collections::IObservableVector<YtFlowApp::ProfileModel> Profiles() const;
+        RequestSender MakeRequestSender(uint32_t pluginId);
 
       private:
         static inline Windows::Storage::ApplicationData appData{Windows::Storage::ApplicationData::Current()};

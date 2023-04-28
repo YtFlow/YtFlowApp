@@ -25,8 +25,8 @@ namespace winrt::YtFlowApp::implementation
       private:
         static void CreatePresetPlugins(uint32_t profileId, NewProfileConfig config);
 
-        event_token m_ssCheckedToken, m_trojanCheckedToken, m_httpCheckedToken;
-        hstring m_selectedOutboundType{L"ss"};
+        event_token m_dynOutboundCheckedToken, m_ssCheckedToken, m_trojanCheckedToken, m_httpCheckedToken;
+        hstring m_selectedOutboundType{L"dyn"};
     };
 }
 

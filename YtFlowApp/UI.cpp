@@ -54,7 +54,14 @@ namespace winrt::YtFlowApp::implementation
                                     }
                                     dialog.Content(box_value(message));
 
-                                    co_await dialog.ShowAsync();
+                                    try
+                                    {
+                                        co_await dialog.ShowAsync();
+                                    }
+                                    catch (...)
+                                    {
+                                        // Really don't know what to do here (e.g. there is an existing dialog)
+                                    }
                                 }
                                 isQueueRunning = false;
                             });

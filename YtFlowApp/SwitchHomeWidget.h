@@ -6,7 +6,8 @@ namespace winrt::YtFlowApp::implementation
 {
     struct SwitchHomeWidget : SwitchHomeWidgetT<SwitchHomeWidget>
     {
-        using RequestSender = std::function<std::vector<uint8_t>(std::string_view, std::vector<uint8_t>)>;
+        using RequestSender =
+            std::function<concurrency::task<std::vector<uint8_t>>(std::string_view, std::vector<uint8_t>)>;
         struct SwitchChoice
         {
             std::string name;

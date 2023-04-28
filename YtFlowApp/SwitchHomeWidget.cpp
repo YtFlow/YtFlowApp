@@ -21,7 +21,7 @@ namespace winrt::YtFlowApp::implementation
     }
     SwitchHomeWidget::SwitchHomeWidget(hstring pluginName, std::shared_ptr<std::vector<uint8_t>> sharedInfo,
                                        RequestSender sendRequest)
-        : m_sharedInfo(sharedInfo), m_sendRequest(sendRequest)
+        : m_sharedInfo(std::move(sharedInfo)), m_sendRequest(std::move(sendRequest))
     {
         InitializeComponent();
 
@@ -56,43 +56,43 @@ namespace winrt::YtFlowApp::implementation
     fire_and_forget SwitchHomeWidget::ChoiceToggleButton_Checked(IInspectable const &sender,
                                                                  RoutedEventArgs const & /* e */)
     {
-        auto const itemObj{sender.as<FrameworkElement>().DataContext()};
-        if (itemObj == nullptr)
-        {
-            co_return;
-        }
-        auto const item{get_self<SwitchChoiceItem>(itemObj.as<YtFlowApp::SwitchChoiceItem>())};
-        if (item->IsActive())
-        {
-            co_return;
-        }
-
-        uint32_t idx{};
-        if (!SwitchList().Items().IndexOf(itemObj, idx))
-        {
-            co_return;
-        }
-        for (auto const otherObj : SwitchList().Items())
-        {
-            auto const otherItem{otherObj.as<YtFlowApp::SwitchChoiceItem>()};
-            if (otherItem.IsActive())
-            {
-                otherItem.IsActive(false);
-                break;
-            }
-        }
-        item->IsActive(true);
-
-        auto const lifetime{get_strong()};
-        co_await resume_background();
         try
         {
+            auto const itemObj{sender.as<FrameworkElement>().DataContext()};
+            if (itemObj == nullptr)
+            {
+                co_return;
+            }
+            auto const item{get_self<SwitchChoiceItem>(itemObj.as<YtFlowApp::SwitchChoiceItem>())};
+            if (item->IsActive())
+            {
+                co_return;
+            }
+
+            uint32_t idx{};
+            if (!SwitchList().Items().IndexOf(itemObj, idx))
+            {
+                co_return;
+            }
+            for (auto const otherObj : SwitchList().Items())
+            {
+                auto const otherItem{otherObj.as<YtFlowApp::SwitchChoiceItem>()};
+                if (otherItem.IsActive())
+                {
+                    otherItem.IsActive(false);
+                    break;
+                }
+            }
+            item->IsActive(true);
+
+            auto const lifetime{get_strong()};
+            co_await resume_background();
             nlohmann::json doc = idx;
-            lifetime->m_sendRequest("s", nlohmann::json::to_cbor(doc));
+            co_await lifetime->m_sendRequest("s", nlohmann::json::to_cbor(doc));
         }
-        catch (std::exception const &ex)
+        catch (...)
         {
-            NotifyUser(to_hstring(ex.what()), L"Switch");
+            NotifyException(L"Switch");
         }
     }
     void SwitchHomeWidget::ChoiceToggleButton_Unchecked(IInspectable const &sender, RoutedEventArgs const & /* e */)

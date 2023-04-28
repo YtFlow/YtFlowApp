@@ -98,13 +98,15 @@ namespace winrt::YtFlowApp::implementation
 
     void NewProfilePage::Page_Loaded(IInspectable const & /* sender */, RoutedEventArgs const & /* e */)
     {
-        SsButton().Checked({this, &NewProfilePage::OutboundTypeButton_Checked});
-        TrojanButton().Checked({this, &NewProfilePage::OutboundTypeButton_Checked});
-        HttpButton().Checked({this, &NewProfilePage::OutboundTypeButton_Checked});
+        m_dynOutboundCheckedToken = DynOutboundButton().Checked({this, &NewProfilePage::OutboundTypeButton_Checked});
+        m_ssCheckedToken = SsButton().Checked({this, &NewProfilePage::OutboundTypeButton_Checked});
+        m_trojanCheckedToken = TrojanButton().Checked({this, &NewProfilePage::OutboundTypeButton_Checked});
+        m_httpCheckedToken = HttpButton().Checked({this, &NewProfilePage::OutboundTypeButton_Checked});
     }
 
     void NewProfilePage::Page_Unloaded(IInspectable const & /* sender */, RoutedEventArgs const & /* e */)
     {
+        DynOutboundButton().Checked(m_dynOutboundCheckedToken);
         SsButton().Checked(m_ssCheckedToken);
         TrojanButton().Checked(m_trojanCheckedToken);
         HttpButton().Checked(m_httpCheckedToken);
@@ -154,7 +156,16 @@ namespace winrt::YtFlowApp::implementation
                 "    \"plugin_version\": 0,"
                 "    \"param\": {"
                 "      \"request_timeout\": 200,"
-                "      \"tcp_next\": \"ss-client.tcp\","
+                "      \"tcp_next\": \"outbound.tcp\","
+                "      \"udp_next\": \"phy.udp\""
+                "    }"
+                "  },"
+                "  \"outbound\": {"
+                "    \"desc\": \"Allows runtime selection of outbound proxies from the Library.\","
+                "    \"plugin\": \"dyn-outbound\","
+                "    \"plugin_version\": 0,"
+                "    \"param\": {"
+                "      \"tcp_next\": \"phy.tcp\","
                 "      \"udp_next\": \"phy.udp\""
                 "    }"
                 "  },"
@@ -294,7 +305,11 @@ namespace winrt::YtFlowApp::implementation
                 "  }"
                 "}"_json};
 
-            if (config.OutboundType == L"http")
+            if (config.OutboundType == L"ss")
+            {
+                doc["main-forward"]["param"]["tcp_next"] = "ss-client.tcp";
+            }
+            else if (config.OutboundType == L"http")
             {
                 doc["main-forward"]["param"]["tcp_next"] = "http-proxy-client.tcp";
             }

@@ -184,6 +184,7 @@
                 <TextBlock Style="{ThemeResource BaseTextBlockStyle}" Margin="0, 0, 0, 8">Type</TextBlock>
                 <ComboBox x:Name="NewPluginTypeBox" HorizontalAlignment="Stretch" SelectedIndex="0">
                     <x:String>dns-server</x:String>
+                    <x:String>dyn-outbound</x:String>
                     <x:String>fake-ip</x:String>
                     <x:String>forward</x:String>
                     <x:String>host-resolver</x:String>

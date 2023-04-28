@@ -34,6 +34,9 @@
     <Page Include="LibraryPage.xaml">
       <Filter>Pages</Filter>
     </Page>
+    <Page Include="DynOutboundHomeWidget.xaml">
+      <Filter>Controls\HomeWidget</Filter>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Midl Include="App.idl" />
@@ -48,9 +51,6 @@
     </ClCompile>
     <ClCompile Include="ConnectionState.cpp">
       <Filter>States</Filter>
-    </ClCompile>
-    <ClCompile Include="CoreFfi.cpp">
-      <Filter>Utils</Filter>
     </ClCompile>
     <ClCompile Include="Rx.cpp">
       <Filter>Utils</Filter>
@@ -82,9 +82,6 @@
     <ClCompile Include="base64.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="CoreRpc.cpp">
-      <Filter>Utils</Filter>
-    </ClCompile>
     <ClCompile Include="SwitchChoiceItem.cpp">
       <Filter>Models</Filter>
     </ClCompile>
@@ -100,8 +97,20 @@
     <ClCompile Include="VectorBuffer.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
+    <ClCompile Include="cppcoro\async_mutex.cpp">
+      <Filter>Utils\cppcoro</Filter>
+    </ClCompile>
+    <ClCompile Include="CoreFfi.cpp">
+      <Filter>CoreInterop</Filter>
+    </ClCompile>
     <ClCompile Include="CoreProxy.cpp">
-      <Filter>Utils</Filter>
+      <Filter>CoreInterop</Filter>
+    </ClCompile>
+    <ClCompile Include="CoreRpc.cpp">
+      <Filter>CoreInterop</Filter>
+    </ClCompile>
+    <ClCompile Include="DynOutboundProxyModel.cpp">
+      <Filter>Models</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -111,9 +120,6 @@
     </ClInclude>
     <ClInclude Include="ConnectionState.h">
       <Filter>States</Filter>
-    </ClInclude>
-    <ClInclude Include="CoreFfi.h">
-      <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="Rx.h">
       <Filter>Utils</Filter>
@@ -145,9 +151,6 @@
     <ClInclude Include="base64.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="CoreRpc.h">
-      <Filter>Utils</Filter>
-    </ClInclude>
     <ClInclude Include="VectorBuffer.h">
       <Filter>Utils</Filter>
     </ClInclude>
@@ -163,8 +166,20 @@
     <ClInclude Include="ProxyModel.h">
       <Filter>Models</Filter>
     </ClInclude>
+    <ClInclude Include="cppcoro\async_mutex.hpp">
+      <Filter>Utils\cppcoro</Filter>
+    </ClInclude>
+    <ClInclude Include="CoreFfi.h">
+      <Filter>CoreInterop</Filter>
+    </ClInclude>
     <ClInclude Include="CoreProxy.h">
-      <Filter>Utils</Filter>
+      <Filter>CoreInterop</Filter>
+    </ClInclude>
+    <ClInclude Include="CoreRpc.h">
+      <Filter>CoreInterop</Filter>
+    </ClInclude>
+    <ClInclude Include="DynOutboundProxyModel.h">
+      <Filter>Models</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -358,6 +373,12 @@
     </Filter>
     <Filter Include="Pages\PluginEditor">
       <UniqueIdentifier>{aef98080-0efb-4f97-8d63-38acb20c4442}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils\cppcoro">
+      <UniqueIdentifier>{cfe4445d-4f80-450e-baa7-25993b13cd80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CoreInterop">
+      <UniqueIdentifier>{d798b532-9a2a-4dec-89d4-ae7a37257de4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

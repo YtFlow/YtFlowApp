@@ -1,0 +1,248 @@
+﻿<UserControl
+    x:Class="YtFlowApp.DynOutboundHomeWidget"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:YtFlowApp"
+    xmlns:animatedvisuals="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:contract7Present="http://schemas.microsoft.com/winfx/2006/xaml/presentation?IsApiContractPresent(Windows.Foundation.UniversalApiContract,7)"
+    xmlns:contract7NotPresent="http://schemas.microsoft.com/winfx/2006/xaml/presentation?IsApiContractNotPresent(Windows.Foundation.UniversalApiContract,7)"
+    mc:Ignorable="d"
+    Loaded="UserControl_Loaded">
+
+    <UserControl.Resources>
+        <Style x:Key="InfoColumnName" TargetType="TextBlock">
+            <Setter Property="HorizontalAlignment" Value="Right" />
+            <Setter Property="Margin" Value="0, 0, 0, 10" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+        <Style x:Key="InfoColumnContent" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{ThemeResource SystemControlPageTextBaseMediumBrush}" />
+            <Setter Property="IsTextSelectionEnabled" Value="True" />
+        </Style>
+        <Style x:Key="NavigationBackButtonNormalStyle" TargetType="Button">
+            <Setter Property="Background" Value="{ThemeResource NavigationViewBackButtonBackground}" />
+            <Setter Property="Foreground" Value="{ThemeResource NavigationViewItemForeground}" />
+            <Setter Property="FontFamily" Value="{ThemeResource SymbolThemeFontFamily}" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="Height" Value="{ThemeResource NavigationBackButtonHeight}" />
+            <Setter Property="Width" Value="{ThemeResource NavigationBackButtonWidth}" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="UseSystemFocusVisuals" Value="{StaticResource UseSystemFocusVisuals}" />
+            <Setter Property="Content" Value="&#xE72B;" />
+            <Setter Property="Margin"  Value="4,2" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid x:Name="RootGrid"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="4">
+
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal" />
+
+                                    <VisualState x:Name="PointerOver">
+
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="RootGrid" Storyboard.TargetProperty="Background">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource NavigationViewButtonBackgroundPointerOver}" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Content" Storyboard.TargetProperty="Foreground">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource NavigationViewButtonForegroundPointerOver}" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                        <VisualState.Setters>
+                                            <Setter Target="Content.(muxc:AnimatedIcon.State)" Value="PointerOver"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+
+                                    <VisualState x:Name="Pressed">
+
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="RootGrid" Storyboard.TargetProperty="Background">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource NavigationViewButtonBackgroundPressed}" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Content" Storyboard.TargetProperty="Foreground">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource NavigationViewButtonForegroundPressed}" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                        <VisualState.Setters>
+                                            <Setter Target="Content.(muxc:AnimatedIcon.State)" Value="Pressed"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+
+                                    <VisualState x:Name="Disabled">
+
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Content" Storyboard.TargetProperty="Foreground">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource NavigationViewButtonForegroundDisabled}" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+
+                            </VisualStateManager.VisualStateGroups>
+                            <muxc:AnimatedIcon x:Name="Content"
+                            Height="16"
+                            Width="16"
+                            muxc:AnimatedIcon.State="Normal"
+                            MirroredWhenRightToLeft="True"
+                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                            AutomationProperties.AccessibilityView="Raw">
+                                <animatedvisuals:AnimatedBackVisualSource/>
+                                <muxc:AnimatedIcon.FallbackIconSource>
+                                    <muxc:FontIconSource
+                                    FontSize="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=FontSize}"
+                                    FontFamily="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=FontFamily}"
+                                    Glyph="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Content}"
+                                    MirroredWhenRightToLeft="True"/>
+                                </muxc:AnimatedIcon.FallbackIconSource>
+                            </muxc:AnimatedIcon>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <muxc:Expander
+        x:Name="MainExpander"
+        HorizontalAlignment="Stretch"
+        HorizontalContentAlignment="Stretch"
+    >
+        <muxc:Expander.Header>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <FontIcon
+                    Grid.Column="0"
+                    Grid.Row="0"
+                    Grid.RowSpan="2"
+                    Margin="{StaticResource PluginWidgetIconMargin}"
+                    Glyph="&#xE7F2;"
+                />
+                <TextBlock
+                    x:Name="PluginNameText"
+                    Grid.Column="1"
+                    Grid.Row="0"
+                    Style="{StaticResource PluginWidgetPluginNameStyle}"
+                />
+                <TextBlock
+                    Grid.Column="1"
+                    Grid.Row="1"
+                    Style="{StaticResource PluginWidgetPluginDescStyle}"
+                >
+                    Dynamic Outbound Selection
+                </TextBlock>
+                <TextBlock
+                    x:Name="PreviewProxyNameText"
+                    Grid.Column="2"
+                    Grid.Row="0"
+                    Grid.RowSpan="2"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                />
+
+            </Grid>
+        </muxc:Expander.Header>
+
+        <Grid>
+            <Grid x:Name="InfoView" HorizontalAlignment="Stretch">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="10" />
+                    <ColumnDefinition Width="2*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource InfoColumnName}" Text="Current Proxy" />
+                <TextBlock
+                    x:Name="ProxyNameText"
+                    Grid.Row="0"
+                    Grid.Column="2"
+                    Style="{StaticResource InfoColumnContent}"
+                />
+                <Button
+                    x:Name="SelectProxyButton"
+                    Grid.Row="1"
+                    Grid.Column="2"
+                    Click="SelectProxyButton_Click"
+                >
+                    Select...
+                </Button>
+            </Grid>
+
+            <Grid x:Name="ProxySelectionView" Visibility="Collapsed">
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Button
+                    Grid.Row="0"
+                    Style="{StaticResource NavigationBackButtonNormalStyle}"
+                    Click="ProxySelectionBackButton_Click"
+                />
+                <GridView
+                    x:Name="ProxyItemGridView"
+                    Grid.Row="1"
+                    Margin="0, 8, 0, 0"
+                >
+                    <GridView.ItemTemplate>
+                        <DataTemplate x:DataType="local:DynOutboundProxyModel">
+                            <Button
+                                Width="150"
+                                Height="50"
+                                HorizontalContentAlignment="Stretch"
+                                ToolTipService.ToolTip="{x:Bind Name}"
+                                Click="ProxyItem_Click"
+                            >
+                                <StackPanel HorizontalAlignment="Left">
+                                    <TextBlock Text="{x:Bind Name, Mode=OneWay}" />
+                                    <TextBlock Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}" Text="{x:Bind GroupName}" />
+                                </StackPanel>
+                            </Button>
+
+                        </DataTemplate>
+                    </GridView.ItemTemplate>
+                </GridView>
+            </Grid>
+        </Grid>
+
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup>
+                <VisualState x:Name="DisplayInfoView">
+                    <VisualState.Storyboard>
+                        <Storyboard>
+                            <DrillOutThemeAnimation EntranceTargetName="InfoView" ExitTargetName="ProxySelectionView" />
+                        </Storyboard>
+                    </VisualState.Storyboard>
+                </VisualState>
+                <VisualState x:Name="DisplayProxySelectionView">
+                    <VisualState.Storyboard>
+                        <Storyboard>
+                            <DrillInThemeAnimation EntranceTargetName="ProxySelectionView" ExitTargetName="InfoView" />
+                        </Storyboard>
+                    </VisualState.Storyboard>
+                    <VisualState.Setters>
+                        <Setter Target="ProxySelectionView.Visibility" Value="Visible" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+    </muxc:Expander>
+</UserControl>

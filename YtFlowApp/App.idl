@@ -104,6 +104,11 @@ namespace YtFlowApp
         SwitchHomeWidget();
     }
 
+    [default_interface] runtimeclass DynOutboundHomeWidget : Windows.UI.Xaml.Controls.UserControl, IHomeWidget
+    {
+        DynOutboundHomeWidget();
+    }
+
     runtimeclass ProfileModel : Windows.UI.Xaml.Data.INotifyPropertyChanged
     {
         ProfileModel();
@@ -289,6 +294,19 @@ namespace YtFlowApp
         {
             get;
             set;
+        };
+    }
+    runtimeclass DynOutboundProxyModel : Windows.UI.Xaml.Data.INotifyPropertyChanged
+    {
+        DynOutboundProxyModel();
+
+        String Name
+        {
+            get;
+        };
+        String GroupName
+        {
+            get;
         };
     }
 

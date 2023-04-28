@@ -4,6 +4,8 @@
 #include "HomePage.g.cpp"
 #endif
 
+using namespace concurrency;
+
 #include "ConnectionState.h"
 #include "CoreFfi.h"
 #include "CoreRpc.h"
@@ -15,6 +17,7 @@
 #include "UI.h"
 #include "WinrtScheduler.h"
 
+#include "DynOutboundHomeWidget.h"
 #include "NetifHomeWidget.h"
 #include "SwitchHomeWidget.h"
 
@@ -103,7 +106,7 @@ namespace winrt::YtFlowApp::implementation
                                     break;
                                 case VpnManagementConnectionStatus::Connected:
                                     lifetime->SubscribeRefreshPluginStatus();
-                                    lifetime->CurrentProfileNameRun().Text(([&]() {
+                                    lifetime->CurrentProfileNameRun().Text([&] {
                                         if (auto id{localSettings.TryLookup(L"YTFLOW_PROFILE_ID").try_as<uint32_t>()};
                                             id.has_value())
                                         {
@@ -116,7 +119,7 @@ namespace winrt::YtFlowApp::implementation
                                             }
                                         }
                                         return hstring{};
-                                    })());
+                                    }());
                                     VisualStateManager::GoToState(*lifetime, L"Connected", true);
                                     break;
                                 case VpnManagementConnectionStatus::Connecting:
@@ -157,13 +160,22 @@ namespace winrt::YtFlowApp::implementation
         m_widgets.clear();
         m_refreshPluginStatus$ =
             rxcpp::observable<>::create<CoreRpc>([weak{get_weak()}](rxcpp::subscriber<CoreRpc> s) {
-                auto rpc{CoreRpc::Connect()};
-                if (auto self{weak.get()}; self)
-                {
-                    self->m_rpc = std::make_shared<CoreRpc>(rpc);
-                }
-                s.add([=]() { rpc.m_socket.Close(); });
-                s.on_next(std::move(rpc));
+                [](auto s, auto weak) -> fire_and_forget {
+                    try
+                    {
+                        auto rpc = co_await CoreRpc::Connect();
+                        if (auto const self{weak.get()}; self)
+                        {
+                            self->m_rpc = std::make_shared<CoreRpc>(rpc);
+                        }
+                        s.add([=]() { rpc.m_socket.Close(); });
+                        s.on_next(std::move(rpc));
+                    }
+                    catch (...)
+                    {
+                        s.on_error(std::current_exception());
+                    }
+                }(std::move(s), weak);
             })
                 .flat_map([weak{get_weak()}](auto rpc) {
                     auto const focus${ObserveApplicationLeavingBackground()};
@@ -178,13 +190,14 @@ namespace winrt::YtFlowApp::implementation
                         return rxcpp::observable<>::interval(1s)
                             .map([](auto) { return true; })
                             .merge(self->m_triggerInfoUpdate$.get_observable())
-                            .map([=](auto) {
-                                auto const info{rpc.CollectAllPluginInfo(*hashcodes)};
+                            .concat_map(
+                                [=](auto) { return Rx::observe_awaitable(rpc.CollectAllPluginInfo(hashcodes)); })
+                            .map([=](auto const &&info) {
                                 for (auto const &p : info)
                                 {
                                     (*hashcodes)[p.id] = p.hashcode;
                                 }
-                                return info;
+                                return std ::move(info);
                             })
                             .tap([](auto const &) {},
                                  [](auto ex) {
@@ -211,14 +224,14 @@ namespace winrt::YtFlowApp::implementation
                 .observe_on(ObserveOnDispatcher())
                 .subscribe(
                     [weak{get_weak()}](auto info) {
-                        try
+                        auto const self{weak.get()};
+                        if (!self)
                         {
-                            auto const self{weak.get()};
-                            if (!self)
-                            {
-                                return;
-                            }
-                            for (auto const &plugin : info)
+                            return;
+                        }
+                        for (auto const &plugin : info)
+                        {
+                            try
                             {
                                 // Append/update only. No deletion required at this moment.
                                 auto it = self->m_widgets.find(plugin.id);
@@ -237,10 +250,10 @@ namespace winrt::YtFlowApp::implementation
                                     widget.UpdateInfo();
                                 }
                             }
-                        }
-                        catch (...)
-                        {
-                            NotifyException(L"Plugin status RPC subscribe");
+                            catch (...)
+                            {
+                                NotifyException(hstring(L"Plugin status RPC subscribe: ") + to_hstring(plugin.name));
+                            }
                         }
                     },
                     [](auto ex) {
@@ -276,7 +289,7 @@ namespace winrt::YtFlowApp::implementation
         const auto localFolder = appData.LocalFolder();
         const auto dbFolder =
             co_await localFolder.CreateFolderAsync(L"db", Windows::Storage::CreationCollisionOption::OpenIfExists);
-        hstring dbPath = dbFolder.Path() + L"\\main.db";
+        hstring const dbPath = dbFolder.Path() + L"\\main.db";
         appData.LocalSettings().Values().Insert(L"YTFLOW_DB_PATH", box_value(dbPath));
 
         FfiDbInstance = std::move(FfiDb::Open(dbPath));
@@ -294,13 +307,14 @@ namespace winrt::YtFlowApp::implementation
         }
         else if (info.plugin == "switch")
         {
-            auto widget{winrt::make<SwitchHomeWidget>(
-                to_hstring(info.name), handle.info, [weak{get_weak()}, id{info.id}](auto func, auto param) {
-                    auto self{weak.get()};
-                    auto const ret{self->m_rpc.load()->SendRequestToPlugin(id, func, std::move(param))};
-                    self->m_triggerInfoUpdate$.get_subscriber().on_next(true);
-                    return ret;
-                })};
+            auto widget = winrt::make<SwitchHomeWidget>(to_hstring(info.name), handle.info, MakeRequestSender(info.id));
+            handle.widget = widget;
+            PluginWidgetPanel().Children().Append(std::move(widget));
+        }
+        else if (info.plugin == "dyn-outbound")
+        {
+            auto widget =
+                winrt::make<DynOutboundHomeWidget>(to_hstring(info.name), handle.info, MakeRequestSender(info.id));
             handle.widget = widget;
             PluginWidgetPanel().Children().Append(std::move(widget));
         }
@@ -309,6 +323,20 @@ namespace winrt::YtFlowApp::implementation
             return {std::nullopt};
         }
         return handle;
+    }
+
+    HomePage::RequestSender HomePage::MakeRequestSender(uint32_t pluginId)
+    {
+        auto weak = get_weak();
+        return [weak = std::move(weak), pluginId](std::string_view func, std::vector<uint8_t> param) {
+            return [](auto weak, auto id, auto func, auto param) -> task<std::vector<uint8_t>> {
+                auto self{weak.get()};
+                // TODO: self is nullptr
+                auto const ret{co_await self->m_rpc.load()->SendRequestToPlugin(id, func, std::move(param))};
+                self->m_triggerInfoUpdate$.get_subscriber().on_next(true);
+                co_return ret;
+            }(weak, pluginId, func, param);
+        };
     }
 
     Windows::Foundation::Collections::IObservableVector<YtFlowApp::ProfileModel> HomePage::Profiles() const
@@ -378,10 +406,10 @@ namespace winrt::YtFlowApp::implementation
     }
     IAsyncAction HomePage::connectToProfile(uint32_t id)
     {
-        auto localSettings = appData.LocalSettings().Values();
+        auto const localSettings = appData.LocalSettings().Values();
         localSettings.Insert(L"YTFLOW_PROFILE_ID", box_value(id));
         auto connectTask{ConnectionState::Instance->Connect()};
-        auto cancelToken{co_await winrt::get_cancellation_token()};
+        auto const cancelToken{co_await winrt::get_cancellation_token()};
         cancelToken.callback([=]() {
             connectTask.Cancel();
             localSettings.TryRemove(YTFLOW_CORE_ERROR_LOAD);

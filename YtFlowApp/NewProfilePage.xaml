@@ -76,7 +76,11 @@
                 <TextBlock Margin="{StaticResource SubheaderMargin}" Style="{ThemeResource BaseTextBlockStyle}">
                     Outbound
                 </TextBlock>
-                <RadioButton x:Name="SsButton" Tag="ss" GroupName="OutboundType" IsChecked="True">Shadowsocks</RadioButton>
+                <RadioButton x:Name="DynOutboundButton" Tag="dyn" GroupName="OutboundType" IsChecked="True">Dynamic Outbound</RadioButton>
+                <TextBlock Margin="0, 4, 0, 8" TextWrapping="Wrap" Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}">
+                    Use proxy servers imported from Asset page.
+                </TextBlock>
+                <RadioButton x:Name="SsButton" Tag="ss" GroupName="OutboundType">Shadowsocks</RadioButton>
                 <RadioButton x:Name="TrojanButton" Tag="trojan" GroupName="OutboundType">Trojan</RadioButton>
                 <RadioButton x:Name="HttpButton" Tag="http" GroupName="OutboundType">HTTP Proxy</RadioButton>
             </StackPanel>

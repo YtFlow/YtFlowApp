@@ -33,6 +33,7 @@ namespace winrt::YtFlowApp::implementation
                                          L"the corresponding handler or fallback handler if there is no match.")},
         {L"forward",
          box_value(L"Establish a new connection for each incoming connection, and forward data between them.")},
+        {L"dyn-outbound", box_value(L"Select an outbound proxy from the database at runtime.")},
         {L"shadowsocks-client", box_value(L"Shadowsocks client.")},
         {L"socks5-client", box_value(L"SOCKS5 client.")},
         {L"http-proxy-client", box_value(L"HTTP Proxy client. Use HTTP CONNECT to connect to the proxy server.")},

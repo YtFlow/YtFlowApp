@@ -156,6 +156,12 @@
     <ClInclude Include="BoolToFontWeightConverter.h" />
     <ClInclude Include="CoreFfi.h" />
     <ClInclude Include="CoreRpc.h" />
+    <ClInclude Include="cppcoro\async_mutex.hpp" />
+    <ClInclude Include="DynOutboundHomeWidget.h">
+      <DependentUpon>DynOutboundHomeWidget.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </ClInclude>
+    <ClInclude Include="DynOutboundProxyModel.h" />
     <ClInclude Include="EditPluginModel.h" />
     <ClInclude Include="EditPluginTreeViewItemTemplateSelector.h" />
     <ClInclude Include="EditProfilePage.h">
@@ -219,6 +225,9 @@
     <ApplicationDefinition Include="App.xaml">
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="DynOutboundHomeWidget.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="EditProfilePage.xaml">
       <SubType>Designer</SubType>
     </Page>
@@ -313,6 +322,12 @@
     <ClCompile Include="BoolToFontWeightConverter.cpp" />
     <ClCompile Include="CoreFfi.cpp" />
     <ClCompile Include="CoreRpc.cpp" />
+    <ClCompile Include="cppcoro\async_mutex.cpp" />
+    <ClCompile Include="DynOutboundHomeWidget.cpp">
+      <DependentUpon>DynOutboundHomeWidget.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </ClCompile>
+    <ClCompile Include="DynOutboundProxyModel.cpp" />
     <ClCompile Include="EditPluginModel.cpp" />
     <ClCompile Include="EditPluginTreeViewItemTemplateSelector.cpp" />
     <ClCompile Include="EditProfilePage.cpp">
