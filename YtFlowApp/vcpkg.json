@@ -4,6 +4,7 @@
   "version": "0.0.1",
   "dependencies": [
     "tinycbor",
-    "uriparser"
+    "uriparser",
+    "openssl"
   ]
 }
