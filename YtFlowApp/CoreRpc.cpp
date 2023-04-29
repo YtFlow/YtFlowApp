@@ -29,7 +29,13 @@ namespace winrt::YtFlowApp::implementation
     {
         StreamSocket socket;
         socket.Control().NoDelay(true);
-        co_await socket.ConnectAsync(HostName{L"127.0.0.1"}, L"9097");
+        auto const port = Windows::Storage::ApplicationData::Current()
+                              .LocalSettings()
+                              .Values()
+                              .TryLookup(L"YTFLOW_CORE_RPC_PORT")
+                              .try_as<hstring>()
+                              .value_or(L"9097");
+        co_await socket.ConnectAsync(HostName{L"127.0.0.1"}, port);
         co_return CoreRpc(std::move(socket));
     }
 
