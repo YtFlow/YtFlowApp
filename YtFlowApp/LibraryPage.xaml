@@ -14,7 +14,7 @@
 
     <Grid x:Name="MainGrid">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition x:Name="WideLeftColumn" Width="0" />
+            <!-- ColumnDefinition x:Name="WideLeftColumn" Width="0" / -->
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
@@ -165,21 +165,21 @@
                     <AppBarButton
                         x:Name="ProxyGroupDeleteProxyButton"
                         Label="Delete"
-                        Icon="Delete"
+                        contract7Present:Icon="Delete"
                         IsEnabled="False"
                         Click="ProxyGroupDeleteProxyButton_Click"
                     />
                     <AppBarButton
                         x:Name="ProxyGroupShareProxyButton"
                         Label="Share"
-                        Icon="Share"
+                        contract7Present:Icon="Share"
                         IsEnabled="False"
                         Click="ProxyGroupShareProxyButton_Click"
                     />
                     <AppBarSeparator />
                     <AppBarButton
                         Label="Add"
-                        Icon="Add"
+                        contract7Present:Icon="Add"
                         IsEnabled="{x:Bind Model.CurrentProxyGroupModel.IsManualGroup, Mode=OneWay, FallbackValue=true}"
                         Click="ProxyGroupAddProxyButton_Click"
                     />
@@ -289,8 +289,8 @@
 
                     <VisualState.Setters>
                         <!-- Setter Target="WideLeftColumn.Width" Value="200" / -->
-                        <Setter Target="ProxyGroupView.(Grid.Column)" Value="1" />
-                        <Setter Target="AssetView.(Grid.Column)" Value="1" />
+                        <!-- Setter Target="ProxyGroupView.(Grid.Column)" Value="1" / -->
+                        <!-- Setter Target="AssetView.(Grid.Column)" Value="1" / -->
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>

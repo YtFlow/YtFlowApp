@@ -43,7 +43,6 @@ namespace winrt::YtFlowApp::implementation
                            [](auto const &group) { return make<ProxyGroupModel>(group); });
             co_await resume_foreground(Dispatcher());
             m_model->ProxyGroups(single_threaded_observable_vector(std::move(proxyGroupModels)));
-            ;
         }
         catch (...)
         {
