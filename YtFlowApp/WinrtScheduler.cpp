@@ -19,7 +19,7 @@ namespace winrt::YtFlowApp::implementation
             return;
         }
         m_dispatcher.RunAsync(CoreDispatcherPriority::Normal,
-                              [scbl, weakCount = static_cast<std::weak_ptr<std::atomic<uint32_t>>>(m_workCount)]() {
+                              [scbl, weakCount = static_cast<std::weak_ptr<std::atomic<uint32_t>>>(m_workCount)] {
                                   auto strong_count = weakCount.lock();
                                   if (strong_count == nullptr)
                                   {
@@ -37,14 +37,9 @@ namespace winrt::YtFlowApp::implementation
         {
             return;
         }
-        const auto run = [when, &scblCaptured = scbl, dispatcherCaptured = m_dispatcher,
-                          weakCountCaptured = static_cast<std::weak_ptr<std::atomic<uint32_t>>>(
-                              m_workCount)]() -> winrt::fire_and_forget {
+        const auto run = [](auto when, auto scbl, auto const dispatcher, auto weakCount) -> winrt::fire_and_forget {
             auto timeSpan = when - worker_interface::clock_type::now();
             // Ensure lifetime of captured variables
-            schedulable scbl = scblCaptured;
-            CoreDispatcher dispatcher = dispatcherCaptured;
-            std::weak_ptr<std::atomic<uint32_t>> weakCount = weakCountCaptured;
             co_await winrt::resume_after(std::chrono::duration_cast<TimeSpan>(timeSpan));
             co_await winrt::resume_foreground(dispatcher);
             auto strong_count = weakCount.lock();
@@ -55,7 +50,7 @@ namespace winrt::YtFlowApp::implementation
             recursion r(strong_count->fetch_sub(1) == 1);
             scbl(r.get_recurse());
         };
-        run();
+        run(when, scbl, m_dispatcher, static_cast<std::weak_ptr<std::atomic<uint32_t>>>(m_workCount));
         m_workCount->fetch_add(1);
     }
 
@@ -79,21 +74,18 @@ namespace winrt::YtFlowApp::implementation
         {
             return;
         }
-        const auto run = [&scblCaptured = scbl, weakCountCaptured = static_cast<std::weak_ptr<std::atomic<uint32_t>>>(
-                                                    m_workCount)]() -> winrt::fire_and_forget {
+        const auto run = [](auto scbl, auto weakCount) -> winrt::fire_and_forget {
             // Ensure lifetime of captured variables
-            schedulable scbl = scblCaptured;
-            std::weak_ptr<std::atomic<uint32_t>> weakCount = weakCountCaptured;
             co_await resume_background();
             auto strong_count = weakCount.lock();
             if (strong_count == nullptr)
             {
                 co_return;
             }
-            recursion r(strong_count->fetch_sub(1) == 1);
+            recursion const r(strong_count->fetch_sub(1) == 1);
             scbl(r.get_recurse());
         };
-        run();
+        run(scbl, static_cast<std::weak_ptr<std::atomic<uint32_t>>>(m_workCount));
         m_workCount->fetch_add(1);
     }
     void RxWinrtThreadPoolScheduler::dispatcher_worker::schedule(worker_interface::clock_type::time_point when,
@@ -103,23 +95,18 @@ namespace winrt::YtFlowApp::implementation
         {
             return;
         }
-        const auto run = [when, &scblCaptured = scbl,
-                          weakCountCaptured = static_cast<std::weak_ptr<std::atomic<uint32_t>>>(
-                              m_workCount)]() -> winrt::fire_and_forget {
+        const auto run = [](auto when, auto scbl, auto weakCount) -> winrt::fire_and_forget {
             auto timeSpan = when - worker_interface::clock_type::now();
-            // Ensure lifetime of captured variables
-            schedulable scbl = scblCaptured;
-            std::weak_ptr<std::atomic<uint32_t>> weakCount = weakCountCaptured;
             co_await winrt::resume_after(std::chrono::duration_cast<TimeSpan>(timeSpan));
             auto strong_count = weakCount.lock();
             if (strong_count == nullptr)
             {
                 co_return;
             }
-            recursion r(strong_count->fetch_sub(1) == 1);
+            recursion const r(strong_count->fetch_sub(1) == 1);
             scbl(r.get_recurse());
         };
-        run();
+        run(when, scbl, static_cast<std::weak_ptr<std::atomic<uint32_t>>>(m_workCount));
         m_workCount->fetch_add(1);
     }
 
