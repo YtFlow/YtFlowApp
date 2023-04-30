@@ -18,17 +18,16 @@ namespace winrt::YtFlowApp::implementation
         {L"host-resolver", box_value(L"Resolve real IP addresses by querying DNS servers.")},
         {L"fake-ip",
          box_value(L"Assign a fake IP address for each domain name. This is useful for TUN inbounds where incoming "
-                   L"connections carry no information about domain names. By using a Fake IP resolver, destination "
-                   L"IP addresses can be mapped back to a domain name that the client is connecting to.")},
+                   L"connections carry no information about domain names.")},
         {L"system-resolver",
          box_value(L"Resolve real IP addresses by calling system functions. This is the recommended resolver for "
                    L"simple proxy scenarios for both client and server.")},
         {L"switch", box_value(L"Handle incoming connections using runtime-selected handlers from a pre-defined list.")},
-        {L"dns-server",
-         box_value(L"Respond to DNS request messages using results returned by the specified resolver.")},
+        {L"dns-server", box_value(L"Respond to DNS request messages using results returned by the specified resolver. "
+                                  L"Also provides domain name lookup (map_back) for resolved IP addresses.")},
         {L"socks5-server", box_value(L"SOCKS5 server.")},
         {L"http-obfs-server", box_value(L"simple-obfs HTTP server.")},
-        {L"resolve-dest", box_value(L"Resolve domain names in flow destinations from/to IP addresses.")},
+        {L"resolve-dest", box_value(L"Resolve domain names in flow destinations to IP addresses.")},
         {L"simple-dispatcher", box_value(L"Match the source/dest address against a list of simple rules, and use "
                                          L"the corresponding handler or fallback handler if there is no match.")},
         {L"forward",
