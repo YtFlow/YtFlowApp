@@ -209,6 +209,10 @@ namespace winrt::YtFlowApp::implementation
                                      {
                                          NotifyUser(to_hstring(e.msg), L"RPC Error");
                                      }
+                                     catch (...)
+                                     {
+                                         NotifyException(L"RPC");
+                                     }
                                  })
                             .subscribe_on(ObserveOnWinrtThreadPool())
                             .take_until(unfocus$);
