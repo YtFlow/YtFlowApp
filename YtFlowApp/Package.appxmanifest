@@ -8,7 +8,7 @@
   <Identity
     Name="56263bdbai.YtFlow"
     Publisher="CN=bdbai"
-    Version="1.1.1.0" />
+    Version="1.1.2.0" />
   <mp:PhoneIdentity PhoneProductId="285da7b3-dece-431d-8d7d-c6b16d5bfb7b" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
   <Properties>
     <DisplayName>YtFlow</DisplayName>
