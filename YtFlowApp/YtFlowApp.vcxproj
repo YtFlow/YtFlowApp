@@ -155,6 +155,7 @@
     <ClInclude Include="base64.h" />
     <ClInclude Include="BoolToFontWeightConverter.h" />
     <ClInclude Include="CoreFfi.h" />
+    <ClInclude Include="CoreProxyImpl.h" />
     <ClInclude Include="CoreRpc.h" />
     <ClInclude Include="cppcoro\async_mutex.hpp" />
     <ClInclude Include="DynOutboundHomeWidget.h">

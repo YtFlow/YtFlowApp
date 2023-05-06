@@ -402,7 +402,7 @@ namespace winrt::YtFlowApp::implementation
             std::views::transform([](auto &&link) { return std::forward<std::optional<std::string>>(link).value(); });
         bool isFirst = true;
         hstring text;
-        for (auto const link : linkRange)
+        for (auto const link : std::move(linkRange))
         {
             if (isFirst)
             {
