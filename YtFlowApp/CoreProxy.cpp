@@ -9,183 +9,656 @@
 
 namespace winrt::YtFlowApp::implementation
 {
+    std::string UriEscape(std::string_view const input)
+    {
+        std::vector<char> buf((input.size() + 1) * 3);
+        uriEscapeExA(input.data(), input.data() + input.size(), buf.data(), URI_TRUE, URI_FALSE);
+        return std::string(buf.data());
+    }
+    std::string UriUnescape(std::string buf)
+    {
+        if (!buf.empty())
+        {
+            auto const endPos = uriUnescapeInPlaceExA(buf.data(), URI_TRUE, URI_BR_DONT_TOUCH);
+            buf.resize(endPos - buf.data());
+        }
+        return buf;
+    }
+    std::optional<std::pair<std::string, std::string>> SplitUserPassFromUserinfo(std::string_view rawUserinfo)
+    {
+        auto const colonPos = rawUserinfo.find(':');
+        if (colonPos == std::string_view::npos)
+        {
+            return std::nullopt;
+        }
+        std::string user = UriUnescape(std::string(rawUserinfo.data(), colonPos));
+        std::string pass =
+            UriUnescape(std::string(rawUserinfo.data() + colonPos + 1, rawUserinfo.size() - colonPos - 1));
+        return {std::make_pair(std::move(user), std::move(pass))};
+    }
     std::optional<std::pair<std::string, std::vector<uint8_t>>> ConvertUriToProxy(ParsedUri const &uri)
     {
         if (uri.scheme == SS_SCHEME)
         {
             if (uri.userInfo.empty())
             {
-                return ConvertLegacySsToProxy(uri);
+                return DecodeUriToProxy(uri, LegacyShadowsocksDecoder{});
             }
-            return ConvertSip002ToProxy(uri);
+            return DecodeUriToProxy(uri, Sip002Decoder{});
         }
         if (uri.scheme == TROJAN_SCHEME)
         {
-            return ConvertTrojanUriToProxy(uri);
+            return DecodeUriToProxy(uri, TrojanDecoder{});
+        }
+        if (uri.scheme == SOCKS5_SCHEME || uri.scheme == SOCKS5H_SCHEME)
+        {
+            return DecodeUriToProxy(uri, Socks5Decoder{});
+        }
+        if (uri.scheme == HTTP_SCHEME && uri.hostText != "t.me")
+        {
+            // TODO: t.me proxy
+            return DecodeUriToProxy(uri, HttpDecoder{});
+        }
+        if (uri.scheme == VMESS_SCHEME)
+        {
+            return DecodeUriToProxy(uri, V2raynDecoder{});
         }
         return std::nullopt;
     }
-    std::optional<std::pair<std::string, std::vector<uint8_t>>> ConvertSip002ToProxy(ParsedUri const &uri)
+
+    std::string Sip002Decoder::DecodeName(ParsedUri const &uri)
     {
-        std::string frag(uri.fragment);
-        uriUnescapeInPlaceExA(frag.data(), URI_TRUE, URI_BR_DONT_TOUCH);
-        std::string proxyName(
-            frag); // proxyName may contain a \0 in the middle, which truncates the string across FFI boundary.
+        std::string proxyName = UriUnescape(std::string(uri.fragment));
         if (proxyName.empty())
         {
-            proxyName = "New Proxy";
+            proxyName = "New Shadowsocks Proxy";
         }
-        ProxyPlugin ssPlugin{.name = "p", .plugin = std::string(SS_PLUGIN_NAME)};
-        ProxyPlugin redirPlugin{.name = "r", .plugin = std::string(REDIR_PLUGIN_NAME)};
-
-        std::string userinfo(uri.userInfo);
-        uriUnescapeInPlaceExA(userinfo.data(), URI_TRUE, URI_BR_DONT_TOUCH);
+        return proxyName;
+    }
+    PluginDecodeResult Sip002Decoder::DecodeProtocol(ParsedUri const &uri, ProxyPlugin &plugin,
+                                                     std::string_view tcpNext, std::string_view udpNext)
+    {
+        plugin.plugin = std::string(SS_PLUGIN_NAME);
+        std::string userinfo;
         try
         {
-            userinfo = base64_decode(userinfo);
+            userinfo = base64_decode(UriUnescape(std::string(uri.userInfo)));
         }
         catch (...)
         {
-            return std::nullopt;
+            return PluginDecodeResult::Fail;
         }
         auto const colonPos = userinfo.find(':');
         if (colonPos == std::string::npos)
         {
-            return std::nullopt;
+            return PluginDecodeResult::Fail;
         }
-        ssPlugin.param = nlohmann::json::to_cbor(
+        plugin.param = nlohmann::json::to_cbor(
             {{"method", std::string_view(userinfo.data(), colonPos)},
              {"password", nlohmann::json::binary_t(
                               std::vector<uint8_t>(userinfo.data() + colonPos + 1, userinfo.data() + userinfo.size()))},
-             {"tcp_next", "r.tcp"},
-             {"udp_next", "r.udp"}});
-        auto const port = ParsePort(uri.portText);
-        if (!port.has_value())
-        {
-            return std::nullopt;
-        }
-
-        redirPlugin.param = nlohmann::json::to_cbor(
-            {{"dest", {{"host", uri.hostText}, {"port", *port}}}, {"tcp_next", "$out.tcp"}, {"udp_next", "$out.udp"}});
-
-        DynOutboundV1Proxy proxy{
-            .tcp_entry = "p.tcp", .udp_entry = "p.udp", .plugins = {std::move(ssPlugin), std::move(redirPlugin)}};
-        return std::make_pair(std::move(proxyName), nlohmann::json::to_cbor(proxy));
+             {"tcp_next", tcpNext},
+             {"udp_next", udpNext}});
+        return PluginDecodeResult::Success;
     }
-
-    std::optional<std::pair<std::string, std::vector<uint8_t>>> ConvertLegacySsToProxy(ParsedUri const &uri)
+    PluginDecodeResult Sip002Decoder::DecodeRedir(ParsedUri const &uri, std::string &host, uint16_t &port)
     {
-        std::string proxyName;
-        if (uri.fragment.empty())
+        auto const portOpt = ParsePort(uri.portText);
+        if (!portOpt.has_value())
         {
-            proxyName = "New Proxy";
+            return PluginDecodeResult::Fail;
+        }
+        port = *portOpt;
+        host = uri.hostText;
+        return PluginDecodeResult::Success;
+    }
+    PluginDecodeResult Sip002Decoder::DecodeObfs(ParsedUri const &uri, ProxyPlugin &plugin, std::string_view tcpNext,
+                                                 std::string_view)
+    {
+        std::string empty{};
+        auto const &param = uri.GetQueryValue("plugin").value_or(std::ref(empty)).get();
+        if (!param.starts_with("obfs-local;"))
+        {
+            return PluginDecodeResult::Ignore;
+        }
+        std::map<std::string_view, std::string_view> obfsMap;
+        for (auto const kv : std::views::split(std::string_view(param.data() + 11, param.size() - 11), ';'))
+        {
+            std::string_view kvStr(kv.begin(), kv.end());
+            auto const eqPos = kvStr.find('=');
+            if (eqPos == std::string_view::npos)
+            {
+                return PluginDecodeResult::Fail;
+            }
+            obfsMap[std::string_view(kvStr.data(), eqPos)] =
+                std::string_view(kvStr.data() + eqPos + 1, kvStr.size() - eqPos - 1);
+        }
+        std::string_view host = obfsMap["obfs-host"];
+        if (host.empty())
+        {
+            host = uri.hostText;
+        }
+        if (obfsMap["obfs"] == "http")
+        {
+            std::string_view path = "/";
+            if (!obfsMap["obfs-uri"].empty())
+            {
+                path = obfsMap["obfs-uri"];
+            }
+            plugin.plugin = HTTP_OBFS_PLUGIN_NAME;
+            plugin.param = nlohmann::json::to_cbor({{"host", host}, {"path", path}, {"next", tcpNext}});
+        }
+        else if (obfsMap["obfs"] == "tls")
+        {
+            plugin.plugin = TLS_OBFS_PLUGIN_NAME;
+            plugin.param = nlohmann::json::to_cbor({{"host", host}, {"next", tcpNext}});
         }
         else
         {
-            std::string fragment(uri.fragment);
-            uriUnescapeInPlaceExA(fragment.data(), URI_TRUE, URI_BR_DONT_TOUCH);
-            proxyName = std::move(fragment);
-            // proxyName may contain a \0 in the middle, which truncates the string across FFI boundary.
+            return PluginDecodeResult::Fail;
         }
-        std::string userinfo(uri.hostText);
-        uriUnescapeInPlaceExA(userinfo.data(), URI_TRUE, URI_BR_DONT_TOUCH);
+        return PluginDecodeResult::Success;
+    }
+    PluginDecodeResult Sip002Decoder::DecodeTls(ParsedUri const &, ProxyPlugin &, std::string_view, std::string_view)
+    {
+        // TODO: tls
+        return PluginDecodeResult::Ignore;
+    }
+    PluginDecodeResult Sip002Decoder::DecodeUdp(ParsedUri const &)
+    {
+        return PluginDecodeResult::Success;
+    }
+
+    std::string LegacyShadowsocksDecoder::DecodeName(ParsedUri const &uri)
+    {
+        return Sip002Decoder{}.DecodeName(uri);
+    }
+    bool LegacyShadowsocksDecoder::decodeUserinfoParts(ParsedUri const &uri)
+    {
+        if (m_userinfoPartsDecoded)
+        {
+            return true;
+        }
+
+        std::string userinfo;
         try
         {
-            userinfo = base64_decode(std::move(userinfo));
+            userinfo = base64_decode(UriUnescape(std::string(uri.hostText)));
         }
         catch (...)
         {
-            return std::nullopt;
+            return false;
         }
         auto const firstColon = userinfo.find(':');
         if (firstColon == std::string::npos)
         {
-            return std::nullopt;
+            return false;
         }
         auto const firstAt = userinfo.find('@', firstColon);
         if (firstAt == std::string::npos)
         {
-            return std::nullopt;
+            return false;
         }
         auto const secondColon = userinfo.find(':', firstAt);
         if (secondColon == std::string::npos)
         {
-            return std::nullopt;
+            return false;
         }
 
-        auto const portText = std::string_view(userinfo.begin() + secondColon + 1, userinfo.end());
-        auto const port = ParsePort(portText);
-        if (!port.has_value())
+        m_userinfoParts =
+            std::make_tuple(std::string(userinfo.data(), firstColon),
+                            std::vector<uint8_t>(userinfo.data() + firstColon + 1, userinfo.data() + firstAt),
+                            std::string(userinfo.begin() + firstAt + 1, userinfo.begin() + secondColon),
+                            std::string(userinfo.begin() + secondColon + 1, userinfo.end()));
+        m_userinfoPartsDecoded = true;
+
+        return true;
+    }
+    PluginDecodeResult LegacyShadowsocksDecoder::DecodeProtocol(ParsedUri const &uri, ProxyPlugin &plugin,
+                                                                std::string_view tcpNext, std::string_view udpNext)
+    {
+        if (!decodeUserinfoParts(uri))
         {
-            return std::nullopt;
+            return PluginDecodeResult::Fail;
         }
-
-        ProxyPlugin ssPlugin{.name = "p", .plugin = std::string(SS_PLUGIN_NAME)};
-        ProxyPlugin redirPlugin{.name = "r", .plugin = std::string(REDIR_PLUGIN_NAME)};
-        ssPlugin.param =
-            nlohmann::json::to_cbor({{"method", std::string_view(userinfo.data(), firstColon)},
-                                     {"password", nlohmann::json::binary_t(std::vector<uint8_t>(
-                                                      userinfo.data() + firstColon + 1, userinfo.data() + firstAt))},
-                                     {"tcp_next", "r.tcp"},
-                                     {"udp_next", "r.udp"}});
-        redirPlugin.param = nlohmann::json::to_cbor(
-            {{"dest",
-              {{"host", std::string_view(userinfo.begin() + firstAt + 1, userinfo.begin() + secondColon)},
-               {"port", *port}}},
-             {"tcp_next", "$out.tcp"},
-             {"udp_next", "$out.udp"}});
-
-        DynOutboundV1Proxy proxy{
-            .tcp_entry = "p.tcp", .udp_entry = "p.udp", .plugins = {std::move(ssPlugin), std::move(redirPlugin)}};
-        return std::make_pair(std::move(proxyName), nlohmann::json::to_cbor(proxy));
+        plugin.plugin = std::string(SS_PLUGIN_NAME);
+        auto const &secondUserinfoPart = std::get<1>(m_userinfoParts);
+        plugin.param = nlohmann::json::to_cbor(
+            {{"method", std::get<0>(m_userinfoParts)},
+             {"password", nlohmann::json::binary_t(std::vector(secondUserinfoPart.data(),
+                                                               secondUserinfoPart.data() + secondUserinfoPart.size()))},
+             {"tcp_next", tcpNext},
+             {"udp_next", udpNext}});
+        return PluginDecodeResult::Success;
+    }
+    PluginDecodeResult LegacyShadowsocksDecoder::DecodeRedir(ParsedUri const &uri, std::string &host, uint16_t &port)
+    {
+        if (!decodeUserinfoParts(uri))
+        {
+            return PluginDecodeResult::Fail;
+        }
+        auto const portOpt = ParsePort(std::get<3>(m_userinfoParts));
+        if (!portOpt.has_value())
+        {
+            return PluginDecodeResult::Fail;
+        }
+        port = *portOpt;
+        host = std::get<2>(m_userinfoParts);
+        return PluginDecodeResult::Success;
+    }
+    PluginDecodeResult LegacyShadowsocksDecoder::DecodeObfs(ParsedUri const &, ProxyPlugin &, std::string_view,
+                                                            std::string_view)
+    {
+        return PluginDecodeResult::Ignore;
+    }
+    PluginDecodeResult LegacyShadowsocksDecoder::DecodeTls(ParsedUri const &, ProxyPlugin &, std::string_view,
+                                                           std::string_view)
+    {
+        return PluginDecodeResult::Ignore;
+    }
+    PluginDecodeResult LegacyShadowsocksDecoder::DecodeUdp(ParsedUri const &)
+    {
+        return PluginDecodeResult::Success;
     }
 
-    std::optional<std::pair<std::string, std::vector<uint8_t>>> ConvertTrojanUriToProxy(ParsedUri const &uri)
+    std::string TrojanDecoder::DecodeName(ParsedUri const &uri)
     {
-        ProxyPlugin trojanPlugin{.name = "p", .plugin = std::string(TROJAN_PLUGIN_NAME)};
-        ProxyPlugin redirPlugin{.name = "r", .plugin = std::string(REDIR_PLUGIN_NAME)};
-        ProxyPlugin tlsPlugin{.name = "t", .plugin = std::string(TLS_PLUGIN_NAME)};
-        std::string userinfo(uri.userInfo);
-        uriUnescapeInPlaceExA(userinfo.data(), URI_TRUE, URI_BR_DONT_TOUCH);
-        std::string const password(userinfo.data());
-        trojanPlugin.param = nlohmann::json::to_cbor(
-            {{"password", nlohmann::json::binary_t(std::vector<uint8_t>(password.begin(), password.end()))},
-             {"tls_next", "r.tcp"}});
-        uint16_t port{};
+        std::string proxyName = UriUnescape(std::string(uri.fragment));
+        if (proxyName.empty())
+        {
+            proxyName = "New Trojan Proxy";
+        }
+        return proxyName;
+    }
+    PluginDecodeResult TrojanDecoder::DecodeProtocol(ParsedUri const &uri, ProxyPlugin &plugin,
+                                                     std::string_view tcpNext, std::string_view)
+    {
+        plugin.plugin = std::string(TROJAN_PLUGIN_NAME);
+        std::string userinfo(UriUnescape(std::string(uri.userInfo)));
+        plugin.param = nlohmann::json::to_cbor({{"password", nlohmann::json::binary_t(std::vector<uint8_t>(
+                                                                 userinfo.data(), userinfo.data() + userinfo.size()))},
+                                                {"tls_next", tcpNext}});
+        return PluginDecodeResult::Success;
+    }
+    PluginDecodeResult TrojanDecoder::DecodeRedir(ParsedUri const &uri, std::string &host, uint16_t &port)
+    {
         if (uri.portText.empty())
         {
             port = 443;
         }
         else
         {
-            auto const parsedPort = ParsePort(uri.portText);
-            if (!parsedPort.has_value())
+            auto const portOpt = ParsePort(uri.portText);
+            if (!portOpt.has_value())
             {
-                return std::nullopt;
+                return PluginDecodeResult::Fail;
             }
-            port = *parsedPort;
+            port = *portOpt;
         }
-        redirPlugin.param = nlohmann::json::to_cbor(
-            {{"dest", {{"host", uri.hostText}, {"port", port}}}, {"tcp_next", "t.tcp"}, {"udp_next", "$out.udp"}});
-        nlohmann::json tlsParam{{"next", "$out.tcp"}};
-        auto const queryMap = ParseQuery(uri.query);
-        if (queryMap.contains("allowInsecure") && queryMap.at("allowInsecure") == "1")
+        host = uri.hostText;
+        return PluginDecodeResult::Success;
+    }
+    PluginDecodeResult TrojanDecoder::DecodeObfs(ParsedUri const &, ProxyPlugin &, std::string_view, std::string_view)
+    {
+        // TODO: trojan-go ws
+        return PluginDecodeResult::Ignore;
+    }
+    nlohmann::json ParseAlpn(std::string_view alpnStr)
+    {
+        nlohmann::json alpns;
+        for (auto const s : std::views::split(alpnStr, ','))
+        {
+            if (s.empty())
+            {
+                continue;
+            }
+            alpns.push_back(std::string_view(s.begin(), s.end()));
+        }
+        return alpns;
+    }
+    PluginDecodeResult TrojanDecoder::DecodeTls(ParsedUri const &uri, ProxyPlugin &plugin, std::string_view tcpNext,
+                                                std::string_view)
+    {
+        nlohmann::json tlsParam{{"next", tcpNext}};
+        auto const allowInsecureParam = uri.GetQueryValue("allowInsecure"), peerParam = uri.GetQueryValue("peer"),
+                   alpnParam = uri.GetQueryValue("alpn");
+        std::string empty{};
+        if (allowInsecureParam.value_or(std::ref(empty)).get() == "1")
         {
             tlsParam["skip_cert_check"] = true;
         }
-        if (queryMap.contains("peer"))
+        if (peerParam.has_value())
         {
-            tlsParam["sni"] = queryMap.at("peer");
+            tlsParam["sni"] = peerParam.value().get();
         }
-        tlsPlugin.param = nlohmann::json::to_cbor(std::move(tlsParam));
+        if (alpnParam.has_value())
+        {
+            auto const &alpnStr = alpnParam.value().get();
+            tlsParam["alpn"] = ParseAlpn(alpnStr);
+        }
+        plugin.param = nlohmann::json::to_cbor(std::move(tlsParam));
 
-        DynOutboundV1Proxy proxy{.tcp_entry = "p.tcp",
-                                 .udp_entry = std::nullopt, // TODO: Trojan UDP
-                                 .plugins = {std::move(trojanPlugin), std::move(redirPlugin), std::move(tlsPlugin)}};
-        std::string fragment(uri.fragment);
-        uriUnescapeInPlaceExA(fragment.data(), URI_TRUE, URI_BR_DONT_TOUCH);
-        std::string const proxyName(fragment.data());
-        return std::make_pair(std::move(proxyName), nlohmann::json::to_cbor(proxy));
+        return PluginDecodeResult::Success;
+    }
+    PluginDecodeResult TrojanDecoder::DecodeUdp(ParsedUri const &)
+    {
+        return PluginDecodeResult::Ignore;
+    }
+    std::string Socks5Decoder::DecodeName(ParsedUri const &uri)
+    {
+        auto const remarks = uri.GetQueryValue("remarks");
+        if (remarks.has_value())
+        {
+            return remarks.value().get();
+        }
+        std::string proxyName = UriUnescape(std::string(uri.fragment));
+        if (proxyName.empty())
+        {
+            proxyName = "New SOCKS5 Proxy";
+        }
+        return proxyName;
+    }
+    PluginDecodeResult Socks5Decoder::DecodeProtocol(ParsedUri const &uri, ProxyPlugin &plugin,
+                                                     std::string_view tcpNext, std::string_view udpNext)
+    {
+        plugin.plugin = std::string(SOCKS5_PLUGIN_NAME);
+        nlohmann::json userDoc = nullptr, passDoc = nullptr;
+        if (!uri.userInfo.empty())
+        {
+            auto userPassSplit = SplitUserPassFromUserinfo(uri.userInfo);
+            if (!userPassSplit.has_value())
+            {
+                return PluginDecodeResult::Fail;
+            }
+            auto const [user, pass] = std::move(userPassSplit).value();
+            userDoc = nlohmann::json::binary_t(std::vector<uint8_t>(user.data(), user.data() + user.size()));
+            passDoc = nlohmann::json::binary_t(std::vector<uint8_t>(pass.data(), pass.data() + pass.size()));
+        }
+        plugin.param = nlohmann::json::to_cbor(
+            {{"user", std::move(userDoc)}, {"pass", std::move(passDoc)}, {"tcp_next", tcpNext}, {"udp_next", udpNext}});
+        return PluginDecodeResult::Success;
+    }
+    PluginDecodeResult Socks5Decoder::DecodeRedir(ParsedUri const &uri, std::string &host, uint16_t &port)
+    {
+        auto const portOpt = ParsePort(uri.portText);
+        if (!portOpt.has_value())
+        {
+            return PluginDecodeResult::Fail;
+        }
+        port = *portOpt;
+        host = uri.hostText;
+        return PluginDecodeResult::Success;
+    }
+    PluginDecodeResult Socks5Decoder::DecodeObfs(ParsedUri const &, ProxyPlugin &, std::string_view, std::string_view)
+    {
+        return PluginDecodeResult::Ignore;
+    }
+    PluginDecodeResult Socks5Decoder::DecodeTls(ParsedUri const &, ProxyPlugin &, std::string_view, std::string_view)
+    {
+        // TODO: tls
+        return PluginDecodeResult::Ignore;
+    }
+    PluginDecodeResult Socks5Decoder::DecodeUdp(ParsedUri const &)
+    {
+        return PluginDecodeResult::Ignore;
+    }
+    std::string HttpDecoder::DecodeName(ParsedUri const &uri)
+    {
+        std::string proxyName = UriUnescape(std::string(uri.fragment));
+        if (proxyName.empty())
+        {
+            proxyName = "New HTTP Proxy";
+        }
+        return proxyName;
+    }
+    PluginDecodeResult HttpDecoder::DecodeProtocol(ParsedUri const &uri, ProxyPlugin &plugin, std::string_view tcpNext,
+                                                   std::string_view)
+    {
+        plugin.plugin = std::string(HTTP_PROXY_PLUGIN_NAME);
+        nlohmann::json userDoc = nlohmann::json::binary_t(std::vector<uint8_t>()),
+                       passDoc = nlohmann::json::binary_t(std::vector<uint8_t>());
+        if (!uri.userInfo.empty())
+        {
+            auto userPassSplit = SplitUserPassFromUserinfo(uri.userInfo);
+            if (!userPassSplit.has_value())
+            {
+                return PluginDecodeResult::Fail;
+            }
+            auto const [user, pass] = std::move(userPassSplit).value();
+            userDoc = nlohmann::json::binary_t(std::vector<uint8_t>(user.data(), user.data() + user.size()));
+            passDoc = nlohmann::json::binary_t(std::vector<uint8_t>(pass.data(), pass.data() + pass.size()));
+        }
+        plugin.param = nlohmann::json::to_cbor(
+            {{"user", std::move(userDoc)}, {"pass", std::move(passDoc)}, {"tcp_next", tcpNext}});
+        return PluginDecodeResult::Success;
+    }
+    PluginDecodeResult HttpDecoder::DecodeRedir(ParsedUri const &uri, std::string &host, uint16_t &port)
+    {
+        if (uri.portText.empty())
+        {
+            port = 80;
+            // TODO: HTTPS
+        }
+        else
+        {
+            auto const portOpt = ParsePort(uri.portText);
+            if (!portOpt.has_value())
+            {
+                return PluginDecodeResult::Fail;
+            }
+            port = *portOpt;
+        }
+        host = uri.hostText;
+        return PluginDecodeResult::Success;
+    }
+    PluginDecodeResult HttpDecoder::DecodeObfs(ParsedUri const &, ProxyPlugin &, std::string_view, std::string_view)
+    {
+        return PluginDecodeResult::Ignore;
+    }
+    PluginDecodeResult HttpDecoder::DecodeTls(ParsedUri const &, ProxyPlugin &, std::string_view, std::string_view)
+    {
+        // TODO: tls
+        return PluginDecodeResult::Ignore;
+    }
+    PluginDecodeResult HttpDecoder::DecodeUdp(ParsedUri const &)
+    {
+        return PluginDecodeResult::Ignore;
+    }
+    [[nodiscard]] bool V2raynDecoder::decodeJsonDoc(ParsedUri const &uri)
+    {
+        if (m_jsonDecoded)
+        {
+            return true;
+        }
+
+        try
+        {
+            std::string userinfo = base64_decode(UriUnescape(std::string(uri.hostText)));
+            m_linkDoc = nlohmann::json::parse(std::move(userinfo));
+            if (!m_linkDoc.contains("v") || (m_linkDoc.at("v") != 2 && m_linkDoc.at("v") != "2"))
+            {
+                return false;
+            }
+        }
+        catch (...)
+        {
+            return false;
+        }
+
+        m_jsonDecoded = true;
+        return true;
+    }
+    std::string V2raynDecoder::DecodeName(ParsedUri const &uri)
+    {
+        if (!decodeJsonDoc(uri) || !m_linkDoc.contains("ps"))
+        {
+            return "Erroneous V2RayN VMess Proxy";
+        }
+        return m_linkDoc.at("ps");
+    }
+    PluginDecodeResult V2raynDecoder::DecodeProtocol(ParsedUri const &uri, ProxyPlugin &plugin,
+                                                     std::string_view tcpNext, std::string_view)
+    {
+        if (!decodeJsonDoc(uri))
+        {
+            return PluginDecodeResult::Fail;
+        }
+        plugin.plugin = std::string(VMESS_PLUGIN_NAME);
+        std::string uid, security;
+        uint16_t alterId;
+        try
+        {
+            uid = m_linkDoc.at("id");
+            security = m_linkDoc.value("scy", "auto");
+            if (security == "zero")
+            {
+                return PluginDecodeResult::Fail;
+            }
+            auto const aidDoc = m_linkDoc.at("aid");
+            if (aidDoc.type() == nlohmann::json::value_t::string)
+            {
+                errno = 0;
+                alterId = static_cast<uint16_t>(std::strtol(aidDoc.get<std::string>().data(), nullptr, 10));
+                if (errno != 0)
+                {
+                    return PluginDecodeResult::Fail;
+                }
+            }
+            else if (aidDoc.type() == nlohmann::json::value_t::number_integer)
+            {
+                alterId = aidDoc;
+            }
+            else
+            {
+                return PluginDecodeResult::Fail;
+            }
+        }
+        catch (...)
+        {
+            return PluginDecodeResult::Fail;
+        }
+        plugin.param = nlohmann::json::to_cbor({{"user_id", std::move(uid)},
+                                                {"security", std::move(security)},
+                                                {"alter_id", alterId},
+                                                {"tcp_next", tcpNext}});
+        return PluginDecodeResult::Success;
+    }
+    PluginDecodeResult V2raynDecoder::DecodeRedir(ParsedUri const &uri, std::string &host, uint16_t &port)
+    {
+        if (!decodeJsonDoc(uri))
+        {
+            return PluginDecodeResult::Fail;
+        }
+        try
+        {
+            auto const portDoc = m_linkDoc.at("port");
+            if (portDoc.type() == nlohmann::json::value_t::string)
+            {
+                auto const portOpt = ParsePort(uri.portText);
+                if (!portOpt.has_value())
+                {
+                    return PluginDecodeResult::Fail;
+                }
+                port = *portOpt;
+            }
+            else if (portDoc.type() == nlohmann::json::value_t::number_integer ||
+                     portDoc.type() == nlohmann::json::value_t::number_unsigned)
+            {
+                port = portDoc;
+            }
+            else
+            {
+                return PluginDecodeResult::Fail;
+            }
+
+            host = m_linkDoc.at("add");
+            return PluginDecodeResult::Success;
+        }
+        catch (...)
+        {
+            return PluginDecodeResult::Fail;
+        }
+    }
+    PluginDecodeResult V2raynDecoder::DecodeObfs(ParsedUri const &uri, ProxyPlugin &plugin, std::string_view tcpNext,
+                                                 std::string_view)
+    {
+        if (!decodeJsonDoc(uri))
+        {
+            return PluginDecodeResult::Fail;
+        }
+        try
+        {
+            if (m_linkDoc.contains("type") && m_linkDoc.at("type") != "none" && m_linkDoc.at("type") != "")
+            {
+                return PluginDecodeResult::Fail;
+            }
+            if (m_linkDoc.at("net") == "tcp")
+            {
+                return PluginDecodeResult::Ignore;
+            }
+            if (m_linkDoc.at("net") == "ws")
+            {
+                plugin.plugin = WS_PLUGIN_NAME;
+                std::string host = m_linkDoc.value("host", m_linkDoc.at("add")), path = m_linkDoc.value("path", "/");
+                plugin.param = nlohmann::json::to_cbor({{"host", std::move(host)},
+                                                        {"path", std::move(path)},
+                                                        {"headers", std::map<std::string, std::string>()},
+                                                        {"next", tcpNext}});
+                return PluginDecodeResult::Success;
+            }
+            return PluginDecodeResult::Fail;
+        }
+        catch (...)
+        {
+            return PluginDecodeResult::Fail;
+        }
+    }
+    PluginDecodeResult V2raynDecoder::DecodeTls(ParsedUri const &uri, ProxyPlugin &tlsPlugin, std::string_view tcpNext,
+                                                std::string_view)
+    {
+        if (!decodeJsonDoc(uri))
+        {
+            return PluginDecodeResult::Fail;
+        }
+        try
+        {
+            if (m_linkDoc.value("tls", "") != "tls")
+            {
+                return PluginDecodeResult::Ignore;
+            }
+            // TODO: fingerprint
+            nlohmann::json sniDoc = nullptr, alpnDoc = nullptr;
+            if (m_linkDoc.contains("alpn"))
+            {
+                if (m_linkDoc.at("alpn").get<std::string>().find("h2") != std::string::npos)
+                {
+                    // WebSocket does not support h2 yet
+                    if (m_linkDoc.value("net", "tcp") == "ws")
+                    {
+                        return PluginDecodeResult::Fail;
+                    }
+                }
+                alpnDoc = ParseAlpn(m_linkDoc.at("alpn"));
+            }
+            if (m_linkDoc.value("sni", "") != "")
+            {
+                sniDoc = m_linkDoc.at("sni").get<std::string>();
+            }
+            tlsPlugin.param = nlohmann::json::to_cbor({{"alpn", std::move(alpnDoc)},
+                                                       // TODO: allow insecure or not?
+                                                       {"skip_cert_check", true},
+                                                       {"sni", std::move(sniDoc)},
+                                                       {"next", tcpNext}});
+            return PluginDecodeResult::Success;
+        }
+        catch (...)
+        {
+            return PluginDecodeResult::Fail;
+        }
+    }
+    PluginDecodeResult V2raynDecoder::DecodeUdp(ParsedUri const &)
+    {
+        return PluginDecodeResult::Ignore;
     }
 
     std::optional<uint16_t> ParsePort(std::string_view portText)
@@ -238,14 +711,29 @@ namespace winrt::YtFlowApp::implementation
         return std::string_view(text.first, text.afterLast);
     }
 
+    std::optional<std::reference_wrapper<std::string>> ParsedUri::GetQueryValue(std::string const &key) const
+    {
+        if (!queryMap.contains(key))
+        {
+            return std::nullopt;
+        }
+        auto &[value, visited] = queryMap[key];
+        visited = true;
+        return {std::ref(value)};
+    }
+    bool ParsedUri::HasUnvisitedQuery() const noexcept
+    {
+        return std::ranges::find_if(queryMap, [](auto const &kv) { return !kv.second.second; }) != queryMap.end();
+    }
     ParsedUri ParsedUri::fromUri(UriUriA const &uri)
     {
-        ParsedUri parsedUri{.scheme = UriTextRangeAToStringView(uri.scheme),
-                            .userInfo = UriTextRangeAToStringView(uri.userInfo),
-                            .hostText = UriTextRangeAToStringView(uri.hostText),
-                            .portText = UriTextRangeAToStringView(uri.portText),
-                            .query = UriTextRangeAToStringView(uri.query),
-                            .fragment = UriTextRangeAToStringView(uri.fragment)};
+        ParsedUri parsedUri;
+        parsedUri.scheme = UriTextRangeAToStringView(uri.scheme);
+        parsedUri.userInfo = UriTextRangeAToStringView(uri.userInfo);
+        parsedUri.hostText = UriTextRangeAToStringView(uri.hostText);
+        parsedUri.portText = UriTextRangeAToStringView(uri.portText);
+        parsedUri.query = UriTextRangeAToStringView(uri.query);
+        parsedUri.fragment = UriTextRangeAToStringView(uri.fragment);
 
         auto pathPtr = uri.pathHead;
         while (pathPtr != nullptr)
@@ -254,6 +742,16 @@ namespace winrt::YtFlowApp::implementation
             parsedUri.pathSegments.emplace_back(UriTextRangeAToStringView(pathText));
             pathPtr = pathPtr->next;
         }
+
+        if (!parsedUri.query.empty())
+        {
+            auto queryMap = ParseQuery(parsedUri.query);
+            std::ranges::transform(
+                std::move(queryMap), std::inserter(parsedUri.queryMap, parsedUri.queryMap.end()), [](auto &&kv) {
+                    return std::make_pair(std::move(kv.first), std::make_pair(std::move(kv.second), false));
+                });
+        }
+
         return parsedUri;
     }
 
@@ -300,7 +798,8 @@ namespace winrt::YtFlowApp::implementation
                 tlsPlugin = std::make_optional(std::cref(plugin));
                 continue;
             }
-            if (plugin.plugin == HTTP_OBFS_PLUGIN_NAME || plugin.plugin == TLS_OBFS_PLUGIN_NAME)
+            if (plugin.plugin == HTTP_OBFS_PLUGIN_NAME || plugin.plugin == TLS_OBFS_PLUGIN_NAME ||
+                plugin.plugin == WS_PLUGIN_NAME)
             {
                 if (transportPlugin.has_value())
                 {
@@ -330,11 +829,11 @@ namespace winrt::YtFlowApp::implementation
         }
         if (protocolPlugin.value().get().plugin == SS_PLUGIN_NAME)
         {
-            if (transportPlugin.has_value() || tlsPlugin.has_value())
+            if (tlsPlugin.has_value())
             {
                 return std::nullopt;
             }
-            return ConvertSsToLink(name, protocolPlugin.value(), redirectPlugin.value());
+            return ConvertSsToLink(name, protocolPlugin.value(), redirectPlugin.value(), transportPlugin);
         }
         if (protocolPlugin.value().get().plugin == TROJAN_PLUGIN_NAME)
         {
@@ -343,6 +842,21 @@ namespace winrt::YtFlowApp::implementation
                 return std::nullopt;
             }
             return ConvertTrojanToLink(name, protocolPlugin.value(), redirectPlugin.value(), tlsPlugin.value());
+        }
+        if (protocolPlugin.value().get().plugin == SOCKS5_PLUGIN_NAME && !transportPlugin.has_value() &&
+            !tlsPlugin.has_value())
+        {
+            return ConvertSocks5ToLink(name, protocolPlugin.value(), redirectPlugin.value());
+        }
+        if (protocolPlugin.value().get().plugin == HTTP_PROXY_PLUGIN_NAME && !transportPlugin.has_value() &&
+            !tlsPlugin.has_value())
+        {
+            return ConvertHttpProxyToLink(name, protocolPlugin.value(), redirectPlugin.value());
+        }
+        if (protocolPlugin.value().get().plugin == VMESS_PLUGIN_NAME)
+        {
+            return ConvertVMessProxyToLink(name, protocolPlugin.value(), redirectPlugin.value(), transportPlugin,
+                                           tlsPlugin);
         }
         return std::nullopt;
     }
@@ -363,9 +877,10 @@ namespace winrt::YtFlowApp::implementation
     }
 
     std::optional<std::string> ConvertSsToLink(std::string_view name, ProxyPlugin const &protocolPlugin,
-                                               ProxyPlugin const &redirectPlugin)
+                                               ProxyPlugin const &redirectPlugin,
+                                               std::optional<std::reference_wrapper<ProxyPlugin const>> obfsPlugin)
     {
-        std::string method, host, port;
+        std::string method, host, port, obfsPluginParam;
         nlohmann::json::binary_t password;
         try
         {
@@ -375,6 +890,24 @@ namespace winrt::YtFlowApp::implementation
             password = ssParam.at("password");
             host = redirParam.at("dest").at("host");
             port = std::to_string(static_cast<int>(redirParam.at("dest").at("port")));
+            if (obfsPlugin.has_value())
+            {
+                auto const &op = obfsPlugin.value().get();
+                auto const opDoc = nlohmann::json::from_cbor(op.param);
+                if (op.plugin == HTTP_OBFS_PLUGIN_NAME)
+                {
+                    obfsPluginParam = std::string("obfs-local;obfs=http;obfs-host=") + opDoc.value("host", "") +
+                                      ";obfs-uri=" + opDoc.value("path", "/");
+                }
+                else if (op.plugin == TLS_OBFS_PLUGIN_NAME)
+                {
+                    obfsPluginParam = std::string("obfs-local;obfs=tls;obfs-host=") + opDoc.value("host", "");
+                }
+                else
+                {
+                    return std::nullopt;
+                }
+            }
         }
         catch (...)
         {
@@ -383,20 +916,55 @@ namespace winrt::YtFlowApp::implementation
         auto const userinfo =
             base64_encode(method + ':' + std::string(reinterpret_cast<char *>(password.data()), password.size()));
 
-        std::vector<char> escapedName((name.size() + 1) * 3);
-        uriEscapeExA(name.data(), name.data() + name.size(), escapedName.data(), URI_TRUE, URI_FALSE);
+        auto const escapedName = UriEscape(name);
+        std::optional<std::string> querystring;
+        UriTextRangeA queryRange{};
+        if (!obfsPluginParam.empty())
+        {
+            UriQueryListA queryList{.key = "plugin", .value = obfsPluginParam.c_str(), .next = nullptr};
+            querystring = ComposeQuery(&queryList);
+            if (!querystring.has_value())
+            {
+                return std::nullopt;
+            }
+            auto const &qs = querystring.value();
+            queryRange = {.first = qs.c_str(), .afterLast = qs.c_str() + qs.size()};
+        }
 
         UriUriA uri{.scheme = StringViewToUriTextRangeA(SS_SCHEME),
                     .userInfo = StringViewToUriTextRangeA(userinfo),
                     .hostText = StringViewToUriTextRangeA(host),
                     .portText = StringViewToUriTextRangeA(port),
-                    .fragment = StringViewToUriTextRangeA(std::string_view(escapedName.data()))};
+                    .query = queryRange,
+                    .fragment = StringViewToUriTextRangeA(escapedName.data())};
         return ComposeUri(uri);
     }
+
+    std::optional<std::string> ComposeQuery(UriQueryListA const *queryList)
+    {
+        if (queryList == nullptr)
+        {
+            return {};
+        }
+        int charsRequired;
+        int qsCharsWritten;
+        if (uriComposeQueryCharsRequiredA(queryList, &charsRequired) != URI_SUCCESS)
+        {
+            return std::nullopt;
+        }
+        charsRequired++;
+        std::vector<char> qs(charsRequired);
+        if (uriComposeQueryA(qs.data(), queryList, charsRequired, &qsCharsWritten) != URI_SUCCESS)
+        {
+            return std::nullopt;
+        }
+        return {std::string(qs.data(), qsCharsWritten - 1)};
+    }
+
     std::optional<std::string> ConvertTrojanToLink(std::string_view name, ProxyPlugin const &protocolPlugin,
                                                    ProxyPlugin const &redirectPlugin, ProxyPlugin const &tlsPlugin)
     {
-        std::string host, port;
+        std::string host, port, alpn;
         nlohmann::json::binary_t password;
         std::optional<std::string> peer;
         bool allowInsecure = false;
@@ -412,9 +980,19 @@ namespace winrt::YtFlowApp::implementation
             {
                 peer = std::make_optional(std::string(tlsParam.at("sni")));
             }
-            if (tlsParam.contains("skip_cert_check") && tlsParam.at("skip_cert_check") == true)
+            if (tlsParam.value("skip_cert_check", false) == true)
             {
                 allowInsecure = true;
+            }
+            std::vector<std::string> const alpns = tlsParam.value("alpn", std::vector<std::string>());
+            for (auto const &a : alpns)
+            {
+                alpn += a;
+                alpn.push_back(',');
+            }
+            if (!alpn.empty())
+            {
+                alpn = alpn.substr(0, alpn.size() - 1);
             }
         }
         catch (...)
@@ -422,9 +1000,9 @@ namespace winrt::YtFlowApp::implementation
             return std::nullopt;
         }
 
-        std::string querystring;
         UriQueryListA *queryList = nullptr, peerQuery = {.key = "peer", .value = "", .next = nullptr},
-                      allowInsecureQuery = {.key = "allowInsecure", .value = "1", .next = nullptr};
+                      allowInsecureQuery = {.key = "allowInsecure", .value = "1", .next = nullptr},
+                      alpnQuery = {.key = "alpn", .value = "", .next = nullptr};
         if (peer.has_value())
         {
             peerQuery.next = queryList;
@@ -436,25 +1014,18 @@ namespace winrt::YtFlowApp::implementation
             allowInsecureQuery.next = queryList;
             queryList = &allowInsecureQuery;
         }
-        if (queryList != nullptr)
+        if (!alpn.empty())
         {
-            int charsRequired;
-            int qsCharsWritten;
-            if (uriComposeQueryCharsRequiredA(queryList, &charsRequired) != URI_SUCCESS)
-            {
-                return std::nullopt;
-            }
-            charsRequired++;
-            std::vector<char> qs(charsRequired);
-            if (uriComposeQueryA(qs.data(), queryList, charsRequired, &qsCharsWritten) != URI_SUCCESS)
-            {
-                return std::nullopt;
-            }
-            querystring = std::string(qs.data(), qsCharsWritten - 1);
+            alpnQuery.next = queryList;
+            alpnQuery.value = alpn.c_str();
+            queryList = &alpnQuery;
         }
-
-        std::vector<char> escapedName((name.size() + 1) * 3);
-        uriEscapeExA(name.data(), name.data() + name.size(), escapedName.data(), URI_TRUE, URI_FALSE);
+        auto const querystring = ComposeQuery(queryList);
+        if (!querystring.has_value())
+        {
+            return std::nullopt;
+        }
+        auto const escapedName = UriEscape(name);
 
         UriUriA uri{.scheme = StringViewToUriTextRangeA(TROJAN_SCHEME),
                     .userInfo =
@@ -462,8 +1033,98 @@ namespace winrt::YtFlowApp::implementation
                                       .afterLast = reinterpret_cast<char const *>(password.data()) + password.size()},
                     .hostText = StringViewToUriTextRangeA(host),
                     .portText = StringViewToUriTextRangeA(port),
-                    .query = StringViewToUriTextRangeA(querystring),
-                    .fragment = StringViewToUriTextRangeA(std::string_view(escapedName.data()))};
+                    .query = StringViewToUriTextRangeA(*querystring),
+                    .fragment = StringViewToUriTextRangeA(escapedName.data())};
         return ComposeUri(uri);
+    }
+
+    std::optional<std::string> ConvertSocks5ToLink(std::string_view name, ProxyPlugin const &protocolPlugin,
+                                                   ProxyPlugin const &redirectPlugin)
+    {
+        std::string host, port, userinfo;
+        try
+        {
+            auto const redirParam = nlohmann::json::from_cbor(redirectPlugin.param);
+            auto const socks5Param = nlohmann::json::from_cbor(protocolPlugin.param);
+            if (socks5Param.value<nlohmann::json>("user", nullptr) != nullptr &&
+                socks5Param.value<nlohmann::json>("pass", nullptr) != nullptr)
+            {
+                nlohmann::json::binary_t userBuf = socks5Param.at("user");
+                nlohmann::json::binary_t passBuf = socks5Param.at("pass");
+                if (!userBuf.empty())
+                {
+                    userinfo +=
+                        UriEscape(std::string_view(reinterpret_cast<char const *>(userBuf.data()),
+                                                   reinterpret_cast<char const *>(userBuf.data() + userBuf.size())));
+                    userinfo.push_back(':');
+                    userinfo +=
+                        UriEscape(std::string_view(reinterpret_cast<char const *>(passBuf.data()),
+                                                   reinterpret_cast<char const *>(passBuf.data() + passBuf.size())));
+                }
+            }
+            host = redirParam.at("dest").at("host");
+            port = std::to_string(static_cast<int>(redirParam.at("dest").at("port")));
+        }
+        catch (...)
+        {
+            return std::nullopt;
+        }
+
+        auto const escapedName = UriEscape(name);
+
+        UriUriA uri{.scheme = StringViewToUriTextRangeA(SOCKS5_SCHEME),
+                    .userInfo = StringViewToUriTextRangeA(userinfo),
+                    .hostText = StringViewToUriTextRangeA(host),
+                    .portText = StringViewToUriTextRangeA(port),
+                    .fragment = StringViewToUriTextRangeA(escapedName.data())};
+        return ComposeUri(uri);
+    }
+    std::optional<std::string> ConvertHttpProxyToLink(std::string_view name, ProxyPlugin const &protocolPlugin,
+                                                      ProxyPlugin const &redirectPlugin)
+    {
+        std::string host, port, userinfo;
+        try
+        {
+            auto const redirParam = nlohmann::json::from_cbor(redirectPlugin.param);
+            auto const httpProxyParam = nlohmann::json::from_cbor(protocolPlugin.param);
+            if (httpProxyParam.value<nlohmann::json>("user", nullptr) != nullptr &&
+                httpProxyParam.value<nlohmann::json>("pass", nullptr) != nullptr)
+            {
+                nlohmann::json::binary_t userBuf = httpProxyParam.at("user");
+                nlohmann::json::binary_t passBuf = httpProxyParam.at("pass");
+                if (!userBuf.empty())
+                {
+                    userinfo +=
+                        UriEscape(std::string_view(reinterpret_cast<char const *>(userBuf.data()),
+                                                   reinterpret_cast<char const *>(userBuf.data() + userBuf.size())));
+                    userinfo.push_back(':');
+                    userinfo +=
+                        UriEscape(std::string_view(reinterpret_cast<char const *>(passBuf.data()),
+                                                   reinterpret_cast<char const *>(passBuf.data() + passBuf.size())));
+                }
+            }
+            host = redirParam.at("dest").at("host");
+            port = std::to_string(static_cast<int>(redirParam.at("dest").at("port")));
+        }
+        catch (...)
+        {
+            return std::nullopt;
+        }
+
+        auto const escapedName = UriEscape(name);
+
+        UriUriA uri{.scheme = StringViewToUriTextRangeA(HTTP_SCHEME),
+                    .userInfo = StringViewToUriTextRangeA(userinfo),
+                    .hostText = StringViewToUriTextRangeA(host),
+                    .portText = StringViewToUriTextRangeA(port),
+                    .fragment = StringViewToUriTextRangeA(escapedName.data())};
+        return ComposeUri(uri);
+    }
+    std::optional<std::string> ConvertVMessProxyToLink(std::string_view, ProxyPlugin const &, ProxyPlugin const &,
+                                                       std::optional<std::reference_wrapper<ProxyPlugin const>>,
+                                                       std::optional<std::reference_wrapper<ProxyPlugin const>>)
+    {
+        // TODO: 写不动了。你们 VMess 的分享链接格式真的群魔乱舞。
+        return std::nullopt;
     }
 }

@@ -340,12 +340,16 @@ namespace winrt::YtFlowApp::implementation
             std::vector<uint32_t> newProxyIds;
             for (auto const wline : std::ranges::views::split(input, L"\r"sv))
             {
-                if (wline.empty())
+                auto const line(to_string(std::wstring_view(wline.begin(), wline.end())));
+                constexpr char const *SPACES = " \r\n\t\v\f";
+                auto const lpos = line.find_first_not_of(SPACES);
+                auto const rpos = line.find_last_not_of(SPACES);
+                if (lpos == std::string::npos || rpos == std::string::npos)
                 {
                     continue;
                 }
-                auto const line(to_string(std::wstring_view(wline.begin(), wline.end())));
-                auto proxy = ConvertShareLinkToProxy(line);
+                std::string trimmedLink(line, lpos, rpos - lpos + 1);
+                auto proxy = ConvertShareLinkToProxy(trimmedLink);
                 if (!proxy.has_value())
                 {
                     unrecognized++;
@@ -372,13 +376,17 @@ namespace winrt::YtFlowApp::implementation
             {
                 currentGroup.Proxies().Append(std::forward<YtFlowApp::ProxyModel>(newProxyModel));
             }
-            hstring unrecognizedMsg;
-            if (unrecognized > 0)
+            if (!newProxyIds.empty() || unrecognized > 0)
             {
-                unrecognizedMsg = unrecognizedMsg + L" (skipped " + to_hstring(unrecognized) + L" unrecognized link)";
+                hstring unrecognizedMsg;
+                if (unrecognized > 0)
+                {
+                    unrecognizedMsg =
+                        unrecognizedMsg + L" (skipped " + to_hstring(unrecognized) + L" unrecognized link)";
+                }
+                NotifyUser(hstring{L"Imported "} + to_hstring(newProxyIds.size()) + L" proxies." + unrecognizedMsg,
+                           L"Import proxy");
             }
-            NotifyUser(hstring{L"Imported "} + to_hstring(newProxyIds.size()) + L" proxies." + unrecognizedMsg,
-                       L"Import proxy");
         }
         catch (...)
         {
