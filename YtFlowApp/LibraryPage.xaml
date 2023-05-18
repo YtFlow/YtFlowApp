@@ -250,7 +250,7 @@
                         x:Name="ProxyGroupProxyImportText"
                         MaxHeight="250"
                         Width="400"
-                        PlaceholderText="Enter proxy sharing URIs, one per line.&#x0d;&#x0a;Supported formats: ss:// trojan://"
+                        PlaceholderText="Enter proxy sharing URIs, one per line.&#x0d;&#x0a;Supported formats: ss:// trojan:// socks5:// http://&#x0d;&#x0a;vmess:// (v2rayN flavor)"
                         InputScope="Url"
                         IsSpellCheckEnabled="False"
                         AcceptsReturn="True"
