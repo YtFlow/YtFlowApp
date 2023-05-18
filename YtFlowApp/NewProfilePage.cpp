@@ -92,8 +92,28 @@ namespace winrt::YtFlowApp::implementation
 
     void NewProfilePage::OutboundTypeButton_Checked(IInspectable const &sender, RoutedEventArgs const & /* e */)
     {
-        auto const btn = sender.as<RadioButton>();
+        auto const btn = sender.as<FrameworkElement>();
         m_selectedOutboundType = btn.Tag().as<hstring>();
+        if (m_selectedOutboundType == L"dyn")
+        {
+            DynOutboundDisabledText().Visibility(Visibility::Collapsed);
+            DynOutboundEnabledText().Visibility(Visibility::Visible);
+            SsButton().IsChecked(false);
+            TrojanButton().IsChecked(false);
+            HttpButton().IsChecked(false);
+            SsButton().IsEnabled(false);
+            TrojanButton().IsEnabled(false);
+            HttpButton().IsEnabled(false);
+        }
+    }
+    void NewProfilePage::DynOutboundButton_Unchecked(IInspectable const &, RoutedEventArgs const &)
+    {
+        DynOutboundDisabledText().Visibility(Visibility::Visible);
+        DynOutboundEnabledText().Visibility(Visibility::Collapsed);
+        SsButton().IsEnabled(true);
+        SsButton().IsChecked(true);
+        TrojanButton().IsEnabled(true);
+        HttpButton().IsEnabled(true);
     }
 
     void NewProfilePage::Page_Loaded(IInspectable const & /* sender */, RoutedEventArgs const & /* e */)

@@ -17,6 +17,7 @@ namespace winrt::YtFlowApp::implementation
 
         fire_and_forget SaveButton_Click(IInspectable const &sender, Windows::UI::Xaml::RoutedEventArgs const &e);
         void OutboundTypeButton_Checked(IInspectable const &sender, Windows::UI::Xaml::RoutedEventArgs const &e);
+        void DynOutboundButton_Unchecked(IInspectable const &sender, Windows::UI::Xaml::RoutedEventArgs const &e);
         void Page_Loaded(IInspectable const &sender, Windows::UI::Xaml::RoutedEventArgs const &e);
         void Page_Unloaded(IInspectable const &sender, winrt::Windows::UI::Xaml::RoutedEventArgs const &e);
         void NewProfileNameText_TextChanged(IInspectable const &sender,

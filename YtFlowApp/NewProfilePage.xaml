@@ -76,20 +76,37 @@
                 <TextBlock Margin="{StaticResource SubheaderMargin}" Style="{ThemeResource BaseTextBlockStyle}">
                     Outbound
                 </TextBlock>
-                <RadioButton x:Name="DynOutboundButton" Tag="dyn" GroupName="OutboundType" IsChecked="True">Dynamic Outbound</RadioButton>
-                <TextBlock Margin="0, 4, 0, 8" TextWrapping="Wrap" Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}">
-                    Use proxy servers imported from Asset page.
+                <CheckBox x:Name="DynOutboundButton" Tag="dyn" IsChecked="True" Unchecked="DynOutboundButton_Unchecked">Dynamic Outbound</CheckBox>
+                <TextBlock x:Name="DynOutboundEnabledText" Margin="0, 4, 0, 8" TextWrapping="Wrap" Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}">
+                    <Run>
+                        Use proxy servers imported from Asset page. To activate an existing proxy server, click 
+                    </Run>
+                    <Run FontFamily="Consolas">
+                        Select...
+                    </Run>
+                    <Run>
+                        under 
+                    </Run>
+                    <Run FontFamily="Consolas">
+                        outbound
+                    </Run>
+                    <Run>
+                        section while YtFlow VPN is connected.
+                    </Run>
                 </TextBlock>
-                <RadioButton x:Name="SsButton" Tag="ss" GroupName="OutboundType">Shadowsocks</RadioButton>
-                <RadioButton x:Name="TrojanButton" Tag="trojan" GroupName="OutboundType">Trojan</RadioButton>
-                <RadioButton x:Name="HttpButton" Tag="http" GroupName="OutboundType">HTTP Proxy</RadioButton>
+                <TextBlock x:Name="DynOutboundDisabledText" Margin="0, 4, 0, 8" Visibility="Collapsed" TextWrapping="Wrap" Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}">
+                    Manually configure parameters for outbound plugins in the Profile Editor.
+                </TextBlock>
+                <RadioButton x:Name="SsButton" Tag="ss" IsEnabled="False" GroupName="OutboundType">Shadowsocks</RadioButton>
+                <RadioButton x:Name="TrojanButton" Tag="trojan" IsEnabled="False" GroupName="OutboundType">Trojan</RadioButton>
+                <RadioButton x:Name="HttpButton" Tag="http" IsEnabled="False" GroupName="OutboundType">HTTP Proxy</RadioButton>
             </StackPanel>
 
             <StackPanel x:Name="SavePanel" Grid.Row="4" Grid.Column="0" Margin="0, 20, 0, 0">
                 <TextBlock Margin="{StaticResource SubheaderMargin}" Style="{ThemeResource BaseTextBlockStyle}">
                     Profile Name
                 </TextBlock>
-                <TextBox x:Name="NewProfileNameText" TextChanged="NewProfileNameText_TextChanged"></TextBox> 
+                <TextBox x:Name="NewProfileNameText" TextChanged="NewProfileNameText_TextChanged"></TextBox>
                 <Button x:Name="SaveButton" Margin="0, 20, 0, 60" Click="SaveButton_Click">Create</Button>
             </StackPanel>
         </Grid>
