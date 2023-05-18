@@ -1020,10 +1020,17 @@ namespace winrt::YtFlowApp::implementation
             alpnQuery.value = alpn.c_str();
             queryList = &alpnQuery;
         }
-        auto const querystring = ComposeQuery(queryList);
-        if (!querystring.has_value())
+        std::optional<std::string> querystring;
+        UriTextRangeA queryRange{};
+        if (queryList != nullptr)
         {
-            return std::nullopt;
+            querystring = ComposeQuery(queryList);
+            if (!querystring.has_value())
+            {
+                return std::nullopt;
+            }
+            auto const &qs = querystring.value();
+            queryRange = {.first = qs.c_str(), .afterLast = qs.c_str() + qs.size()};
         }
         auto const escapedName = UriEscape(name);
 
@@ -1033,7 +1040,7 @@ namespace winrt::YtFlowApp::implementation
                                       .afterLast = reinterpret_cast<char const *>(password.data()) + password.size()},
                     .hostText = StringViewToUriTextRangeA(host),
                     .portText = StringViewToUriTextRangeA(port),
-                    .query = StringViewToUriTextRangeA(*querystring),
+                    .query = queryRange,
                     .fragment = StringViewToUriTextRangeA(escapedName.data())};
         return ComposeUri(uri);
     }
