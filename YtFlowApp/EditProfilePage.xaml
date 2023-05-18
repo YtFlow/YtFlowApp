@@ -206,6 +206,9 @@
                     <x:String>switch</x:String>
                     <x:String>system-resolver</x:String>
                     <x:String>tls-client</x:String>
+                    <x:String>tls-obfs-client</x:String>
+                    <x:String>vmess-client</x:String>
+                    <x:String>ws-client</x:String>
                     <x:String>trojan-client</x:String>
                     <x:String>vpn-tun</x:String>
                 </ComboBox>

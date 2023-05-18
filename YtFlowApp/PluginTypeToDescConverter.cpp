@@ -39,7 +39,10 @@ namespace winrt::YtFlowApp::implementation
         {L"tls-client", box_value(L"TLS client stream.")},
         {L"trojan-client", box_value(L"Trojan client. Note that TLS is not included. You will likely need to "
                                      L"connect this plugin to a TLS plugin.")},
+        {L"vmess-client", box_value(L"VMess client.")},
         {L"http-obfs-client", box_value(L"simple-obfs HTTP client.")},
+        {L"tls-obfs-client", box_value(L"simple-obfs TLS client.")},
+        {L"ws-client", box_value(L"WebSocket client.")},
         {L"redirect", box_value(L"Change the destination of connections or datagrams.")},
         {L"socket", box_value(L"Represents a system socket connection.")},
         {L"netif", box_value(L"A dynamic network interface.")}};
