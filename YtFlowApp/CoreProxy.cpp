@@ -554,7 +554,7 @@ namespace winrt::YtFlowApp::implementation
             auto const portDoc = m_linkDoc.at("port");
             if (portDoc.type() == nlohmann::json::value_t::string)
             {
-                auto const portOpt = ParsePort(uri.portText);
+                auto const portOpt = ParsePort(portDoc);
                 if (!portOpt.has_value())
                 {
                     return PluginDecodeResult::Fail;
@@ -599,7 +599,11 @@ namespace winrt::YtFlowApp::implementation
             if (m_linkDoc.at("net") == "ws")
             {
                 plugin.plugin = WS_PLUGIN_NAME;
-                std::string host = m_linkDoc.value("host", m_linkDoc.at("add")), path = m_linkDoc.value("path", "/");
+                std::string host = m_linkDoc.value("host", ""), path = m_linkDoc.value("path", "/");
+                if (host.empty())
+                {
+                    host = m_linkDoc.at("add");
+                }
                 plugin.param = nlohmann::json::to_cbor({{"host", std::move(host)},
                                                         {"path", std::move(path)},
                                                         {"headers", std::map<std::string, std::string>()},
