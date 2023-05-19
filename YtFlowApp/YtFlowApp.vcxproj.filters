@@ -37,6 +37,9 @@
     <Page Include="DynOutboundHomeWidget.xaml">
       <Filter>Controls\HomeWidget</Filter>
     </Page>
+    <Page Include="ForwardHomeWidget.xaml">
+      <Filter>Controls\HomeWidget</Filter>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Midl Include="App.idl" />
@@ -111,6 +114,15 @@
     </ClCompile>
     <ClCompile Include="DynOutboundProxyModel.cpp">
       <Filter>Models</Filter>
+    </ClCompile>
+    <ClCompile Include="HomePageHomeWidget.cpp">
+      <Filter>Pages</Filter>
+    </ClCompile>
+    <ClCompile Include="HomePageInit.cpp">
+      <Filter>Pages</Filter>
+    </ClCompile>
+    <ClCompile Include="HomePagePluginStatus.cpp">
+      <Filter>Pages</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

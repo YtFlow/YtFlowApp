@@ -173,6 +173,10 @@
       <DependentUpon>FirstTimePage.xaml</DependentUpon>
       <SubType>Code</SubType>
     </ClInclude>
+    <ClInclude Include="ForwardHomeWidget.h">
+      <DependentUpon>ForwardHomeWidget.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </ClInclude>
     <ClInclude Include="HomePage.h">
       <DependentUpon>HomePage.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -233,6 +237,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="FirstTimePage.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="ForwardHomeWidget.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Include="HomePage.xaml">
@@ -339,10 +346,17 @@
       <DependentUpon>FirstTimePage.xaml</DependentUpon>
       <SubType>Code</SubType>
     </ClCompile>
+    <ClCompile Include="ForwardHomeWidget.cpp">
+      <DependentUpon>ForwardHomeWidget.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </ClCompile>
     <ClCompile Include="HomePage.cpp">
       <DependentUpon>HomePage.xaml</DependentUpon>
       <SubType>Code</SubType>
     </ClCompile>
+    <ClCompile Include="HomePageInit.cpp" />
+    <ClCompile Include="HomePageHomeWidget.cpp" />
+    <ClCompile Include="HomePagePluginStatus.cpp" />
     <ClCompile Include="HomeProfileControl.cpp">
       <DependentUpon>HomeProfileControl.xaml</DependentUpon>
       <SubType>Code</SubType>
