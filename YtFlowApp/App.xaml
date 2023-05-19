@@ -20,6 +20,15 @@
                         <Setter Property="Foreground" Value="{ThemeResource SystemControlPageTextBaseMediumBrush}" />
                         <Setter Property="FontWeight" Value="Normal" />
                     </Style>
+                    <Style x:Key="PluginWidgetInfoColumnName" TargetType="TextBlock">
+                        <Setter Property="HorizontalAlignment" Value="Right" />
+                        <Setter Property="Margin" Value="0, 0, 0, 10" />
+                        <Setter Property="FontWeight" Value="SemiBold" />
+                    </Style>
+                    <Style x:Key="PluginWidgetInfoColumnContent" TargetType="TextBlock">
+                        <Setter Property="Foreground" Value="{ThemeResource SystemControlPageTextBaseMediumBrush}" />
+                        <Setter Property="IsTextSelectionEnabled" Value="True" />
+                    </Style>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>

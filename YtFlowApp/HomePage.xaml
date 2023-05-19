@@ -85,7 +85,7 @@
                     Orientation="Vertical"
                 >
                 </StackPanel>
-                <StackPanel x:Name="ConnectedViewSidePanel" Grid.Row="1" Grid.Column="0" />
+                <StackPanel x:Name="ConnectedViewSidePanel" Grid.Row="1" Grid.Column="0" Margin="0, 20, 0, 0" />
             </Grid>
 
 
@@ -196,6 +196,7 @@
                         <Setter Target="PluginWidgetPanel.(Grid.Row)" Value="1" />
                         <Setter Target="ConnectedViewSidePanel.(Grid.Row)" Value="1" />
                         <Setter Target="ConnectedViewSidePanel.(Grid.Column)" Value="1" />
+                        <Setter Target="ConnectedViewSidePanel.Margin" Value="8, 20, 0, 0" />
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>

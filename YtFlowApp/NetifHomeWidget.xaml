@@ -9,15 +9,6 @@
     mc:Ignorable="d">
 
     <UserControl.Resources>
-        <Style x:Key="InfoColumnName" TargetType="TextBlock">
-            <Setter Property="HorizontalAlignment" Value="Right" />
-            <Setter Property="Margin" Value="0, 0, 0, 10" />
-            <Setter Property="FontWeight" Value="SemiBold" />
-        </Style>
-        <Style x:Key="InfoColumnContent" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="{ThemeResource SystemControlPageTextBaseMediumBrush}" />
-            <Setter Property="IsTextSelectionEnabled" Value="True" />
-        </Style>
     </UserControl.Resources>
 
     <muxc:Expander
@@ -83,33 +74,33 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource InfoColumnName}" Text="Interface Name" />
+            <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource PluginWidgetInfoColumnName}" Text="Interface Name" />
             <TextBlock
                 x:Name="InterfaceNameText"
                 Grid.Row="0"
                 Grid.Column="2"
-                Style="{StaticResource InfoColumnContent}"
+                Style="{StaticResource PluginWidgetInfoColumnContent}"
             />
-            <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource InfoColumnName}" Text="IPv4 Address" />
+            <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource PluginWidgetInfoColumnName}" Text="IPv4 Address" />
             <TextBlock
                 x:Name="Ipv4AddrText"
                 Grid.Row="1"
                 Grid.Column="2"
-                Style="{StaticResource InfoColumnContent}"
+                Style="{StaticResource PluginWidgetInfoColumnContent}"
             />
-            <TextBlock Grid.Row="2" Grid.Column="0" Style="{StaticResource InfoColumnName}" Text="IPv6 Address" />
+            <TextBlock Grid.Row="2" Grid.Column="0" Style="{StaticResource PluginWidgetInfoColumnName}" Text="IPv6 Address" />
             <TextBlock
                 x:Name="Ipv6AddrText"
                 Grid.Row="2"
                 Grid.Column="2"
-                Style="{StaticResource InfoColumnContent}"
+                Style="{StaticResource PluginWidgetInfoColumnContent}"
             />
-            <TextBlock Grid.Row="3" Grid.Column="0" Style="{StaticResource InfoColumnName}" Text="DNS Servers" />
+            <TextBlock Grid.Row="3" Grid.Column="0" Style="{StaticResource PluginWidgetInfoColumnName}" Text="DNS Servers" />
             <TextBlock
                 x:Name="DnsText"
                 Grid.Row="3"
                 Grid.Column="2"
-                Style="{StaticResource InfoColumnContent}"
+                Style="{StaticResource PluginWidgetInfoColumnContent}"
             />
         </Grid>
     </muxc:Expander>

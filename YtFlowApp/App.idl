@@ -109,6 +109,11 @@ namespace YtFlowApp
         DynOutboundHomeWidget();
     }
 
+    [default_interface] runtimeclass ForwardHomeWidget : Windows.UI.Xaml.Controls.UserControl, IHomeWidget
+    {
+        ForwardHomeWidget();
+    }
+
     runtimeclass ProfileModel : Windows.UI.Xaml.Data.INotifyPropertyChanged
     {
         ProfileModel();

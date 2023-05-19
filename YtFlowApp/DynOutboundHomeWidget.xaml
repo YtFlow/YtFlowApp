@@ -13,15 +13,6 @@
     Loaded="UserControl_Loaded">
 
     <UserControl.Resources>
-        <Style x:Key="InfoColumnName" TargetType="TextBlock">
-            <Setter Property="HorizontalAlignment" Value="Right" />
-            <Setter Property="Margin" Value="0, 0, 0, 10" />
-            <Setter Property="FontWeight" Value="SemiBold" />
-        </Style>
-        <Style x:Key="InfoColumnContent" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="{ThemeResource SystemControlPageTextBaseMediumBrush}" />
-            <Setter Property="IsTextSelectionEnabled" Value="True" />
-        </Style>
         <Style x:Key="NavigationBackButtonNormalStyle" TargetType="Button">
             <Setter Property="Background" Value="{ThemeResource NavigationViewBackButtonBackground}" />
             <Setter Property="Foreground" Value="{ThemeResource NavigationViewItemForeground}" />
@@ -170,12 +161,12 @@
                     <RowDefinition />
                 </Grid.RowDefinitions>
 
-                <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource InfoColumnName}" Text="Current Proxy" />
+                <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource PluginWidgetInfoColumnName}" Text="Current Proxy" />
                 <TextBlock
                     x:Name="ProxyNameText"
                     Grid.Row="0"
                     Grid.Column="2"
-                    Style="{StaticResource InfoColumnContent}"
+                    Style="{StaticResource PluginWidgetInfoColumnContent}"
                 />
                 <Button
                     x:Name="SelectProxyButton"
