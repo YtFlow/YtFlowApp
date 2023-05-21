@@ -632,17 +632,26 @@ namespace winrt::YtFlowApp::implementation
             }
             // TODO: fingerprint
             nlohmann::json sniDoc = nullptr, alpnDoc = nullptr;
-            if (m_linkDoc.contains("alpn"))
+            auto const isWs = m_linkDoc.value("net", "tcp") == "ws";
+            if (m_linkDoc.at("alpn").get<std::string>().find("h2") != std::string::npos)
             {
-                if (m_linkDoc.at("alpn").get<std::string>().find("h2") != std::string::npos)
+                // WebSocket does not support h2 yet
+                if (isWs)
                 {
-                    // WebSocket does not support h2 yet
-                    if (m_linkDoc.value("net", "tcp") == "ws")
-                    {
-                        return PluginDecodeResult::Fail;
-                    }
+                    return PluginDecodeResult::Fail;
                 }
-                alpnDoc = ParseAlpn(m_linkDoc.at("alpn"));
+            }
+            alpnDoc = ParseAlpn(m_linkDoc.value("alpn", ""));
+            if (alpnDoc.empty())
+            {
+                if (isWs)
+                {
+                    alpnDoc = {"http/1.1"};
+                }
+                else
+                {
+                    alpnDoc = {"h2", "http/1.1"};
+                }
             }
             if (m_linkDoc.value("sni", "") != "")
             {
