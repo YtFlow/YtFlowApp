@@ -305,7 +305,7 @@ namespace winrt::YtFlowApp::implementation
                 "    \"plugin_version\": 0,"
                 "    \"param\": {"
                 "      \"fallback_tcp\": \"main-forward.tcp\","
-                "      \"fallback_udp\": \"main-forward.udp\","
+                "      \"fallback_udp\": \"fakeip-dns-server.udp_map_back.main-forward.udp\","
                 "      \"rules\": ["
                 "        {"
                 "          \"src\": {"
