@@ -10,6 +10,7 @@
 
     <muxc:Expander
         x:Name="MainExpander"
+        Margin="{ThemeResource PluginWidgetMargin}"
         IsExpanded="True"
         HorizontalAlignment="Stretch"
         HorizontalContentAlignment="Stretch"

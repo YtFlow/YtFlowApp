@@ -10,6 +10,7 @@
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
                 <ResourceDictionary>
                     <x:Double x:Key="MediumAdaptiveWidth">600</x:Double>
+                    <Thickness x:Key="PluginWidgetMargin">0, 0, 0, 8</Thickness>
                     <Thickness x:Key="PluginWidgetIconMargin">10, 25, 20, 25</Thickness>
                     <Style x:Key="PluginWidgetPluginNameStyle" TargetType="TextBlock">
                         <Setter Property="VerticalAlignment" Value="Bottom" />

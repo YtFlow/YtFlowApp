@@ -13,6 +13,7 @@
 
     <muxc:Expander
         x:Name="MainExpander"
+        Margin="{StaticResource PluginWidgetMargin}"
         HorizontalAlignment="Stretch"
         HorizontalContentAlignment="Stretch"
     >

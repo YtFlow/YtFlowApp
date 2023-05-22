@@ -9,8 +9,30 @@
     Loaded="UserControl_Loaded"
     Unloaded="UserControl_Unloaded">
 
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <Style TargetType="TextBlock" x:Key="MetricLabelStyle">
+                <Setter Property="FontSize" Value="13" />
+                <Setter Property="Foreground" Value="{ThemeResource SystemControlPageTextBaseMediumBrush}" />
+            </Style>
+            <Style TargetType="TextBlock" x:Key="MetricTextStyle">
+                <Setter Property="FontSize" Value="20" />
+            </Style>
+            <Style TargetType="StackPanel" x:Key="MetricContainerStyle">
+                <Setter Property="Orientation" Value="Horizontal" />
+            </Style>
+            <Style TargetType="FontIcon" x:Key="DirectionIconStyle">
+                <Setter Property="Margin" Value="0, 0, 4, 0" />
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="FontWeight" Value="Light" />
+                <Setter Property="Foreground" Value="{ThemeResource SystemAccentColorDark1}" />
+            </Style>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
     <Grid
         Padding="18"
+        Margin="{StaticResource PluginWidgetMargin}"
         Background="{ThemeResource LayerFillColorDefaultBrush}"
         CornerRadius="8"
         BorderThickness="1"
@@ -22,17 +44,59 @@
             <RowDefinition />
             <RowDefinition />
             <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*" />
-            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="3*" />
+            <ColumnDefinition Width="2*" />
         </Grid.ColumnDefinitions>
 
-        <TextBlock x:Name="PluginNameText" Grid.Row="0" Grid.ColumnSpan="2" Style="{ThemeResource SubheaderTextBlockStyle}" />
-        <TextBlock x:Name="UplinkText" Grid.Row="1" Grid.ColumnSpan="2" Text="0 B/s" />
-        <TextBlock x:Name="DownlinkText" Grid.Row="2" Grid.ColumnSpan="2" Text="0 B/s" />
-        <TextBlock x:Name="TcpCountText" Grid.Row="3" Grid.ColumnSpan="2" Text="0" />
-        <TextBlock x:Name="UdpCountText" Grid.Row="4" Grid.ColumnSpan="2" Text="0" />
+        <TextBlock x:Name="PluginNameText" Grid.Row="0" Grid.ColumnSpan="4" Margin="0, 0, 0, 8" Style="{ThemeResource BaseTextBlockStyle}" />
+        <TextBlock Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="2" HorizontalAlignment="Right" Text="forward" Foreground="{ThemeResource SystemColorControlAccentBrush}" />
+        <TextBlock Grid.Row="1" Grid.Column="1" Text="TCP" Style="{StaticResource MetricLabelStyle}" />
+        <TextBlock
+            x:Name="TcpCountText"
+            Grid.Row="2"
+            Grid.Column="1"
+            Text="0"
+            Style="{StaticResource MetricTextStyle}"
+            Margin="0, 0, 0, 4"
+            ToolTipService.ToolTip="Active TCP connections"
+        />
+        <TextBlock Grid.Row="3" Grid.Column="1" Text="UDP" Style="{StaticResource MetricLabelStyle}" />
+        <TextBlock
+            x:Name="UdpCountText"
+            Grid.Row="4"
+            Grid.Column="1"
+            Text="0"
+            Style="{StaticResource MetricTextStyle}"
+            ToolTipService.ToolTip="Active UDP relay sessions"
+        />
+        <StackPanel Grid.Row="1" Grid.Column="0" Style="{StaticResource MetricContainerStyle}">
+            <FontIcon Glyph="&#xEB11;" Style="{StaticResource DirectionIconStyle}" />
+            <TextBlock Text="Uplink" Style="{StaticResource MetricLabelStyle}" />
+        </StackPanel>
+        <TextBlock
+            x:Name="UplinkText"
+            Grid.Row="2"
+            Grid.Column="0"
+            Text="0 B/s"
+            Style="{StaticResource MetricTextStyle}"
+            ToolTipService.ToolTip="Average bytes sent within a period"
+        />
+        <StackPanel Grid.Row="3" Grid.Column="0" Style="{StaticResource MetricContainerStyle}">
+            <FontIcon Glyph="&#xEB0F;" Style="{StaticResource DirectionIconStyle}" />
+            <TextBlock Text="Downlink" Style="{StaticResource MetricLabelStyle}" />
+        </StackPanel>
+        <TextBlock
+            x:Name="DownlinkText"
+            Grid.Row="4"
+            Grid.Column="0"
+            Text="0 B/s"
+            Style="{StaticResource MetricTextStyle}"
+            ToolTipService.ToolTip="Average bytes received within a period"
+        />
     </Grid>
 </UserControl>
 

@@ -79,7 +79,10 @@ namespace winrt::YtFlowApp::implementation
                     {
                         throw std::runtime_error("Cannot subscribe when ForwardHomeWidget disposed");
                     }
-                    return rxcpp::observable<>::interval(1s).map([](auto) { return true; }).take_until(unfocus$);
+                    return rxcpp::observable<>::interval(1s)
+                        .map([](auto) { return true; })
+                        .subscribe_on(ObserveOnWinrtThreadPool())
+                        .take_until(unfocus$);
                 })
                 .subscribe_on(ObserveOnWinrtThreadPool())
                 .observe_on(ObserveOnDispatcher())
@@ -103,10 +106,16 @@ namespace winrt::YtFlowApp::implementation
                             self->TcpCountText().Text(to_hstring(stat.tcp_connections));
                             self->UdpCountText().Text(to_hstring(stat.udp_sessions));
                             auto const timespan = now - *lastTimestamp;
+                            hstring uplinkText, downlinkText;
                             if (timespan > 3s)
                             {
-                                self->UplinkText().Text(HumanizeByteSpeed(0));
-                                self->DownlinkText().Text(HumanizeByteSpeed(0));
+                                uplinkText = HumanizeByteSpeed(0);
+                                downlinkText = HumanizeByteSpeed(0);
+                            }
+                            else if (timespan < 1005ms)
+                            {
+                                uplinkText = HumanizeByteSpeed(stat.uplink_written - lastStat->uplink_written);
+                                downlinkText = HumanizeByteSpeed(stat.downlink_written - lastStat->downlink_written);
                             }
                             else
                             {
@@ -114,11 +123,13 @@ namespace winrt::YtFlowApp::implementation
                                     static_cast<double>(
                                         std::chrono::duration_cast<std::chrono::milliseconds>(timespan).count()) /
                                     1000;
-                                self->UplinkText().Text(HumanizeByteSpeed(
-                                    static_cast<uint64_t>((stat.uplink_written - lastStat->uplink_written) / scale)));
-                                self->DownlinkText().Text(HumanizeByteSpeed(static_cast<uint64_t>(
-                                    (stat.downlink_written - lastStat->downlink_written) / scale)));
+                                uplinkText = HumanizeByteSpeed(
+                                    static_cast<uint64_t>((stat.uplink_written - lastStat->uplink_written) / scale));
+                                downlinkText = HumanizeByteSpeed(static_cast<uint64_t>(
+                                    (stat.downlink_written - lastStat->downlink_written) / scale));
                             }
+                            self->UplinkText().Text(uplinkText);
+                            self->DownlinkText().Text(downlinkText);
                             *lastStat = stat;
                             *lastTimestamp = now;
                         }
@@ -135,7 +146,7 @@ namespace winrt::YtFlowApp::implementation
                                 std::rethrow_exception(ex);
                             }
                         }
-                        catch (...) 
+                        catch (...)
                         {
                             NotifyException(L"ForwardHomeWidget Stat subscribe error");
                         }
