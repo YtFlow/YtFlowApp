@@ -76,6 +76,10 @@ namespace YtFlowApp
             get;
         };
     }
+    [default_interface] runtimeclass AboutPage : Windows.UI.Xaml.Controls.Page
+    {
+        AboutPage();
+    }
 
     [default_interface] runtimeclass HomeProfileControl : Windows.UI.Xaml.Controls.UserControl
     {

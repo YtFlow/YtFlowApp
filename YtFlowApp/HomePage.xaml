@@ -53,7 +53,7 @@
                     Grid.ColumnSpan="2"
                     Padding="18"
                     Background="{ThemeResource LayerFillColorDefaultBrush}"
-                    CornerRadius="8"
+                    CornerRadius="{StaticResource AppControlCornerRadius}"
                     BorderThickness="1"
                     BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                 >
@@ -112,7 +112,7 @@
                             <local:HomeProfileControl
                                 VerticalAlignment="Stretch"
                                 HorizontalAlignment="Stretch"
-                                Margin="0, 0, 0, 16"
+                                Margin="0, 0, 0, 4"
                                 Profile="{x:Bind}"
                                 ConnectRequested="OnConnectRequested"
                                 EditRequested="OnEditRequested"
@@ -131,9 +131,15 @@
                     x:Name="SidePanel"
                     Grid.Row="1"
                     Grid.Column="0"
-                    Margin="14, 0, 16, 0"
+                    Margin="14, 8, 16, 0"
                 >
-                    <TextBlock Style="{ThemeResource SubtitleTextBlockStyle}" Margin="4, 0, 0, 16">Add a Profile</TextBlock>
+                    <TextBlock
+                        x:Name="AddProfileLabel"
+                        Style="{ThemeResource SubtitleTextBlockStyle}"
+                        Margin="4, 0, 0, 16"
+                    >
+                        Add a Profile
+                    </TextBlock>
                     <Button HorizontalAlignment="Stretch" Click="CreateProfileButton_Click" Height="48">
                         <StackPanel Orientation="Horizontal">
                             <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE7B8;" />

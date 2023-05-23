@@ -39,13 +39,8 @@
         >
             <muxc:NavigationView.MenuItems>
                 <muxc:NavigationViewItem Icon="Home" Content="Home" Tag="home" />
-                <!-- muxc:NavigationViewItem Icon="Library" Content="Assets"/ -->
                 <muxc:NavigationViewItem Icon="Library" Content="Assets" Tag="library" />
-                <muxc:NavigationViewItem Icon="Repair" Content="Tools">
-                    <muxc:NavigationViewItem.MenuItems>
-                        <muxc:NavigationViewItem Icon="Help" Content="About" />
-                    </muxc:NavigationViewItem.MenuItems>
-                </muxc:NavigationViewItem>
+                <muxc:NavigationViewItem Icon="Setting" Content="About" Tag="about" />
             </muxc:NavigationView.MenuItems>
             <Grid>
                 <Frame x:Name="ContentFrame" CacheSize="20" Navigated="ContentFrame_Navigated">
@@ -54,7 +49,7 @@
                                 VerticalAlignment="Top" 
                                 HorizontalAlignment="Left" 
                                 Margin="16"
-                                CornerRadius="8"
+                                CornerRadius="{StaticResource AppControlCornerRadius}"
                                 BorderThickness="1"
                                 BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
                             <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center">Content here!</TextBlock>

@@ -1,0 +1,128 @@
+﻿<Page
+    x:Class="YtFlowApp.AboutPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:YtFlowApp"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    NavigationCacheMode="Enabled"
+    Loaded="Page_Loaded">
+    <Page.Resources>
+        <Style TargetType="Grid" x:Key="AboutItemContainerStyle">
+            <Setter Property="Padding" Value="18" />
+            <Setter Property="Background" Value="{ThemeResource LayerFillColorDefaultBrush}" />
+            <Setter Property="CornerRadius" Value="{StaticResource AppControlCornerRadius}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}" />
+            <Setter Property="Margin" Value="0, 0, 0, 4" />
+        </Style>
+        <Style TargetType="TextBlock" x:Key="AboutItemValueStyle">
+            <Setter Property="Foreground" Value="{ThemeResource SystemControlPageTextBaseMediumBrush}" />
+        </Style>
+    </Page.Resources>
+
+    <ScrollViewer x:Name="MainScrollViewer" Margin="16, 0, 16, 0">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition x:Name="SideColumn" Width="0" />
+            </Grid.ColumnDefinitions>
+            <ContentControl
+                x:Name="HeaderControl"
+                Grid.Row="0"
+                Grid.ColumnSpan="2"
+                Margin="0, 0, 0, 16"
+                Style="{ThemeResource NavigationViewTitleHeaderContentControlTextStyle}"
+                Height="48"
+            >
+                About
+            </ContentControl>
+
+            <StackPanel x:Name="SidePanel" Grid.Row="2">
+                <Image
+                    Source="ms-appx:///Assets/Square150x150Logo.png"
+                    HorizontalAlignment="Center"
+                    Width="150"
+                />
+                <TextBlock
+                    Text="© YtFlow contributors"
+                    Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
+                    HorizontalAlignment="Center"
+                />
+                <TextBlock 
+                    Text="Logo by annoymous-hentai"
+                    Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
+                    HorizontalAlignment="Center"
+                />
+            </StackPanel>
+            <StackPanel x:Name="MainPanel" Grid.Row="1">
+                <Grid Style="{StaticResource AboutItemContainerStyle}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Grid.Row="0" Text="YtFlow" />
+                    <TextBlock x:Name="PackageVersionText" Grid.Column="0" Grid.Row="1" Style="{StaticResource AboutItemValueStyle}" />
+                    <HyperlinkButton
+                        Grid.Column="1"
+                        Grid.RowSpan="2"
+                        NavigateUri="https://github.com/YtFlow/YtFlowApp/tree/next"
+                        Content="View on GitHub"
+                    />
+                </Grid>
+                <Grid Style="{StaticResource AboutItemContainerStyle}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Grid.Row="0" Text="YtFlowCore" />
+                    <TextBlock x:Name="CoreVersionText" Grid.Column="0" Grid.Row="1" Style="{StaticResource AboutItemValueStyle}" />
+                    <HyperlinkButton
+                        Grid.Column="1"
+                        Grid.RowSpan="2"
+                        NavigateUri="https://github.com/YtFlow/YtFlowCore"
+                        Content="View on GitHub"
+                    />
+                </Grid>
+                <Button Content="Third-Party Licenses..." Margin="0, 16, 0, 0" Click="LicenseButton_Click" />
+            </StackPanel>
+        </Grid>
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup>
+                <VisualState>
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="{StaticResource MediumAdaptiveWidth}" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="HeaderControl.Margin" Value="12, 44, 0, 0" />
+                        <Setter Target="HeaderControl.Height" Value="80" />
+                        <Setter Target="SideColumn.Width" Value="200" />
+                        <Setter Target="SidePanel.(Grid.Column)" Value="1" />
+                        <Setter Target="SidePanel.(Grid.ColumnSpan)" Value="1" />
+                        <Setter Target="SidePanel.(Grid.Row)" Value="1" />
+                        <Setter Target="MainPanel.(Grid.Column)" Value="0" />
+                        <Setter Target="MainPanel.(Grid.ColumnSpan)" Value="1" />
+                        <Setter Target="MainPanel.(Grid.Row)" Value="1" />
+                        <Setter Target="MainPanel.Margin" Value="0, 0, 16, 0" />
+                        <Setter Target="MainScrollViewer.Margin" Value="40, 0, 40, 0" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+    </ScrollViewer>
+</Page>
+

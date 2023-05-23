@@ -34,18 +34,18 @@
         Padding="18"
         Margin="{StaticResource PluginWidgetMargin}"
         Background="{ThemeResource LayerFillColorDefaultBrush}"
-        CornerRadius="8"
+        CornerRadius="{StaticResource AppControlCornerRadius}"
         BorderThickness="1"
         BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
     >
         <Grid.RowDefinitions>
-            <RowDefinition />
-            <RowDefinition />
-            <RowDefinition />
-            <RowDefinition />
-            <RowDefinition />
-            <RowDefinition />
-            <RowDefinition />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="3*" />

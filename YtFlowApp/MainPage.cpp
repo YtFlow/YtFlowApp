@@ -1,6 +1,8 @@
 ﻿#include "pch.h"
 #include "MainPage.h"
 #include "MainPage.g.cpp"
+
+#include "ConnectionState.h"
 #include "WinrtScheduler.h"
 
 #include <winrt/Windows.System.Profile.h>
@@ -17,6 +19,11 @@ namespace muxc = winrt::Microsoft::UI::Xaml::Controls;
 
 namespace winrt::YtFlowApp::implementation
 {
+    std::vector<std::pair<std::wstring, Windows::UI::Xaml::Interop::TypeName>> MainPage::m_pages = {
+        {L"home", xaml_typename<YtFlowApp::HomePage>()},
+        {L"library", xaml_typename<YtFlowApp::LibraryPage>()},
+        {L"about", xaml_typename<YtFlowApp::AboutPage>()}};
+
     MainPage::MainPage()
     {
         InitializeComponent();

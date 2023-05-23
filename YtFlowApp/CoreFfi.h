@@ -157,4 +157,5 @@ namespace winrt::YtFlowApp::implementation
         ytflow_core::Database *db_ptr{nullptr};
     };
     inline FfiDb FfiDbInstance;
+    std::string GetYtFlowCoreVersion();
 }

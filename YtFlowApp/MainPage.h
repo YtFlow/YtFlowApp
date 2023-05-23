@@ -1,8 +1,5 @@
 ﻿#pragma once
 
-#include "ConnectionState.h"
-#include "HomePage.h"
-#include "LibraryPage.h"
 #include "MainPage.g.h"
 
 using namespace winrt::Windows::ApplicationModel::Core;
@@ -43,8 +40,7 @@ namespace winrt::YtFlowApp::implementation
 
       private:
         // Vector of std::pair holding the Navigation Tag and the relative Navigation Page.
-        inline static std::vector<std::pair<std::wstring, Windows::UI::Xaml::Interop::TypeName>> m_pages = {
-            {L"home", xaml_typename<YtFlowApp::HomePage>()}, {L"library", xaml_typename<YtFlowApp::LibraryPage>()}};
+        static std::vector<std::pair<std::wstring, Windows::UI::Xaml::Interop::TypeName>> m_pages;
 
         void SubscribeConnectionChanges();
         void UnsubscribeConnectionChanges();

@@ -215,4 +215,8 @@ namespace winrt::YtFlowApp::implementation
             unwrap_ffi_result<FfiNoop>(ytflow_core::ytflow_db_conn_free(conn_ptr));
         }
     }
+    std::string GetYtFlowCoreVersion()
+    {
+        return std::string(ytflow_core::ytflow_get_version());
+    }
 }

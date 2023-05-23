@@ -40,6 +40,9 @@
     <Page Include="ForwardHomeWidget.xaml">
       <Filter>Controls\HomeWidget</Filter>
     </Page>
+    <Page Include="AboutPage.xaml">
+      <Filter>Pages</Filter>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Midl Include="App.idl" />
@@ -402,5 +405,9 @@
     <None Include="Package.StoreAssociation.xml" />
     <None Include="Directory.Build.props" />
     <None Include="Directory.Build.targets" />
+    <None Include="YtFlowApp_TemporaryKey.pfx" />
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="third_party.txt" />
   </ItemGroup>
 </Project>

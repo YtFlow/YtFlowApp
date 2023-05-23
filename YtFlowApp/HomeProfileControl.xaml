@@ -10,7 +10,7 @@
 
     <Grid
         Background="{ThemeResource LayerFillColorDefaultBrush}"
-        CornerRadius="8"
+        CornerRadius="{StaticResource AppControlCornerRadius}"
         BorderThickness="1"
         BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
     >

@@ -22,11 +22,12 @@
         </muxc:TreeView -->
         <ScrollViewer
             x:Name="AssetView"
-            Margin="40, 0, 0, 0"
+            Margin="16, 0, 0, 0"
         >
             <StackPanel Margin="0, 0, 80, 0">
                 <ContentControl
-                    Margin="0, 44, 0, 44"
+                    x:Name="HeaderControl"
+                    Margin="0, 0, 0, 44"
                     Style="{ThemeResource NavigationViewTitleHeaderContentControlTextStyle}"
                 >
                     Asset Library
@@ -288,6 +289,8 @@
                     </VisualState.StateTriggers>
 
                     <VisualState.Setters>
+                        <Setter Target="HeaderControl.Margin" Value="0, 44, 0, 44" />
+                        <Setter Target="AssetView.Margin" Value="40, 0, 0, 0" />
                         <!-- Setter Target="WideLeftColumn.Width" Value="200" / -->
                         <!-- Setter Target="ProxyGroupView.(Grid.Column)" Value="1" / -->
                         <!-- Setter Target="AssetView.(Grid.Column)" Value="1" / -->
