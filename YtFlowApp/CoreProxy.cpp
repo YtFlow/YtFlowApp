@@ -473,7 +473,13 @@ namespace winrt::YtFlowApp::implementation
 
         try
         {
-            std::string userinfo = base64_decode(UriUnescape(std::string(uri.hostText)));
+            std::string jsonText(uri.hostText);
+            for (auto const pathSegment : uri.pathSegments)
+            {
+                jsonText += "/";
+                jsonText += pathSegment;
+            }
+            std::string userinfo = base64_decode(std::move(jsonText));
             m_linkDoc = nlohmann::json::parse(std::move(userinfo));
             if (!m_linkDoc.contains("v") || (m_linkDoc.at("v") != 2 && m_linkDoc.at("v") != "2"))
             {
@@ -508,6 +514,11 @@ namespace winrt::YtFlowApp::implementation
         uint16_t alterId;
         try
         {
+            auto const enableVlessDoc = m_linkDoc.value("enable_vless", nlohmann::json{nullptr});
+            if (enableVlessDoc == true || enableVlessDoc == "true")
+            {
+                return PluginDecodeResult::Fail;
+            }
             uid = m_linkDoc.at("id");
             security = m_linkDoc.value("scy", "auto");
             if (security == "zero")
@@ -524,7 +535,8 @@ namespace winrt::YtFlowApp::implementation
                     return PluginDecodeResult::Fail;
                 }
             }
-            else if (aidDoc.type() == nlohmann::json::value_t::number_integer)
+            else if (aidDoc.type() == nlohmann::json::value_t::number_integer ||
+                     aidDoc.type() == nlohmann::json::value_t::number_unsigned)
             {
                 alterId = aidDoc;
             }
@@ -629,6 +641,11 @@ namespace winrt::YtFlowApp::implementation
             if (m_linkDoc.value("tls", "") != "tls")
             {
                 return PluginDecodeResult::Ignore;
+            }
+            auto const enableXtlsDoc = m_linkDoc.value("enable_xtls", nlohmann::json{nullptr});
+            if (enableXtlsDoc == true || enableXtlsDoc == "true")
+            {
+                return PluginDecodeResult::Fail;
             }
             // TODO: fingerprint
             nlohmann::json sniDoc = nullptr, alpnDoc = nullptr;
