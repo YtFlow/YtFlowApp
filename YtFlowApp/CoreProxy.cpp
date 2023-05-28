@@ -473,13 +473,13 @@ namespace winrt::YtFlowApp::implementation
 
         try
         {
-            std::string jsonText(uri.hostText);
+            std::string b64Text(uri.hostText);
             for (auto const pathSegment : uri.pathSegments)
             {
-                jsonText += "/";
-                jsonText += pathSegment;
+                b64Text += "/";
+                b64Text += pathSegment;
             }
-            std::string userinfo = base64_decode(std::move(jsonText));
+            std::string userinfo = base64_decode(std::move(b64Text));
             m_linkDoc = nlohmann::json::parse(std::move(userinfo));
             if (!m_linkDoc.contains("v") || (m_linkDoc.at("v") != 2 && m_linkDoc.at("v") != "2"))
             {
@@ -600,7 +600,8 @@ namespace winrt::YtFlowApp::implementation
         }
         try
         {
-            if (m_linkDoc.contains("type") && m_linkDoc.at("type") != "none" && m_linkDoc.at("type") != "")
+            auto const typeDoc = m_linkDoc.value("type", "");
+            if (typeDoc != "none" && typeDoc != "vmess" && m_linkDoc.at("type") != "")
             {
                 return PluginDecodeResult::Fail;
             }
