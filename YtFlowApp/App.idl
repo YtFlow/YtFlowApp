@@ -98,6 +98,19 @@ namespace YtFlowApp
         event Windows.Foundation.EventHandler<HomeProfileControl> DeleteRequested;
     }
 
+    [default_interface] runtimeclass NewProfileRulesetControl : Windows.UI.Xaml.Controls.ContentDialog
+    {
+        NewProfileRulesetControl();
+        Boolean RulesetSelected
+        {
+            get;
+        };
+        String RulesetName
+        {
+            get;
+        };
+    }
+
     [default_interface] runtimeclass NetifHomeWidget : Windows.UI.Xaml.Controls.UserControl, IHomeWidget
     {
         NetifHomeWidget();

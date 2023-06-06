@@ -203,6 +203,60 @@ namespace winrt::YtFlowApp::implementation
         unwrap_ffi_result<FfiNoop>(
             ytflow_core::ytflow_proxy_reorder(proxyGroupId, rangeStartOrder, rangeEndOrder, moves, conn_ptr));
     }
+    std::vector<FfiResource> FfiConn::GetResources() &
+    {
+        std::lock_guard _guard(conn_mu);
+        return unwrap_ffi_buffer<std::vector<FfiResource>>(ytflow_core::ytflow_resource_get_all(conn_ptr));
+    }
+    void FfiConn::DeleteResource(uint32_t resourceId) &
+    {
+        std::lock_guard _guard(conn_mu);
+        unwrap_ffi_result<FfiNoop>(ytflow_core::ytflow_resource_delete(resourceId, conn_ptr));
+    }
+    uint32_t FfiConn::CreateResourceWithUrl(char const *key, char const *type, char const *local_file,
+                                            char const *url) &
+    {
+        std::lock_guard _guard(conn_mu);
+        const auto [ptrRaw, metaRaw] = unwrap_ffi_result<FfiNoop>(
+            ytflow_core::ytflow_resource_create_with_url(key, type, local_file, url, conn_ptr));
+        return (uint32_t)((uintptr_t)ptrRaw & 0xFFFFFFFF);
+    }
+    uint32_t FfiConn::CreateResourceWithGitHubRelease(char const *key, char const *type, char const *local_file,
+                                                      char const *github_username, char const *github_repo,
+                                                      char const *asset_name) &
+    {
+        std::lock_guard _guard(conn_mu);
+        const auto [ptrRaw, metaRaw] =
+            unwrap_ffi_result<FfiNoop>(ytflow_core::ytflow_resource_create_with_github_release(
+                key, type, local_file, github_username, github_repo, asset_name, conn_ptr));
+        return (uint32_t)((uintptr_t)ptrRaw & 0xFFFFFFFF);
+    }
+    FfiResourceUrl FfiConn::GetResourceUrlByResourceId(uint32_t resourceId) &
+    {
+        std::lock_guard _guard(conn_mu);
+        return unwrap_ffi_buffer<FfiResourceUrl>(
+            ytflow_core::ytflow_resource_url_query_by_resource_id(resourceId, conn_ptr));
+    }
+    void FfiConn::UpdateResourceUrlRetrievedByResourceId(uint32_t resourceId, char const *etag,
+                                                         char const *lastModified) &
+    {
+        std::lock_guard _guard(conn_mu);
+        unwrap_ffi_result<FfiNoop>(
+            ytflow_core::ytflow_resource_url_update_retrieved_by_resource_id(resourceId, etag, lastModified, conn_ptr));
+    }
+    FfiResourceGitHubRelease FfiConn::GetResourceGitHubReleaseByResourceId(uint32_t resourceId) &
+    {
+        std::lock_guard _guard(conn_mu);
+        return unwrap_ffi_buffer<FfiResourceGitHubRelease>(
+            ytflow_core::ytflow_resource_github_release_query_by_resource_id(resourceId, conn_ptr));
+    }
+    void FfiConn::UpdateResourceGitHubReleaseRetrievedByResourceId(uint32_t resourceId, char const *gitTag,
+                                                                   char const *releaseTitle) &
+    {
+        std::lock_guard _guard(conn_mu);
+        unwrap_ffi_result<FfiNoop>(ytflow_core::ytflow_resource_github_release_update_retrieved_by_resource_id(
+            resourceId, gitTag, releaseTitle, conn_ptr));
+    }
 
     FfiConn FfiConn::from_ffi(void *ptr1, uintptr_t)
     {

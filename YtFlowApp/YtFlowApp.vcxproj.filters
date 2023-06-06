@@ -43,6 +43,9 @@
     <Page Include="AboutPage.xaml">
       <Filter>Pages</Filter>
     </Page>
+    <Page Include="NewProfileRulesetControl.xaml">
+      <Filter>Controls</Filter>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Midl Include="App.idl" />
@@ -406,8 +409,5 @@
     <None Include="Directory.Build.props" />
     <None Include="Directory.Build.targets" />
     <None Include="YtFlowApp_TemporaryKey.pfx" />
-  </ItemGroup>
-  <ItemGroup>
-    <CopyFileToFolders Include="third_party.txt" />
   </ItemGroup>
 </Project>

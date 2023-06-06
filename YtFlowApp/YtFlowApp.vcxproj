@@ -202,6 +202,10 @@
       <DependentUpon>NewProfilePage.xaml</DependentUpon>
       <SubType>Code</SubType>
     </ClInclude>
+    <ClInclude Include="NewProfileRulesetControl.h">
+      <DependentUpon>NewProfileRulesetControl.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </ClInclude>
     <ClInclude Include="pch.h" />
     <ClInclude Include="App.h">
       <DependentUpon>App.xaml</DependentUpon>
@@ -266,6 +270,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="NewProfilePage.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="NewProfileRulesetControl.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Include="RawEditorPage.xaml">
@@ -386,6 +393,10 @@
     </ClCompile>
     <ClCompile Include="NewProfilePage.cpp">
       <DependentUpon>NewProfilePage.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </ClCompile>
+    <ClCompile Include="NewProfileRulesetControl.cpp">
+      <DependentUpon>NewProfileRulesetControl.xaml</DependentUpon>
       <SubType>Code</SubType>
     </ClCompile>
     <ClCompile Include="PluginModel.cpp" />

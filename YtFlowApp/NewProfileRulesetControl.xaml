@@ -1,0 +1,43 @@
+﻿<ContentDialog
+    x:Class="YtFlowApp.NewProfileRulesetControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:YtFlowApp"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    xmlns:contract7Present="http://schemas.microsoft.com/winfx/2006/xaml/presentation?IsApiContractPresent(Windows.Foundation.UniversalApiContract,7)"
+    xmlns:contract7NotPresent="http://schemas.microsoft.com/winfx/2006/xaml/presentation?IsApiContractNotPresent(Windows.Foundation.UniversalApiContract,7)"
+    Title="Select Ruleset"
+    PrimaryButtonText="Select"
+    IsPrimaryButtonEnabled="False"
+    contract7NotPresent:SecondaryButtonText="Close"
+    Opened="ContentDialog_Opened"
+    Closing="ContentDialog_Closing"
+>
+    <contract7Present:ContentDialog.SecondaryButtonCommand>
+        <contract7Present:StandardUICommand Kind="Close"/>
+    </contract7Present:ContentDialog.SecondaryButtonCommand>
+
+    <StackPanel>
+        <ComboBox x:Name="SelectionComboBox" SelectedIndex="0" Width="300">
+            <ComboBoxItem Tag="dreamacro">GeoIP Country (Dreamacro/maxmind-geoip)</ComboBoxItem>
+            <ComboBoxItem Tag="loyalsoldier">Enhanced GeoIP (only CN, private) (Loyalsoldier/geoip)</ComboBoxItem>
+        </ComboBox>
+        <StackPanel Orientation="Horizontal" Margin="0, 8, 0, 8">
+            <TextBlock Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}">Last update:</TextBlock>
+            <TextBlock x:Name="LastUpdatedText" Margin="4, 0, 0, 0" Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}" />
+        </StackPanel>
+        <ProgressBar x:Name="UpdateProgressBar" Visibility="Collapsed" />
+        <Button x:Name="UpdateButton" Margin="0, 4, 0, 4" IsEnabled="False" Click="UpdateButton_Click">Update</Button>
+        <Button x:Name="CancelUpdateButton" Visibility="Collapsed" Margin="0, 4, 0, 0" Click="CancelUpdateButton_Click">Cancel</Button>
+        <TextBlock
+            x:Name="UpdateErrorText"
+            MaxHeight="50"
+            Width="300"
+            IsTextSelectionEnabled="True"
+            Foreground="{ThemeResource SystemControlErrorTextForegroundBrush}"
+        />
+    </StackPanel>
+</ContentDialog>
+

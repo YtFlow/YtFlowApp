@@ -93,6 +93,82 @@ namespace winrt::YtFlowApp::implementation
         uint16_t proxy_version{0};
     };
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(FfiProxy, id, name, order_num, proxy, proxy_version)
+    struct FfiResource
+    {
+        uint32_t id{};
+        std::string key;
+        std::string type;
+        std::string local_file;
+        std::string remote_type;
+    };
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(FfiResource, id, key, type, local_file, remote_type)
+    struct FfiResourceUrl
+    {
+        uint32_t id{};
+        std::string url;
+        std::optional<std::string> etag;
+        std::optional<std::string> last_modified;
+        std::optional<std::string> retrieved_at;
+    };
+    inline void from_json(nlohmann::json const &json, FfiResourceUrl &r)
+    {
+        json.at("id").get_to(r.id);
+        json.at("url").get_to(r.url);
+        if (!json.contains("retrieved_at") || json.at("retrieved_at") == nullptr)
+        {
+            return;
+        }
+        if (nlohmann::json const etagDoc = json.value("etag", nlohmann::json{nullptr}); etagDoc != nullptr)
+        {
+            r.etag = {etagDoc.get<std::string>()};
+        }
+        if (nlohmann::json const lastModifiedDoc = json.value("last_modified", nlohmann::json{nullptr});
+            lastModifiedDoc != nullptr)
+        {
+            r.last_modified = {lastModifiedDoc.get<std::string>()};
+        }
+        if (nlohmann::json const retrievedAtDoc = json.value("retrieved_at", nlohmann::json{nullptr});
+            retrievedAtDoc != nullptr)
+        {
+            r.retrieved_at = {retrievedAtDoc.get<std::string>()};
+        }
+    }
+    struct FfiResourceGitHubRelease
+    {
+        uint32_t id{};
+        std::string github_username;
+        std::string github_repo;
+        std::string asset_name;
+        std::optional<std::string> git_tag;
+        std::optional<std::string> release_title;
+        std::optional<std::string> retrieved_at;
+    };
+    inline void from_json(nlohmann::json const &json, FfiResourceGitHubRelease &r)
+    {
+        json.at("id").get_to(r.id);
+        json.at("github_username").get_to(r.github_username);
+        json.at("github_repo").get_to(r.github_repo);
+        json.at("asset_name").get_to(r.asset_name);
+        if (!json.contains("retrieved_at") || json.at("retrieved_at") == nullptr)
+        {
+            return;
+        }
+        if (nlohmann::json const gitTagDoc = json.value("git_tag", nlohmann::json{nullptr}); gitTagDoc != nullptr)
+        {
+            r.git_tag = {gitTagDoc.get<std::string>()};
+        }
+        if (nlohmann::json const releaseTitleDoc = json.value("release_title", nlohmann::json{nullptr});
+            releaseTitleDoc != nullptr)
+        {
+            r.release_title = {releaseTitleDoc.get<std::string>()};
+        }
+        if (nlohmann::json const retrievedAtDoc = json.value("retrieved_at", nlohmann::json{nullptr});
+            retrievedAtDoc != nullptr)
+        {
+            r.retrieved_at = {retrievedAtDoc.get<std::string>()};
+        }
+    }
+
     struct FfiConn final
     {
         FfiConn(ytflow_core::Connection *conn) noexcept : conn_ptr(conn)
@@ -127,6 +203,17 @@ namespace winrt::YtFlowApp::implementation
                          uint16_t proxyVersion) &;
         void DeleteProxy(uint32_t proxyId) &;
         void ReorderProxy(uint32_t proxyGroupId, int32_t rangeStartOrder, int32_t rangeEndOrder, int32_t moves) &;
+        std::vector<FfiResource> GetResources() &;
+        void DeleteResource(uint32_t resourceId) &;
+        uint32_t CreateResourceWithUrl(char const *key, char const *type, char const *local_file, char const *url) &;
+        uint32_t CreateResourceWithGitHubRelease(char const *key, char const *type, char const *local_file,
+                                                 char const *github_username, char const *github_repo,
+                                                 char const *asset_name) &;
+        FfiResourceUrl GetResourceUrlByResourceId(uint32_t resourceId) &;
+        void UpdateResourceUrlRetrievedByResourceId(uint32_t resourceId, char const *etag, char const *lastModified) &;
+        FfiResourceGitHubRelease GetResourceGitHubReleaseByResourceId(uint32_t resourceId) &;
+        void UpdateResourceGitHubReleaseRetrievedByResourceId(uint32_t resourceId, char const *gitTag,
+                                                              char const *releaseTitle) &;
 
         static FfiConn from_ffi(void *ptr1, uintptr_t);
         ~FfiConn();

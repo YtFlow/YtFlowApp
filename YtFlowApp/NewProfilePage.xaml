@@ -53,7 +53,8 @@
                 <TextBlock Margin="{StaticResource SubheaderMargin}" Style="{ThemeResource BaseTextBlockStyle}">
                     Inbound mode
                 </TextBlock>
-                <RadioButton GroupName="InboundModeGroup" IsChecked="True">UWP VPN, Fake IP range</RadioButton>
+                <RadioButton GroupName="InboundModeGroup" IsChecked="True" Tag="fake">UWP VPN, Fake IP range</RadioButton>
+                <RadioButton GroupName="InboundModeGroup" Tag="full">UWP VPN, Full IP range</RadioButton>
                 <TextBlock Margin="{StaticResource SubheaderMargin}" Style="{ThemeResource BaseTextBlockStyle}">
                     Additional Inbound ports
                 </TextBlock>
@@ -69,7 +70,32 @@
                 <TextBlock Margin="{StaticResource SubheaderMargin}" Style="{ThemeResource BaseTextBlockStyle}">
                     Split Routing
                 </TextBlock>
-                <RadioButton GroupName="SplitRoutingTypeGroup" IsChecked="True">All Proxy</RadioButton>
+                <RadioButton x:Name="AllProxyButton" Tag="all" GroupName="SplitRoutingTypeGroup" IsChecked="True">All Proxy</RadioButton>
+                <RadioButton x:Name="WhitelistButton" Tag="whitelist" GroupName="SplitRoutingTypeGroup">Proxy all but CN</RadioButton>
+                <TextBlock Margin="0, 4, 0, 8" TextWrapping="Wrap" Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}">
+                    Connection requests to Chinese websites are handled by direct forwarder. All remaining connections are handled by proxy forwarder. Also called whitelist mode.
+                </TextBlock>
+                <!-- RadioButton GroupName="SplitRoutingTypeGroup">Proxy non-CN only</RadioButton>
+                <TextBlock Margin="0, 4, 0, 8" TextWrapping="Wrap" Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}">
+                    Connection requests to known, overseas websites are handled by proxy forwarder. All remaining connections are handled by direct forwarder. Also called blacklist mode.
+                </TextBlock -->
+                <RadioButton x:Name="OverseasButton" Tag="overseas" GroupName="SplitRoutingTypeGroup">Proxy CN only</RadioButton>
+                <TextBlock Margin="0, 4, 0, 8" TextWrapping="Wrap" Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}">
+                    Connection requests to Chinese websites are handled by proxy forwarder. All remaining connections are handled by direct forwarder. Suitable for overseas users.
+                </TextBlock>
+                <TextBlock Margin="{StaticResource SubheaderMargin}" Style="{ThemeResource BaseTextBlockStyle}">
+                    Ruleset
+                </TextBlock>
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="Select..." Click="SelectRulesetButton_Click" />
+                    <TextBlock x:Name="SelectedRulesetNameText" Margin="8, 0, 0, 0" />
+                </StackPanel>
+                <TextBlock Margin="{StaticResource SubheaderMargin}" Style="{ThemeResource BaseTextBlockStyle}">
+                    Resolver for Rule Matching
+                </TextBlock>
+                <RadioButton GroupName="RuleResolver" Tag="local">Local Resolver</RadioButton>
+                <RadioButton GroupName="RuleResolver" Tag="1111">1.1.1.1 (DoH)</RadioButton>
+                <RadioButton GroupName="RuleResolver" Tag="ali">Alibaba Cloud Public DNS (DoH)</RadioButton>
             </StackPanel>
 
             <StackPanel x:Name="RightPanel" Grid.Row="3" Grid.Column="0">
@@ -99,16 +125,19 @@
                 </TextBlock>
                 <RadioButton x:Name="SsButton" Tag="ss" IsEnabled="False" GroupName="OutboundType">Shadowsocks</RadioButton>
                 <RadioButton x:Name="TrojanButton" Tag="trojan" IsEnabled="False" GroupName="OutboundType">Trojan</RadioButton>
+                <RadioButton x:Name="VmessWsTlsButton" Tag="vmess_ws_tls" IsEnabled="False" GroupName="OutboundType">VMess + WebSocket + TLS</RadioButton>
                 <RadioButton x:Name="HttpButton" Tag="http" IsEnabled="False" GroupName="OutboundType">HTTP Proxy</RadioButton>
+
+                <StackPanel x:Name="SavePanel" Margin="0, 20, 0, 0">
+                    <TextBlock Margin="{StaticResource SubheaderMargin}" Style="{ThemeResource BaseTextBlockStyle}">
+                        Profile Name
+                    </TextBlock>
+                    <TextBox x:Name="NewProfileNameText" TextChanged="NewProfileNameText_TextChanged"></TextBox>
+                    <Button x:Name="SaveButton" Margin="0, 20, 0, 60" Click="SaveButton_Click">Create</Button>
+                </StackPanel>
             </StackPanel>
 
-            <StackPanel x:Name="SavePanel" Grid.Row="4" Grid.Column="0" Margin="0, 20, 0, 0">
-                <TextBlock Margin="{StaticResource SubheaderMargin}" Style="{ThemeResource BaseTextBlockStyle}">
-                    Profile Name
-                </TextBlock>
-                <TextBox x:Name="NewProfileNameText" TextChanged="NewProfileNameText_TextChanged"></TextBox>
-                <Button x:Name="SaveButton" Margin="0, 20, 0, 60" Click="SaveButton_Click">Create</Button>
-            </StackPanel>
+            <local:NewProfileRulesetControl x:Name="RulesetDialog" />
         </Grid>
 
         <VisualStateManager.VisualStateGroups>
@@ -126,11 +155,14 @@
                         <Setter Target="HeaderControl.Height" Value="80" />
                         <Setter Target="WelcomeHeaderControl.Margin" Value="0, 40, 0, 0" />
                         <Setter Target="WelcomeHeaderControl.Height" Value="80" />
+                        <Setter Target="LeftPanel.(Grid.RowSpan)" Value="3" />
                         <Setter Target="MiddlePanel.(Grid.Column)" Value="1" />
                         <Setter Target="MiddlePanel.(Grid.Row)" Value="1" />
+                        <Setter Target="MiddlePanel.(Grid.RowSpan)" Value="3" />
+                        <Setter Target="RightPanel.Margin" Value="8, 0, 0, 0" />
                         <Setter Target="RightPanel.(Grid.Column)" Value="2" />
                         <Setter Target="RightPanel.(Grid.Row)" Value="1" />
-                        <Setter Target="SavePanel.(Grid.Column)" Value="2" />
+                        <Setter Target="RightPanel.(Grid.RowSpan)" Value="3" />
                         <Setter Target="SaveButton.Margin" Value="0, 20, 0, 0" />
                     </VisualState.Setters>
                 </VisualState>

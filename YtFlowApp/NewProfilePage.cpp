@@ -100,11 +100,18 @@ namespace winrt::YtFlowApp::implementation
             DynOutboundEnabledText().Visibility(Visibility::Visible);
             SsButton().IsChecked(false);
             TrojanButton().IsChecked(false);
+            VmessWsTlsButton().IsChecked(false);
             HttpButton().IsChecked(false);
             SsButton().IsEnabled(false);
             TrojanButton().IsEnabled(false);
+            VmessWsTlsButton().IsEnabled(false);
             HttpButton().IsEnabled(false);
         }
+    }
+    void NewProfilePage::SplitRoutingTypeButton_Checked(IInspectable const &sender, RoutedEventArgs const & /* e */)
+    {
+        auto const btn = sender.as<FrameworkElement>();
+        m_selectedSplitRoutingType = btn.Tag().as<hstring>();
     }
     void NewProfilePage::DynOutboundButton_Unchecked(IInspectable const &, RoutedEventArgs const &)
     {
@@ -113,6 +120,7 @@ namespace winrt::YtFlowApp::implementation
         SsButton().IsEnabled(true);
         SsButton().IsChecked(true);
         TrojanButton().IsEnabled(true);
+        VmessWsTlsButton().IsEnabled(true);
         HttpButton().IsEnabled(true);
     }
 
@@ -121,7 +129,11 @@ namespace winrt::YtFlowApp::implementation
         m_dynOutboundCheckedToken = DynOutboundButton().Checked({this, &NewProfilePage::OutboundTypeButton_Checked});
         m_ssCheckedToken = SsButton().Checked({this, &NewProfilePage::OutboundTypeButton_Checked});
         m_trojanCheckedToken = TrojanButton().Checked({this, &NewProfilePage::OutboundTypeButton_Checked});
+        m_vmessWsTlsCheckedToken = VmessWsTlsButton().Checked({this, &NewProfilePage::OutboundTypeButton_Checked});
         m_httpCheckedToken = HttpButton().Checked({this, &NewProfilePage::OutboundTypeButton_Checked});
+        m_allProxyToken = AllProxyButton().Checked({this, &NewProfilePage::SplitRoutingTypeButton_Checked});
+        m_whitelistToken = WhitelistButton().Checked({this, &NewProfilePage::SplitRoutingTypeButton_Checked});
+        m_overseasToken = OverseasButton().Checked({this, &NewProfilePage::SplitRoutingTypeButton_Checked});
     }
 
     void NewProfilePage::Page_Unloaded(IInspectable const & /* sender */, RoutedEventArgs const & /* e */)
@@ -129,6 +141,7 @@ namespace winrt::YtFlowApp::implementation
         DynOutboundButton().Checked(m_dynOutboundCheckedToken);
         SsButton().Checked(m_ssCheckedToken);
         TrojanButton().Checked(m_trojanCheckedToken);
+        VmessWsTlsButton().Checked(m_vmessWsTlsCheckedToken);
         HttpButton().Checked(m_httpCheckedToken);
     }
 
@@ -231,7 +244,7 @@ namespace winrt::YtFlowApp::implementation
                 "    }"
                 "  },"
                 "  \"trojan-client\": {"
-                "    \"desc\": \"Trojan client. The TLS part is in plugin trojan-client-tls.\","
+                "    \"desc\": \"Trojan client. The TLS part is in plugin client-tls.\","
                 "    \"plugin\": \"trojan-client\","
                 "    \"plugin_version\": 0,"
                 "    \"param\": {"
@@ -239,17 +252,39 @@ namespace winrt::YtFlowApp::implementation
                 "        \"__byte_repr\": \"utf8\","
                 "        \"data\": \"my_trojan_password\""
                 "      },"
-                "      \"tls_next\": \"trojan-client-tls.tcp\""
+                "      \"tls_next\": \"proxy-redir.tcp\""
                 "    }"
                 "  },"
-                "  \"trojan-client-tls\": {"
-                "    \"desc\": \"TLS client stream for Trojan client.\","
+                "  \"client-tls\": {"
+                "    \"desc\": \"TLS client stream for proxy client.\","
                 "    \"plugin\": \"tls-client\","
                 "    \"plugin_version\": 0,"
                 "    \"param\": {"
-                "      \"next\": \"proxy-redir.tcp\","
+                "      \"next\": \"phy.tcp\","
                 "      \"skip_cert_check\": false,"
-                "      \"sni\": \"my.trojan.proxy.server.com\""
+                "      \"sni\": \"my.proxy.server.com\""
+                "    }"
+                "  },"
+                "  \"vmess-client\": {"
+                "    \"desc\": \"VMess client.\","
+                "    \"plugin\": \"vmess-client\","
+                "    \"plugin_version\": 0,"
+                "    \"param\": {"
+                "      \"user_id\": \"b831381d-6324-4d53-ad4f-8cda48b30811\","
+                "      \"security\": \"auto\","
+                "      \"alter_id\": 0,"
+                "      \"tcp_next\": \"proxy-redir.tcp\""
+                "    }"
+                "  },"
+                "  \"ws-client\": {"
+                "    \"desc\": \"WebSocket client.\","
+                "    \"plugin\": \"ws-client\","
+                "    \"plugin_version\": 0,"
+                "    \"param\": {"
+                "      \"host\": \"dl.microsoft.com\","
+                "      \"path\": \"/\","
+                "      \"headers\": {},"
+                "      \"next\": \"client-tls.tcp\""
                 "    }"
                 "  },"
                 "  \"proxy-redir\": {"
@@ -347,6 +382,14 @@ namespace winrt::YtFlowApp::implementation
             else if (config.OutboundType == L"trojan")
             {
                 doc["main-forward"]["param"]["tcp_next"] = "trojan-client.tcp";
+                doc["proxy-redir"]["param"]["tcp_next"] = "client-tls.tcp";
+                doc["client-tls"]["param"]["alpn"] = {"h2", "http/1.1"};
+            }
+            else if (config.OutboundType == L"vmess_ws_tls")
+            {
+                doc["main-forward"]["param"]["tcp_next"] = "vmess-client.tcp";
+                doc["proxy-redir"]["param"]["tcp_next"] = "ws-client.tcp";
+                doc["client-tls"]["param"]["alpn"] = {"http/1.1"};
             }
 
             auto conn{FfiDbInstance.Connect()};
@@ -371,4 +414,14 @@ namespace winrt::YtFlowApp::implementation
             NotifyException(L"Creating preset plugins");
         }
     }
+
+    fire_and_forget NewProfilePage::SelectRulesetButton_Click(IInspectable const &, RoutedEventArgs const &)
+    {
+        co_await RulesetDialog().ShowAsync();
+        if (RulesetDialog().RulesetSelected())
+        {
+            SelectedRulesetNameText().Text(RulesetDialog().RulesetName());
+        }
+    }
+
 }
