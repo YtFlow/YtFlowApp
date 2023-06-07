@@ -30,6 +30,8 @@ namespace winrt::YtFlowApp::implementation
         {L"resolve-dest", box_value(L"Resolve domain names in flow destinations to IP addresses.")},
         {L"simple-dispatcher", box_value(L"Match the source/dest address against a list of simple rules, and use "
                                          L"the corresponding handler or fallback handler if there is no match.")},
+        {L"rule-dispatcher", box_value(L"Match the connection against rules defined in a resource, and use the handler "
+                                       L"of a corresponding action or fallback if there is no match.")},
         {L"forward",
          box_value(L"Establish a new connection for each incoming connection, and forward data between them.")},
         {L"dyn-outbound", box_value(L"Select an outbound proxy from the database at runtime.")},

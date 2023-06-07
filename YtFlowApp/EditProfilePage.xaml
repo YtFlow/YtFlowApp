@@ -197,6 +197,7 @@
                     <x:String>redirect</x:String>
                     <x:String>reject</x:String>
                     <x:String>resolve-dest</x:String>
+                    <x:String>rule-dispatcher</x:String>
                     <x:String>shadowsocks-client</x:String>
                     <x:String>simple-dispatcher</x:String>
                     <x:String>socket</x:String>
