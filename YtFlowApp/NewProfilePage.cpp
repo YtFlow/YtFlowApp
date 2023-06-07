@@ -48,11 +48,24 @@ namespace winrt::YtFlowApp::implementation
                 co_return;
             }
 
+            if (m_selectedSplitRoutingType != L"all")
+            {
+                if (SelectedRulesetNameText().Text() == L"")
+                {
+                    SelectRulesetButton_Click(nullptr, nullptr);
+                    co_return;
+                }
+            }
+
             SaveButton().IsEnabled(false);
             const auto lifetime{get_strong()};
             bool nameDuplicated{false};
             NewProfileConfig config;
+            config.InboundMode = InboundModeButtons().SelectedItem().as<RadioButton>().Tag().as<hstring>();
             config.OutboundType = m_selectedOutboundType;
+            config.SplitRoutingMode = m_selectedSplitRoutingType;
+            config.SplitRoutingRuleset = SelectedRulesetNameText().Text();
+            config.RuleResolver = RuleResolverComboBox().SelectedItem().as<ComboBoxItem>().Tag().as<hstring>();
 
             co_await resume_background();
 
@@ -162,7 +175,7 @@ namespace winrt::YtFlowApp::implementation
                 "    \"plugin\": \"ip-stack\","
                 "    \"plugin_version\": 0,"
                 "    \"param\": {"
-                "      \"tcp_next\": \"fakeip-dns-server.tcp_map_back.main-forward.tcp\","
+                "      \"tcp_next\": \"fakeip-dns-server.tcp_map_back.geoip-dispatcher.tcp\","
                 "      \"udp_next\": \"dns-dispatcher.udp\","
                 "      \"tun\": \"uwp-vpn-tun.tun\""
                 "    }"
@@ -194,13 +207,23 @@ namespace winrt::YtFlowApp::implementation
                 "      \"web_proxy\": null"
                 "    }"
                 "  },"
-                "  \"main-forward\": {"
-                "    \"desc\": \"Forward connections to the main outbound.\","
+                "  \"proxy-forward\": {"
+                "    \"desc\": \"Forward connections to the proxy outbound.\","
                 "    \"plugin\": \"forward\","
                 "    \"plugin_version\": 0,"
                 "    \"param\": {"
                 "      \"request_timeout\": 200,"
                 "      \"tcp_next\": \"outbound.tcp\","
+                "      \"udp_next\": \"phy.udp\""
+                "    }"
+                "  },"
+                "  \"direct-forward\": {"
+                "    \"desc\": \"Forward connections to the physical outbound.\","
+                "    \"plugin\": \"forward\","
+                "    \"plugin_version\": 0,"
+                "    \"param\": {"
+                "      \"request_timeout\": 200,"
+                "      \"tcp_next\": \"phy.tcp\","
                 "      \"udp_next\": \"phy.udp\""
                 "    }"
                 "  },"
@@ -334,13 +357,26 @@ namespace winrt::YtFlowApp::implementation
                 "      \"prefix_v6\": [38, 12, 32, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]"
                 "    }"
                 "  },"
+                "  \"doh-resolver\": {"
+                "    \"desc\": \"Resolves real IP addresses from a secure, trusted provider.\","
+                "    \"plugin\": \"host-resolver\","
+                "    \"plugin_version\": 0,"
+                "    \"param\": {"
+                "      \"udp\": [],"
+                "      \"tcp\": [],"
+                "      \"doh\": [{"
+                "        \"url\": \"https://1.1.1.1/dns-query\","
+                "        \"next\": \"general-tls.tcp\""
+                "      }]"
+                "    }"
+                "  },"
                 "  \"dns-dispatcher\": {"
                 "    \"desc\": \"Dispatches DNS requests to our DNS server.\","
                 "    \"plugin\": \"simple-dispatcher\","
                 "    \"plugin_version\": 0,"
                 "    \"param\": {"
-                "      \"fallback_tcp\": \"main-forward.tcp\","
-                "      \"fallback_udp\": \"fakeip-dns-server.udp_map_back.main-forward.udp\","
+                "      \"fallback_tcp\": \"reject.tcp\","
+                "      \"fallback_udp\": \"fakeip-dns-server.udp_map_back.geoip-dispatcher.udp\","
                 "      \"rules\": ["
                 "        {"
                 "          \"src\": {"
@@ -357,6 +393,41 @@ namespace winrt::YtFlowApp::implementation
                 "      ]"
                 "    }"
                 "  },"
+                "  \"geoip-dispatcher\": {"
+                "    \"desc\": \"Split routing by GeoIP rules.\","
+                "    \"plugin\": \"rule-dispatcher\","
+                "    \"plugin_version\": 0,"
+                "    \"param\": {"
+                "      \"resolver\": \"doh-resolver.resolver\","
+                "      \"source\": \"dreamacro-geoip\","
+                "      \"actions\": {"
+                "        \"direct\": {"
+                "          \"tcp\": \"direct-forward.tcp\","
+                "          \"udp\": \"direct-forward.udp\""
+                "        },"
+                "        \"proxy\": {"
+                "          \"tcp\": \"proxy-forward.tcp\","
+                "          \"udp\": \"proxy-forward.udp\""
+                "        }"
+                "      },"
+                "      \"rules\": {"
+                "        \"cn\": \"direct\""
+                "      },"
+                "      \"fallback\": {"
+                "        \"tcp\": \"proxy-forward.tcp\","
+                "        \"udp\": \"proxy-forward.udp\""
+                "      }"
+                "    }"
+                "  },"
+                "  \"general-tls\": {"
+                "    \"desc\": \"TLS client stream for h2, DoH etc.\","
+                "    \"plugin\": \"tls-client\","
+                "    \"plugin_version\": 0,"
+                "    \"param\": {"
+                "      \"next\": \"phy.tcp\","
+                "      \"skip_cert_check\": false"
+                "    }"
+                "  },"
                 "  \"fakeip-dns-server\": {"
                 "    \"desc\": \"Respond to DNS request messages using results from the FakeIP resolver.\","
                 "    \"plugin\": \"dns-server\","
@@ -364,30 +435,69 @@ namespace winrt::YtFlowApp::implementation
                 "    \"param\": {"
                 "      \"concurrency_limit\": 64,"
                 "      \"resolver\": \"fake-ip.resolver\","
-                "      \"tcp_map_back\": [\"main-forward.tcp\"],"
-                "      \"udp_map_back\": [\"main-forward.udp\"],"
+                "      \"tcp_map_back\": [\"proxy-forward.tcp\"],"
+                "      \"udp_map_back\": [\"proxy-forward.udp\"],"
                 "      \"ttl\": 60"
                 "    }"
                 "  }"
                 "}"_json};
 
+            if (config.InboundMode == L"full")
+            {
+                doc["uwp-vpn-tun"]["param"]["ipv4_route"] = {"0.0.0.0/1", "128.0.0.0/1"};
+                doc["uwp-vpn-tun"]["param"]["ipv6_route"] = {"::/1", "8000::/1"};
+            }
+
+            std::string_view ruleResolver = "phy.resolver";
+            if (config.RuleResolver == L"1111")
+            {
+                ruleResolver = "doh-resolver.resolver";
+            }
+            else if (config.RuleResolver == L"ali")
+            {
+                doc["doh-resolver"]["param"]["doh"][0]["url"] = "https://223.5.5.5/dns-query";
+                ruleResolver = "doh-resolver.resolver";
+            }
+            doc["geoip-dispatcher"]["param"]["resolver"] = ruleResolver;
+
+            if (config.SplitRoutingMode == L"all")
+            {
+                doc["entry-ip-stack"]["param"]["tcp_next"] = "fakeip-dns-server.tcp_map_back.proxy-forward.tcp";
+                doc["dns-dispatcher"]["param"]["fallback_udp"] = "fakeip-dns-server.udp_map_back.proxy-forward.udp";
+                doc.erase("direct-forward");
+            }
+            else if (config.SplitRoutingMode == L"whitelist")
+            {
+                doc["fakeip-dns-server"]["param"]["tcp_map_back"].push_back("geoip-dispatcher.tcp");
+                doc["fakeip-dns-server"]["param"]["udp_map_back"].push_back("geoip-dispatcher.udp");
+            }
+            else if (config.SplitRoutingMode == L"overseas")
+            {
+                doc["geoip-dispatcher"]["param"]["rules"]["cn"] = "proxy";
+                doc["geoip-dispatcher"]["param"]["fallback"]["tcp"] = "direct-forward.tcp";
+                doc["geoip-dispatcher"]["param"]["fallback"]["udp"] = "direct-forward.udp";
+                doc["fakeip-dns-server"]["param"]["tcp_map_back"].push_back("geoip-dispatcher.tcp");
+                doc["fakeip-dns-server"]["param"]["udp_map_back"].push_back("geoip-dispatcher.udp");
+            }
+            doc["geoip-dispatcher"]["param"]["source"] = to_string(config.SplitRoutingRuleset);
+
             if (config.OutboundType == L"ss")
             {
-                doc["main-forward"]["param"]["tcp_next"] = "ss-client.tcp";
+                doc["proxy-forward"]["param"]["tcp_next"] = "ss-client.tcp";
             }
             else if (config.OutboundType == L"http")
             {
-                doc["main-forward"]["param"]["tcp_next"] = "http-proxy-client.tcp";
+                doc["proxy-forward"]["param"]["tcp_next"] = "http-proxy-client.tcp";
             }
             else if (config.OutboundType == L"trojan")
             {
-                doc["main-forward"]["param"]["tcp_next"] = "trojan-client.tcp";
+                doc["proxy-forward"]["param"]["tcp_next"] = "trojan-client.tcp";
                 doc["proxy-redir"]["param"]["tcp_next"] = "client-tls.tcp";
                 doc["client-tls"]["param"]["alpn"] = {"h2", "http/1.1"};
             }
             else if (config.OutboundType == L"vmess_ws_tls")
             {
-                doc["main-forward"]["param"]["tcp_next"] = "vmess-client.tcp";
+                doc["proxy-forward"]["param"]["tcp_next"] = "vmess-client.tcp";
                 doc["proxy-redir"]["param"]["tcp_next"] = "ws-client.tcp";
                 doc["client-tls"]["param"]["alpn"] = {"http/1.1"};
             }

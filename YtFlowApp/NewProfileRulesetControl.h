@@ -26,10 +26,15 @@ namespace winrt::YtFlowApp::implementation
                                       winrt::Windows::UI::Xaml::RoutedEventArgs const &e);
         fire_and_forget UpdateButton_Click(winrt::Windows::Foundation::IInspectable const &sender,
                                            winrt::Windows::UI::Xaml::RoutedEventArgs const &e);
+        void ContentDialog_PrimaryButtonClick(
+            winrt::Windows::UI::Xaml::Controls::ContentDialog const &sender,
+            winrt::Windows::UI::Xaml::Controls::ContentDialogButtonClickEventArgs const &args);
 
       private:
         static inline Windows::Storage::StorageFolder m_resourceFolder{nullptr};
 
+        bool m_rulesetSelected{false};
+        hstring m_rulesetName;
         Windows::Web::Http::HttpClient m_client{nullptr};
         event_token m_selectionChangeToken;
         std::vector<FfiResource> m_resources;

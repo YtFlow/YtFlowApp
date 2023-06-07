@@ -5,6 +5,7 @@
     xmlns:local="using:YtFlowApp"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     mc:Ignorable="d"
     Loaded="Page_Loaded"
     Unloaded="Page_Unloaded">
@@ -53,8 +54,10 @@
                 <TextBlock Margin="{StaticResource SubheaderMargin}" Style="{ThemeResource BaseTextBlockStyle}">
                     Inbound mode
                 </TextBlock>
-                <RadioButton GroupName="InboundModeGroup" IsChecked="True" Tag="fake">UWP VPN, Fake IP range</RadioButton>
-                <RadioButton GroupName="InboundModeGroup" Tag="full">UWP VPN, Full IP range</RadioButton>
+                <muxc:RadioButtons x:Name="InboundModeButtons" SelectedIndex="0">
+                    <RadioButton Tag="fake">UWP VPN, Fake IP range</RadioButton>
+                    <RadioButton Tag="full">UWP VPN, Full IP range</RadioButton>
+                </muxc:RadioButtons>
                 <TextBlock Margin="{StaticResource SubheaderMargin}" Style="{ThemeResource BaseTextBlockStyle}">
                     Additional Inbound ports
                 </TextBlock>
@@ -88,14 +91,16 @@
                 </TextBlock>
                 <StackPanel Orientation="Horizontal">
                     <Button Content="Select..." Click="SelectRulesetButton_Click" />
-                    <TextBlock x:Name="SelectedRulesetNameText" Margin="8, 0, 0, 0" />
+                    <TextBlock x:Name="SelectedRulesetNameText" Margin="8, 0, 0, 0" VerticalAlignment="Center" />
                 </StackPanel>
                 <TextBlock Margin="{StaticResource SubheaderMargin}" Style="{ThemeResource BaseTextBlockStyle}">
-                    Resolver for Rule Matching
+                    DNS provider for Rule Matching
                 </TextBlock>
-                <RadioButton GroupName="RuleResolver" Tag="local">Local Resolver</RadioButton>
-                <RadioButton GroupName="RuleResolver" Tag="1111">1.1.1.1 (DoH)</RadioButton>
-                <RadioButton GroupName="RuleResolver" Tag="ali">Alibaba Cloud Public DNS (DoH)</RadioButton>
+                <ComboBox x:Name="RuleResolverComboBox" SelectedIndex="1">
+                    <ComboBoxItem Tag="local">Local Resolver</ComboBoxItem>
+                    <ComboBoxItem Tag="1111">1.1.1.1 (DoH)</ComboBoxItem>
+                    <ComboBoxItem Tag="ali">Alibaba Cloud Public DNS (DoH)</ComboBoxItem>
+                </ComboBox>
             </StackPanel>
 
             <StackPanel x:Name="RightPanel" Grid.Row="3" Grid.Column="0">
@@ -137,7 +142,7 @@
                 </StackPanel>
             </StackPanel>
 
-            <local:NewProfileRulesetControl x:Name="RulesetDialog" />
+            <local:NewProfileRulesetControl x:Name="RulesetDialog" Grid.RowSpan="5" />
         </Grid>
 
         <VisualStateManager.VisualStateGroups>

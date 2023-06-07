@@ -9,11 +9,13 @@
     xmlns:contract7Present="http://schemas.microsoft.com/winfx/2006/xaml/presentation?IsApiContractPresent(Windows.Foundation.UniversalApiContract,7)"
     xmlns:contract7NotPresent="http://schemas.microsoft.com/winfx/2006/xaml/presentation?IsApiContractNotPresent(Windows.Foundation.UniversalApiContract,7)"
     Title="Select Ruleset"
+    Style="{ThemeResource DefaultContentDialogStyle}"
     PrimaryButtonText="Select"
     IsPrimaryButtonEnabled="False"
     contract7NotPresent:SecondaryButtonText="Close"
     Opened="ContentDialog_Opened"
     Closing="ContentDialog_Closing"
+    PrimaryButtonClick="ContentDialog_PrimaryButtonClick"
 >
     <contract7Present:ContentDialog.SecondaryButtonCommand>
         <contract7Present:StandardUICommand Kind="Close"/>
@@ -29,8 +31,10 @@
             <TextBlock x:Name="LastUpdatedText" Margin="4, 0, 0, 0" Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}" />
         </StackPanel>
         <ProgressBar x:Name="UpdateProgressBar" Visibility="Collapsed" />
-        <Button x:Name="UpdateButton" Margin="0, 4, 0, 4" IsEnabled="False" Click="UpdateButton_Click">Update</Button>
-        <Button x:Name="CancelUpdateButton" Visibility="Collapsed" Margin="0, 4, 0, 0" Click="CancelUpdateButton_Click">Cancel</Button>
+        <StackPanel Orientation="Horizontal">
+            <Button x:Name="UpdateButton" Margin="0, 4, 8, 4" IsEnabled="False" Click="UpdateButton_Click">Update</Button>
+            <Button x:Name="CancelUpdateButton" Visibility="Collapsed" Margin="0, 4, 0, 4" Click="CancelUpdateButton_Click">Cancel</Button>
+        </StackPanel>
         <TextBlock
             x:Name="UpdateErrorText"
             MaxHeight="50"

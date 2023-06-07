@@ -23,11 +23,11 @@ namespace winrt::YtFlowApp::implementation
 {
     bool NewProfileRulesetControl::RulesetSelected()
     {
-        return false;
+        return m_rulesetSelected;
     }
     hstring NewProfileRulesetControl::RulesetName()
     {
-        return L"";
+        return m_rulesetName;
     }
 
     std::string_view NewProfileRulesetControl::GetResourceKeyFromSelectedRuleset()
@@ -170,6 +170,7 @@ namespace winrt::YtFlowApp::implementation
 
     void NewProfileRulesetControl::ContentDialog_Opened(ContentDialog const &, ContentDialogOpenedEventArgs const &)
     {
+        m_rulesetSelected = false;
         m_selectionChangeToken =
             SelectionComboBox().SelectionChanged({this, &NewProfileRulesetControl::SelectionComboBox_SelectionChanged});
         InitSelectedRuleset();
@@ -418,5 +419,11 @@ namespace winrt::YtFlowApp::implementation
         lifetime->UpdateButton().IsEnabled(true);
         lifetime->CancelUpdateButton().Visibility(Visibility::Collapsed);
         lifetime->UpdateProgressBar().Visibility(Visibility::Collapsed);
+    }
+    void NewProfileRulesetControl::ContentDialog_PrimaryButtonClick(ContentDialog const &,
+                                                                    ContentDialogButtonClickEventArgs const &)
+    {
+        m_rulesetSelected = true;
+        m_rulesetName = to_hstring(GetResourceKeyFromSelectedRuleset());
     }
 }

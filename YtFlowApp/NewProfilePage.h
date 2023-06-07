@@ -6,6 +6,10 @@ namespace winrt::YtFlowApp::implementation
 {
     struct NewProfileConfig
     {
+        hstring InboundMode;
+        hstring SplitRoutingMode;
+        hstring SplitRoutingRuleset;
+        hstring RuleResolver;
         hstring OutboundType;
     };
     struct NewProfilePage : NewProfilePageT<NewProfilePage>
