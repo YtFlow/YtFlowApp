@@ -73,7 +73,8 @@ namespace winrt::YtFlowApp::implementation
                                      }
                                  })
                             .subscribe_on(ObserveOnWinrtThreadPool())
-                            .take_until(unfocus$);
+                            .take_until(unfocus$)
+                            .as_dynamic();
                     });
                 })
                 .on_error_resume_next([](auto) {

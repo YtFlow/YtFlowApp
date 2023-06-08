@@ -19,7 +19,7 @@ variables:
   appxPackageDir: '$(build.artifactStagingDirectory)\AppxPackages\\'
   keyFile: 'YtFlowApp_TemporaryKey.pfx'
   NUGET_PACKAGES: $(Pipeline.Workspace)/.nuget/packages
-  vcpkgGitCommitId: 95252eadd63118201b0d0df0b4360fa613f0de84
+  vcpkgGitCommitId: 75059166857a374297e5edd6e1e7a60912907a46
   cleanBuild: false
 
 steps:
