@@ -52,7 +52,7 @@ namespace winrt::YtFlowApp::implementation
       private:
         static inline Windows::Storage::ApplicationData appData{Windows::Storage::ApplicationData::Current()};
 
-        fire_and_forget SaveProfileName();
+        Windows::Foundation::IAsyncAction SaveProfileName();
         void RefreshTreeView();
         void LoadTreeNodesByName();
         void LoadTreeNodesByDependency();

@@ -24,8 +24,20 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <FontIcon Grid.Column="0" Grid.RowSpan="2" FontFamily="Segoe MDL2 Assets" Glyph="&#xE7B8;" />
-        <TextBlock Grid.Column="1" Grid.Row="0" VerticalAlignment="Bottom" FontSize="18" Text="{x:Bind Profile.Name}" />
-        <TextBlock Grid.Column="1" Grid.Row="1" VerticalAlignment="Top" Text="Local Profile" Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}" />
+        <TextBlock
+            Grid.Column="1"
+            Grid.Row="0"
+            VerticalAlignment="Bottom"
+            FontSize="18"
+            Text="{x:Bind Profile.Name}"
+        />
+        <TextBlock
+            Grid.Column="1"
+            Grid.Row="1"
+            VerticalAlignment="Top"
+            Text="Local Profile"
+            Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
+        />
         <Button
             Grid.Column="2"
             Grid.Row="0"

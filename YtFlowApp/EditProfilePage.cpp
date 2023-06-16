@@ -161,6 +161,8 @@ namespace winrt::YtFlowApp::implementation
             }
             auto const navArgs{args};
             auto const lifetime{get_strong()};
+            co_await SaveProfileName();
+
             if (std::exchange(m_forceQuit, false))
             {
                 co_return;
@@ -174,7 +176,7 @@ namespace winrt::YtFlowApp::implementation
                     unsavedPluginNames = unsavedPluginNames + L"\r\n" + model->Plugin().Name();
                 }
             }
-            if (unsavedPluginNames == L"")
+            if (unsavedPluginNames.empty())
             {
                 co_return;
             }
@@ -259,12 +261,17 @@ namespace winrt::YtFlowApp::implementation
         }
     }
 
-    fire_and_forget EditProfilePage::SaveProfileName()
+    IAsyncAction EditProfilePage::SaveProfileName()
     {
         try
         {
-            const auto profile{m_profile};
-            const auto newProfileName{ProfileNameBox().Text()};
+            auto const lifetime{get_strong()};
+            auto const profile{m_profile};
+            auto const newProfileName{ProfileNameBox().Text()};
+            if (!profile)
+            {
+                co_return;
+            }
             if (profile->Name() == newProfileName)
             {
                 co_return;
@@ -275,6 +282,9 @@ namespace winrt::YtFlowApp::implementation
             auto conn{FfiDbInstance.Connect()};
             conn.UpdateProfile(profile->Id(), winrt::to_string(newProfileName).data(),
                                winrt::to_string(profile->Locale()).data());
+
+            co_await resume_foreground(lifetime->Dispatcher());
+            profile->Name(newProfileName);
         }
         catch (...)
         {
