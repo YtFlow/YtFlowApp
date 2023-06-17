@@ -4,10 +4,13 @@
 #include "LibraryPage.g.cpp"
 #endif
 
+#include "winrt\Windows.Web.Http.Headers.h"
 #include <ranges>
+#include <winrt\Windows.Web.Http.h>
 
 #include "CoreFfi.h"
 #include "CoreProxy.h"
+#include "CoreSubscription.h"
 #include "ProxyGroupModel.h"
 #include "ProxyModel.h"
 #include "UI.h"
@@ -172,6 +175,83 @@ namespace winrt::YtFlowApp::implementation
         catch (...)
         {
             NotifyException(L"Creating");
+        }
+    }
+
+    fire_and_forget LibraryPage::CreateSubscriptionButton_Click(IInspectable const &, RoutedEventArgs const &)
+    {
+        try
+        {
+            auto const lifetime = get_strong();
+            ProxyGroupAddSubscriptionError().Text(L"");
+            ProxyGroupAddSubscriptionError().Visibility(Visibility::Collapsed);
+            while (co_await ProxyGroupAddSubscriptionDialog().ShowAsync() == ContentDialogResult::Primary)
+            {
+                auto const url = ProxyGroupAddSubscriptionUrlText().Text();
+                std::optional<hstring> errMsg = std::nullopt;
+
+                try
+                {
+                    Uri const uri{url};
+                    // TODO:
+
+                    static Windows::Web::Http::HttpClient client{};
+                    client.DefaultRequestHeaders().UserAgent().Clear();
+                    client.DefaultRequestHeaders().UserAgent().ParseAdd(L"YtFlowApp/0.0 SubscriptionUpdater/0.0");
+                    auto const res = (co_await client.GetAsync(uri)).EnsureSuccessStatusCode();
+                    auto const userinfoHeader = res.Headers().TryLookup(L"subscription-userinfo");
+                    DecodedSubscriptionUserInfo userinfo{};
+                    if (userinfoHeader.has_value())
+                    {
+                        userinfo = DecodeSubscriptionUserInfoFromResponseHeaderValue(to_string(*userinfoHeader));
+                    }
+                    // TODO: total, not remaining
+
+                    auto const resStr = to_string(co_await res.Content().ReadAsStringAsync());
+                    char const *format{nullptr};
+                    auto const proxies = DecodeSubscriptionProxies(resStr, format);
+                    if (!proxies.has_value() || format == nullptr)
+                    {
+                        throw hresult_invalid_argument(L"The subscription data contains no valid proxy.");
+                    }
+
+                    co_await resume_background();
+                    auto conn = FfiDbInstance.Connect();
+                    auto const newGroupId = conn.CreateProxySubscriptionGroup(to_string(uri.Domain()).c_str(), format,
+                                                                              to_string(url).c_str());
+                    conn.BatchUpdateProxyInGroup(newGroupId, proxies->data(), proxies->size());
+                    char const *expiresAt{nullptr};
+                    if (userinfo.expires_at.has_value())
+                    {
+                        expiresAt = userinfo.expires_at->c_str();
+                    }
+                    conn.UpdateProxySubscriptionRetrievedByProxyGroup(newGroupId, userinfo.upload_bytes_used,
+                                                                      userinfo.download_bytes_used,
+                                                                      userinfo.bytes_total, expiresAt);
+                    auto const newGroupModel = make<ProxyGroupModel>(conn.GetProxyGroupById(newGroupId),
+                                                                     conn.GetProxySubscriptionByProxyGroup(newGroupId));
+                    co_await resume_foreground(lifetime->Dispatcher());
+                    m_model->ProxyGroups().Append(newGroupModel);
+                }
+                catch (hresult_error const &hr)
+                {
+                    errMsg = {hr.message()};
+                }
+                co_await resume_foreground(lifetime->Dispatcher());
+                if (errMsg.has_value())
+                {
+                    ProxyGroupAddSubscriptionError().Text(*errMsg);
+                    ProxyGroupAddSubscriptionError().Visibility(Visibility::Visible);
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+        catch (...)
+        {
+            NotifyException(L"Import Subscription");
         }
     }
 

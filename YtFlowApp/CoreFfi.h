@@ -84,6 +84,44 @@ namespace winrt::YtFlowApp::implementation
         std::string type;
     };
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(FfiProxyGroup, id, name, type)
+    struct FfiProxyGroupSubscription
+    {
+        std::string format;
+        std::string url;
+        std::optional<uint64_t> upload_bytes_used;
+        std::optional<uint64_t> download_bytes_used;
+        std::optional<uint64_t> bytes_total;
+        std::optional<std::string> expires_at;
+        std::optional<std::string> retrieved_at;
+    };
+    inline void from_json(nlohmann::json const &json, FfiProxyGroupSubscription &r)
+    {
+        json.at("format").get_to(r.format);
+        json.at("url").get_to(r.url);
+        if (nlohmann::json const uploadBytesUsedDoc = json.value("upload_bytes_used", nlohmann::json());
+            uploadBytesUsedDoc != nullptr)
+        {
+            r.upload_bytes_used = {uploadBytesUsedDoc.get<uint64_t>()};
+        }
+        if (nlohmann::json const downloadBytesUsedDoc = json.value("download_bytes_used", nlohmann::json());
+            downloadBytesUsedDoc != nullptr)
+        {
+            r.download_bytes_used = {downloadBytesUsedDoc.get<uint64_t>()};
+        }
+        if (nlohmann::json const bytesTotalDoc = json.value("bytes_total", nlohmann::json()); bytesTotalDoc != nullptr)
+        {
+            r.bytes_total = {bytesTotalDoc.get<uint64_t>()};
+        }
+        if (nlohmann::json const expiresAtDoc = json.value("expires_at", nlohmann::json()); expiresAtDoc != nullptr)
+        {
+            r.expires_at = {expiresAtDoc.get<std::string>()};
+        }
+        if (nlohmann::json const retrievedAtDoc = json.value("retrieved_at", nlohmann::json());
+            retrievedAtDoc != nullptr)
+        {
+            r.retrieved_at = {retrievedAtDoc.get<std::string>()};
+        }
+    }
     struct FfiProxy
     {
         uint32_t id{};
@@ -118,16 +156,16 @@ namespace winrt::YtFlowApp::implementation
         {
             return;
         }
-        if (nlohmann::json const etagDoc = json.value("etag", nlohmann::json{nullptr}); etagDoc != nullptr)
+        if (nlohmann::json const etagDoc = json.value("etag", nlohmann::json()); etagDoc != nullptr)
         {
             r.etag = {etagDoc.get<std::string>()};
         }
-        if (nlohmann::json const lastModifiedDoc = json.value("last_modified", nlohmann::json{nullptr});
+        if (nlohmann::json const lastModifiedDoc = json.value("last_modified", nlohmann::json());
             lastModifiedDoc != nullptr)
         {
             r.last_modified = {lastModifiedDoc.get<std::string>()};
         }
-        if (nlohmann::json const retrievedAtDoc = json.value("retrieved_at", nlohmann::json{nullptr});
+        if (nlohmann::json const retrievedAtDoc = json.value("retrieved_at", nlohmann::json());
             retrievedAtDoc != nullptr)
         {
             r.retrieved_at = {retrievedAtDoc.get<std::string>()};
@@ -153,16 +191,16 @@ namespace winrt::YtFlowApp::implementation
         {
             return;
         }
-        if (nlohmann::json const gitTagDoc = json.value("git_tag", nlohmann::json{nullptr}); gitTagDoc != nullptr)
+        if (nlohmann::json const gitTagDoc = json.value("git_tag", nlohmann::json()); gitTagDoc != nullptr)
         {
             r.git_tag = {gitTagDoc.get<std::string>()};
         }
-        if (nlohmann::json const releaseTitleDoc = json.value("release_title", nlohmann::json{nullptr});
+        if (nlohmann::json const releaseTitleDoc = json.value("release_title", nlohmann::json());
             releaseTitleDoc != nullptr)
         {
             r.release_title = {releaseTitleDoc.get<std::string>()};
         }
-        if (nlohmann::json const retrievedAtDoc = json.value("retrieved_at", nlohmann::json{nullptr});
+        if (nlohmann::json const retrievedAtDoc = json.value("retrieved_at", nlohmann::json());
             retrievedAtDoc != nullptr)
         {
             r.retrieved_at = {retrievedAtDoc.get<std::string>()};
@@ -196,13 +234,19 @@ namespace winrt::YtFlowApp::implementation
         void RenameProxyGroup(uint32_t id, char const *name) &;
         void DeleteProxyGroup(uint32_t id) &;
         uint32_t CreateProxyGroup(char const *name, char const *type) &;
+        uint32_t CreateProxySubscriptionGroup(char const *name, char const *format, char const *url) &;
         std::vector<FfiProxy> GetProxiesByProxyGroup(uint32_t proxyGroupId) &;
+        FfiProxyGroupSubscription GetProxySubscriptionByProxyGroup(uint32_t proxyGroupId) &;
+        void UpdateProxySubscriptionRetrievedByProxyGroup(uint32_t proxyGroupId, std::optional<uint64_t> uploadBytes,
+                                                          std::optional<uint64_t> downloadBytes,
+                                                          std::optional<uint64_t> totalBytes, char const *expiresAt) &;
         uint32_t CreateProxy(uint32_t proxyGroupId, char const *name, uint8_t const *proxy, size_t proxyLen,
                              uint16_t proxyVersion) &;
         void UpdateProxy(uint32_t proxyId, char const *name, uint8_t const *proxy, size_t proxyLen,
                          uint16_t proxyVersion) &;
         void DeleteProxy(uint32_t proxyId) &;
         void ReorderProxy(uint32_t proxyGroupId, int32_t rangeStartOrder, int32_t rangeEndOrder, int32_t moves) &;
+        void BatchUpdateProxyInGroup(uint32_t proxyGroupId, uint8_t const *newProxyBuf, size_t newProxyBufLen) &;
         std::vector<FfiResource> GetResources() &;
         void DeleteResource(uint32_t resourceId) &;
         uint32_t CreateResourceWithUrl(char const *key, char const *type, char const *local_file, char const *url) &;

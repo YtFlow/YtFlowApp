@@ -84,12 +84,16 @@ namespace winrt::YtFlowApp::implementation
 
     struct Sip002Decoder
     {
+        static PluginDecodeResult DecodeSip003Plugin(std::string_view pluginName, std::string_view pluginOpts,
+                                                     std::string_view defaultHost, ProxyPlugin &plugin,
+                                                     std::string_view tcpNext);
+
         std::string DecodeName(ParsedUri const &uri);
         PluginDecodeResult DecodeProtocol(ParsedUri const &uri, ProxyPlugin &plugin, std::string_view tcpNext,
                                           std::string_view udpNext);
         PluginDecodeResult DecodeRedir(ParsedUri const &uri, std::string &host, uint16_t &port);
         PluginDecodeResult DecodeObfs(ParsedUri const &uri, ProxyPlugin &plugin, std::string_view tcpNext,
-                                      std::string_view udpNext); // TODO: obfs
+                                      std::string_view udpNext);
         PluginDecodeResult DecodeTls(ParsedUri const &uri, ProxyPlugin &plugin, std::string_view tcpNext,
                                      std::string_view udpNext);
         PluginDecodeResult DecodeUdp(ParsedUri const &uri);

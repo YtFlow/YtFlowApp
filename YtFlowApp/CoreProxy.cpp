@@ -112,17 +112,21 @@ namespace winrt::YtFlowApp::implementation
         host = uri.hostText;
         return PluginDecodeResult::Success;
     }
-    PluginDecodeResult Sip002Decoder::DecodeObfs(ParsedUri const &uri, ProxyPlugin &plugin, std::string_view tcpNext,
-                                                 std::string_view)
+
+    PluginDecodeResult Sip002Decoder::DecodeSip003Plugin(std::string_view pluginName, std::string_view pluginOpts,
+                                                         std::string_view defaultHost, ProxyPlugin &plugin,
+                                                         std::string_view tcpNext)
     {
-        std::string empty{};
-        auto const &param = uri.GetQueryValue("plugin").value_or(std::ref(empty)).get();
-        if (!param.starts_with("obfs-local;"))
+        if (pluginName == "")
         {
             return PluginDecodeResult::Ignore;
         }
+        if (pluginName != "obfs-local")
+        {
+            return PluginDecodeResult::Fail;
+        }
         std::map<std::string_view, std::string_view> obfsMap;
-        for (auto const kv : std::views::split(std::string_view(param.data() + 11, param.size() - 11), ';'))
+        for (auto const kv : std::views::split(pluginOpts, ';'))
         {
             std::string_view kvStr(kv.begin(), kv.end());
             auto const eqPos = kvStr.find('=');
@@ -136,7 +140,7 @@ namespace winrt::YtFlowApp::implementation
         std::string_view host = obfsMap["obfs-host"];
         if (host.empty())
         {
-            host = uri.hostText;
+            host = defaultHost;
         }
         if (obfsMap["obfs"] == "http")
         {
@@ -158,6 +162,20 @@ namespace winrt::YtFlowApp::implementation
             return PluginDecodeResult::Fail;
         }
         return PluginDecodeResult::Success;
+    }
+    PluginDecodeResult Sip002Decoder::DecodeObfs(ParsedUri const &uri, ProxyPlugin &plugin, std::string_view tcpNext,
+                                                 std::string_view)
+    {
+        std::string empty{};
+        auto const &param = uri.GetQueryValue("plugin").value_or(std::ref(empty)).get();
+        auto const semiPos = param.find(';');
+        if (semiPos == std::string::npos)
+        {
+            return DecodeSip003Plugin("", std::string_view(param.data(), param.size()), uri.hostText, plugin, tcpNext);
+        }
+        return DecodeSip003Plugin(std::string_view(param.data(), semiPos),
+                                  std::string_view(param.data() + semiPos + 1, param.size() - semiPos - 1),
+                                  uri.hostText, plugin, tcpNext);
     }
     PluginDecodeResult Sip002Decoder::DecodeTls(ParsedUri const &, ProxyPlugin &, std::string_view, std::string_view)
     {
@@ -457,7 +475,7 @@ namespace winrt::YtFlowApp::implementation
     }
     PluginDecodeResult HttpDecoder::DecodeTls(ParsedUri const &, ProxyPlugin &, std::string_view, std::string_view)
     {
-        // TODO: tls
+        // TODO: https tls
         return PluginDecodeResult::Ignore;
     }
     PluginDecodeResult HttpDecoder::DecodeUdp(ParsedUri const &)
@@ -514,7 +532,7 @@ namespace winrt::YtFlowApp::implementation
         uint16_t alterId;
         try
         {
-            auto const enableVlessDoc = m_linkDoc.value("enable_vless", nlohmann::json{nullptr});
+            auto const enableVlessDoc = m_linkDoc.value("enable_vless", nlohmann::json());
             if (enableVlessDoc == true || enableVlessDoc == "true")
             {
                 return PluginDecodeResult::Fail;
@@ -643,7 +661,7 @@ namespace winrt::YtFlowApp::implementation
             {
                 return PluginDecodeResult::Ignore;
             }
-            auto const enableXtlsDoc = m_linkDoc.value("enable_xtls", nlohmann::json{nullptr});
+            auto const enableXtlsDoc = m_linkDoc.value("enable_xtls", nlohmann::json());
             if (enableXtlsDoc == true || enableXtlsDoc == "true")
             {
                 return PluginDecodeResult::Fail;
@@ -651,25 +669,14 @@ namespace winrt::YtFlowApp::implementation
             // TODO: fingerprint
             nlohmann::json sniDoc = nullptr, alpnDoc = nullptr;
             auto const isWs = m_linkDoc.value("net", "tcp") == "ws";
-            if (m_linkDoc.at("alpn").get<std::string>().find("h2") != std::string::npos)
+            auto const rawAlpn = m_linkDoc.value("alpn", "");
+            if (isWs && rawAlpn == "h2,http/1.1")
             {
-                // WebSocket does not support h2 yet
-                if (isWs)
-                {
-                    return PluginDecodeResult::Fail;
-                }
+                // websocket-client is ALPN-aware. Omit alpn to enable h2 probe.
             }
-            alpnDoc = ParseAlpn(m_linkDoc.value("alpn", ""));
-            if (alpnDoc.empty())
+            else
             {
-                if (isWs)
-                {
-                    alpnDoc = {"http/1.1"};
-                }
-                else
-                {
-                    alpnDoc = {"h2", "http/1.1"};
-                }
+                alpnDoc = ParseAlpn(rawAlpn);
             }
             if (m_linkDoc.value("sni", "") != "")
             {

@@ -162,6 +162,7 @@
     <ClInclude Include="CoreFfi.h" />
     <ClInclude Include="CoreProxyImpl.h" />
     <ClInclude Include="CoreRpc.h" />
+    <ClInclude Include="CoreSubscription.h" />
     <ClInclude Include="cppcoro\async_mutex.hpp" />
     <ClInclude Include="DynOutboundHomeWidget.h">
       <DependentUpon>DynOutboundHomeWidget.xaml</DependentUpon>
@@ -352,6 +353,7 @@
     <ClCompile Include="BoolToFontWeightConverter.cpp" />
     <ClCompile Include="CoreFfi.cpp" />
     <ClCompile Include="CoreRpc.cpp" />
+    <ClCompile Include="CoreSubscription.cpp" />
     <ClCompile Include="cppcoro\async_mutex.cpp" />
     <ClCompile Include="DynOutboundHomeWidget.cpp">
       <DependentUpon>DynOutboundHomeWidget.xaml</DependentUpon>

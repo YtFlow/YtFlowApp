@@ -285,6 +285,7 @@ namespace winrt::YtFlowApp::implementation
             hstring errMsg{};
             try
             {
+                client.DefaultRequestHeaders().UserAgent().Clear();
                 client.DefaultRequestHeaders().UserAgent().ParseAdd(L"YtFlowApp/0.0 ResourceUpdater/0.0");
                 HttpRequestMessage req;
                 req.RequestUri(Uri{to_hstring(url)});

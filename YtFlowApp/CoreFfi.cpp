@@ -171,11 +171,46 @@ namespace winrt::YtFlowApp::implementation
             unwrap_ffi_result<FfiNoop>(ytflow_core::ytflow_proxy_group_create(name, type, conn_ptr));
         return (uint32_t)((uintptr_t)ptrRaw & 0xFFFFFFFF);
     }
+    uint32_t FfiConn::CreateProxySubscriptionGroup(char const *name, char const *format, char const *url) &
+    {
+        std::lock_guard _guard(conn_mu);
+        const auto [ptrRaw, metaRaw] = unwrap_ffi_result<FfiNoop>(
+            ytflow_core::ytflow_proxy_group_create_subscription(name, format, url, conn_ptr));
+        return (uint32_t)((uintptr_t)ptrRaw & 0xFFFFFFFF);
+    }
     std::vector<FfiProxy> FfiConn::GetProxiesByProxyGroup(uint32_t proxyGroupId) &
     {
         std::lock_guard _guard(conn_mu);
         return unwrap_ffi_buffer<std::vector<FfiProxy>>(
             ytflow_core::ytflow_proxy_get_by_proxy_group(proxyGroupId, conn_ptr));
+    }
+    FfiProxyGroupSubscription FfiConn::GetProxySubscriptionByProxyGroup(uint32_t proxyGroupId) &
+    {
+        std::lock_guard _guard(conn_mu);
+        return unwrap_ffi_buffer<FfiProxyGroupSubscription>(
+            ytflow_core::ytflow_proxy_subscription_query_by_proxy_group_id(proxyGroupId, conn_ptr));
+    }
+    void FfiConn::UpdateProxySubscriptionRetrievedByProxyGroup(uint32_t proxyGroupId,
+                                                               std::optional<uint64_t> uploadBytes,
+                                                               std::optional<uint64_t> downloadBytes,
+                                                               std::optional<uint64_t> totalBytes,
+                                                               char const *expiresAt) &
+    {
+        uint64_t const *uploadBytesPtr{nullptr}, *downloadBytesPtr{nullptr}, *totalBytesPtr{nullptr};
+        if (uploadBytes.has_value())
+        {
+            uploadBytesPtr = &*uploadBytes;
+        }
+        if (downloadBytes.has_value())
+        {
+            downloadBytesPtr = &*downloadBytes;
+        }
+        if (totalBytes.has_value())
+        {
+            totalBytesPtr = &*totalBytes;
+        }
+        unwrap_ffi_result<FfiNoop>(ytflow_core::ytflow_proxy_subscription_update_retrieved_by_proxy_group_id(
+            proxyGroupId, uploadBytesPtr, downloadBytesPtr, totalBytesPtr, expiresAt, conn_ptr));
     }
     uint32_t FfiConn::CreateProxy(uint32_t proxyGroupId, char const *name, uint8_t const *proxy, size_t proxyLen,
                                   uint16_t proxyVersion) &
@@ -202,6 +237,12 @@ namespace winrt::YtFlowApp::implementation
         std::lock_guard _guard(conn_mu);
         unwrap_ffi_result<FfiNoop>(
             ytflow_core::ytflow_proxy_reorder(proxyGroupId, rangeStartOrder, rangeEndOrder, moves, conn_ptr));
+    }
+    void FfiConn::BatchUpdateProxyInGroup(uint32_t proxyGroupId, uint8_t const *newProxyBuf, size_t newProxyBufLen) &
+    {
+        std::lock_guard _guard(conn_mu);
+        unwrap_ffi_result<FfiNoop>(
+            ytflow_core::ytflow_proxy_batch_update_by_group(proxyGroupId, newProxyBuf, newProxyBufLen, conn_ptr));
     }
     std::vector<FfiResource> FfiConn::GetResources() &
     {

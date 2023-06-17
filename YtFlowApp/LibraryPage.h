@@ -20,6 +20,8 @@ namespace winrt::YtFlowApp::implementation
         fire_and_forget RenameProxyGroupItem(YtFlowApp::ProxyGroupModel const &item);
         fire_and_forget CreateProxyGroupButton_Click(winrt::Windows::Foundation::IInspectable const &sender,
                                                      winrt::Windows::UI::Xaml::RoutedEventArgs const &e);
+        fire_and_forget CreateSubscriptionButton_Click(winrt::Windows::Foundation::IInspectable const &sender,
+                                                       winrt::Windows::UI::Xaml::RoutedEventArgs const &e);
         void ProxyGroupItem_Click(winrt::Windows::Foundation::IInspectable const &sender,
                                   winrt::Windows::UI::Xaml::RoutedEventArgs const &e);
         void ProxyGroupProxyList_SelectionChanged(

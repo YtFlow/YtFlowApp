@@ -34,11 +34,13 @@
                 </ContentControl>
                 <Grid Margin="0, 0, 0, 20">
                     <TextBlock Style="{ThemeResource SubtitleTextBlockStyle}">Proxy Group</TextBlock>
-                    <Button
-                        Style="{ThemeResource AccentButtonStyle}"
-                        HorizontalAlignment="Right"
-                        Click="CreateProxyGroupButton_Click"
-                    >
+                    <muxc:DropDownButton Style="{ThemeResource AccentButtonStyle}" HorizontalAlignment="Right">
+                        <muxc:DropDownButton.Flyout>
+                            <MenuFlyout>
+                                <MenuFlyoutItem Click="CreateProxyGroupButton_Click">Group</MenuFlyoutItem>
+                                <MenuFlyoutItem Click="CreateSubscriptionButton_Click">Subscription</MenuFlyoutItem>
+                            </MenuFlyout>
+                        </muxc:DropDownButton.Flyout>
                         <StackPanel Orientation="Horizontal" Margin="8, 0">
                             <FontIcon
                                 FontFamily="Segoe MDL2 Assets"
@@ -48,7 +50,7 @@
                             />
                             <TextBlock FontWeight="SemiBold">Create</TextBlock>
                         </StackPanel>
-                    </Button>
+                    </muxc:DropDownButton>
                 </Grid>
                 <GridView
                     x:Name="ProxyGroupGridView"
@@ -146,6 +148,32 @@
                         </DataTemplate>
                     </ContentDialog.ContentTemplate>
                 </ContentDialog>
+                <ContentDialog
+                    x:Name="ProxyGroupAddSubscriptionDialog"
+                    Title="Import Subscription"
+                    PrimaryButtonText="Import"
+                    contract7NotPresent:SecondaryButtonText="Close"
+                    DefaultButton="Primary">
+                    <contract7Present:ContentDialog.SecondaryButtonCommand>
+                        <contract7Present:StandardUICommand Kind="Close"/>
+                    </contract7Present:ContentDialog.SecondaryButtonCommand>
+                    <StackPanel>
+                        <TextBlock Style="{ThemeResource BaseTextBlockStyle}" Margin="4, 8, 0, 4">URL</TextBlock>
+                        <TextBox x:Name="ProxyGroupAddSubscriptionUrlText" PlaceholderText="https://" Width="400" InputScope="Url" />
+                        <TextBlock Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}" TextWrapping="Wrap" Margin="4, 0, 0, 0">
+                            Supported formats: SIP008
+                        </TextBlock>
+                        <TextBlock
+                            x:Name="ProxyGroupAddSubscriptionError"
+                            Foreground="{ThemeResource SystemErrorTextColor}"
+                            Margin="0, 4, 0, 0"
+                            Visibility="Collapsed"
+                            TextWrapping="Wrap"
+                            IsTextSelectionEnabled="True"
+                        />
+                    </StackPanel>
+                </ContentDialog>
+
             </StackPanel>
         </ScrollViewer>
         <Grid

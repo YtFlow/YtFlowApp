@@ -13,6 +13,10 @@ namespace winrt::YtFlowApp::implementation
             : m_id(proxyGroup.id), m_name(to_hstring(proxyGroup.name)), m_type(to_hstring(proxyGroup.type))
         {
         }
+        ProxyGroupModel(FfiProxyGroup const &proxyGroup, FfiProxyGroupSubscription const &subscription)
+            : m_id(proxyGroup.id), m_name(to_hstring(proxyGroup.name)), m_type(to_hstring(proxyGroup.type))
+        {
+        }
 
         uint32_t Id() const;
         hstring Name() const;
