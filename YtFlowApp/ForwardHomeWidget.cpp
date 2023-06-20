@@ -13,31 +13,6 @@ using namespace Windows::UI::Xaml;
 
 namespace winrt::YtFlowApp::implementation
 {
-    hstring ForwardHomeWidget::HumanizeByteSpeed(uint64_t num)
-    {
-        if (num == 0)
-        {
-            return L"0 B/s";
-        }
-        if (num < 1024)
-        {
-            return to_hstring(num) + L" B/s";
-        }
-        if (num < 1024ULL * 1000)
-        {
-            return to_hstring(double(num * 10 / 1024) / 10) + L" KB/s";
-        }
-        if (num < 1024ULL * 1024 * 1000)
-        {
-            return to_hstring(double(num * 10 / 1024 / 1024) / 10) + L" MB/s";
-        }
-        if (num < 1024ULL * 1024 * 1024 * 1000)
-        {
-            return to_hstring(double(num * 10 / 1024 / 1024 / 1024) / 10) + L" GB/s";
-        }
-        return L"∞";
-    }
-
     ForwardHomeWidget::ForwardHomeWidget(hstring pluginName, std::shared_ptr<std::vector<uint8_t>> sharedInfo)
         : m_sharedInfo(std::move(sharedInfo))
     {

@@ -293,6 +293,26 @@ namespace YtFlowApp
         {
             get;
         };
+        String SubscriptionUrl
+        {
+            get;
+        };
+        String SubscriptionUploadUsed
+        {
+            get;
+        };
+        String SubscriptionDownloadUsed
+        {
+            get;
+        };
+        String SubscriptionBytesTotal
+        {
+            get;
+        };
+        String SubscriptionRetrievedAt
+        {
+            get;
+        };
         Windows.Foundation.Collections.IObservableVector<ProxyModel> Proxies
         {
             get;

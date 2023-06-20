@@ -6,7 +6,6 @@
 
 #include "winrt\Windows.Web.Http.Headers.h"
 #include <ranges>
-#include <winrt\Windows.Web.Http.h>
 
 #include "CoreFfi.h"
 #include "CoreProxy.h"
@@ -41,10 +40,25 @@ namespace winrt::YtFlowApp::implementation
             auto conn = FfiDbInstance.Connect();
             auto const proxyGroups = conn.GetProxyGroups();
             std::vector<YtFlowApp::ProxyGroupModel> proxyGroupModels;
+            std::vector<std::pair<ProxyGroupModel *, FfiProxyGroupSubscription>> subscriptionInfoToAttach;
             proxyGroupModels.reserve(proxyGroups.size());
+            subscriptionInfoToAttach.reserve(proxyGroups.size());
             std::transform(proxyGroups.begin(), proxyGroups.end(), std::back_inserter(proxyGroupModels),
-                           [](auto const &group) { return make<ProxyGroupModel>(group); });
+                           [&conn, &subscriptionInfoToAttach](auto const &group) {
+                               auto ret = make<ProxyGroupModel>(group);
+                               if (group.type == "subscription")
+                               {
+                                   subscriptionInfoToAttach.emplace_back(
+                                       std::make_pair(get_self<ProxyGroupModel>(ret),
+                                                      conn.GetProxySubscriptionByProxyGroup(group.id)));
+                               }
+                               return ret;
+                           });
             co_await resume_foreground(Dispatcher());
+            for (auto &&[model, subscriptionInfo] : subscriptionInfoToAttach)
+            {
+                model->AttachSubscriptionInfo(subscriptionInfo);
+            }
             m_model->ProxyGroups(single_threaded_observable_vector(std::move(proxyGroupModels)));
         }
         catch (...)
@@ -70,6 +84,27 @@ namespace winrt::YtFlowApp::implementation
             args.Cancel(true);
             isDetailedViewShown = false;
         }
+    }
+
+    void LibraryPage::Page_Loaded(IInspectable const &, RoutedEventArgs const &)
+    {
+        ProxySubscriptionUpdatesRunning$.get_observable()
+            .scan(std::make_pair(0, 0),
+                  [](auto prev, int curr) { return std::make_pair(prev.second, prev.second + curr); })
+            .filter([](auto change) { return change.first == 0 || change.second == 0; })
+            .subscribe([weak{get_weak()}](auto change) {
+                if (auto const self = weak.get())
+                {
+                    if (change.first == 0)
+                    {
+                        self->SyncSubscriptionButtonRunStoryboard().Begin();
+                    }
+                    else
+                    {
+                        self->SyncSubscriptionButtonRunStoryboard().Stop();
+                    }
+                }
+            });
     }
 
     fire_and_forget LibraryPage::ProxyGroupItemDelete_Click(IInspectable const &sender, RoutedEventArgs const &e)
@@ -178,6 +213,44 @@ namespace winrt::YtFlowApp::implementation
         }
     }
 
+    Windows::Web::Http::HttpClient LibraryPage::GetHttpClientForSubscription()
+    {
+        static Windows::Web::Http::HttpClient client{nullptr};
+        if (client == nullptr)
+        {
+            client = Windows::Web::Http::HttpClient();
+            client.DefaultRequestHeaders().UserAgent().Clear();
+            client.DefaultRequestHeaders().UserAgent().ParseAdd(L"YtFlowApp/0.0 SubscriptionUpdater/0.0");
+        }
+        return client;
+    }
+    IAsyncAction LibraryPage::DownloadSubscriptionProxies(Windows::Web::Http::HttpClient client, Uri uri,
+                                                          char const *format,
+                                                          std::shared_ptr<SubscriptionDownloadDecodeResult> result)
+    {
+        auto const res = (co_await client.GetAsync(uri)).EnsureSuccessStatusCode();
+        auto const userinfoHeader = res.Headers().TryLookup(L"subscription-userinfo");
+        DecodedSubscriptionUserInfo userinfo{};
+        if (userinfoHeader.has_value())
+        {
+            userinfo = DecodeSubscriptionUserInfoFromResponseHeaderValue(to_string(*userinfoHeader));
+        }
+
+        auto const resStr = to_string(co_await res.Content().ReadAsStringAsync());
+        auto proxies = DecodeSubscriptionProxies(resStr, format);
+        if (!proxies.has_value() || format == nullptr)
+        {
+            throw hresult_invalid_argument(L"The subscription data contains no valid proxy.");
+        }
+        *result = SubscriptionDownloadDecodeResult{.proxies = std::move(proxies).value(),
+                                                   .format = format,
+                                                   .userinfo = std::move(userinfo),
+                                                   .expiresAt = nullptr};
+        if (result->userinfo.expires_at.has_value())
+        {
+            result->expiresAt = userinfo.expires_at->c_str();
+        }
+    }
     fire_and_forget LibraryPage::CreateSubscriptionButton_Click(IInspectable const &, RoutedEventArgs const &)
     {
         try
@@ -185,52 +258,31 @@ namespace winrt::YtFlowApp::implementation
             auto const lifetime = get_strong();
             ProxyGroupAddSubscriptionError().Text(L"");
             ProxyGroupAddSubscriptionError().Visibility(Visibility::Collapsed);
+            auto const client = GetHttpClientForSubscription();
             while (co_await ProxyGroupAddSubscriptionDialog().ShowAsync() == ContentDialogResult::Primary)
             {
                 auto const url = ProxyGroupAddSubscriptionUrlText().Text();
                 std::optional<hstring> errMsg = std::nullopt;
+                lifetime->ProxySubscriptionUpdatesRunning$.get_subscriber().on_next(1);
 
                 try
                 {
                     Uri const uri{url};
-                    // TODO:
-
-                    static Windows::Web::Http::HttpClient client{};
-                    client.DefaultRequestHeaders().UserAgent().Clear();
-                    client.DefaultRequestHeaders().UserAgent().ParseAdd(L"YtFlowApp/0.0 SubscriptionUpdater/0.0");
-                    auto const res = (co_await client.GetAsync(uri)).EnsureSuccessStatusCode();
-                    auto const userinfoHeader = res.Headers().TryLookup(L"subscription-userinfo");
-                    DecodedSubscriptionUserInfo userinfo{};
-                    if (userinfoHeader.has_value())
-                    {
-                        userinfo = DecodeSubscriptionUserInfoFromResponseHeaderValue(to_string(*userinfoHeader));
-                    }
-                    // TODO: total, not remaining
-
-                    auto const resStr = to_string(co_await res.Content().ReadAsStringAsync());
-                    char const *format{nullptr};
-                    auto const proxies = DecodeSubscriptionProxies(resStr, format);
-                    if (!proxies.has_value() || format == nullptr)
-                    {
-                        throw hresult_invalid_argument(L"The subscription data contains no valid proxy.");
-                    }
+                    auto const res = std::make_shared<SubscriptionDownloadDecodeResult>();
+                    co_await DownloadSubscriptionProxies(client, uri, nullptr, res);
 
                     co_await resume_background();
                     auto conn = FfiDbInstance.Connect();
-                    auto const newGroupId = conn.CreateProxySubscriptionGroup(to_string(uri.Domain()).c_str(), format,
-                                                                              to_string(url).c_str());
-                    conn.BatchUpdateProxyInGroup(newGroupId, proxies->data(), proxies->size());
-                    char const *expiresAt{nullptr};
-                    if (userinfo.expires_at.has_value())
-                    {
-                        expiresAt = userinfo.expires_at->c_str();
-                    }
-                    conn.UpdateProxySubscriptionRetrievedByProxyGroup(newGroupId, userinfo.upload_bytes_used,
-                                                                      userinfo.download_bytes_used,
-                                                                      userinfo.bytes_total, expiresAt);
-                    auto const newGroupModel = make<ProxyGroupModel>(conn.GetProxyGroupById(newGroupId),
-                                                                     conn.GetProxySubscriptionByProxyGroup(newGroupId));
+                    auto const newGroupId = conn.CreateProxySubscriptionGroup(to_string(uri.Domain()).c_str(),
+                                                                              res->format, to_string(url).c_str());
+                    conn.BatchUpdateProxyInGroup(newGroupId, res->proxies.data(), res->proxies.size());
+                    conn.UpdateProxySubscriptionRetrievedByProxyGroup(newGroupId, res->userinfo.upload_bytes_used,
+                                                                      res->userinfo.download_bytes_used,
+                                                                      res->userinfo.bytes_total, res->expiresAt);
+                    auto const newGroupModel = make<ProxyGroupModel>(conn.GetProxyGroupById(newGroupId));
                     co_await resume_foreground(lifetime->Dispatcher());
+                    get_self<ProxyGroupModel>(newGroupModel)
+                        ->AttachSubscriptionInfo(conn.GetProxySubscriptionByProxyGroup(newGroupId));
                     m_model->ProxyGroups().Append(newGroupModel);
                 }
                 catch (hresult_error const &hr)
@@ -238,6 +290,7 @@ namespace winrt::YtFlowApp::implementation
                     errMsg = {hr.message()};
                 }
                 co_await resume_foreground(lifetime->Dispatcher());
+                lifetime->ProxySubscriptionUpdatesRunning$.get_subscriber().on_next(-1);
                 if (errMsg.has_value())
                 {
                     ProxyGroupAddSubscriptionError().Text(*errMsg);
@@ -253,6 +306,81 @@ namespace winrt::YtFlowApp::implementation
         {
             NotifyException(L"Import Subscription");
         }
+    }
+
+    void LibraryPage::SyncSubscriptionButton_Click(IInspectable const &, RoutedEventArgs const &)
+    {
+        UpdateSubscription(std::nullopt);
+    }
+
+    fire_and_forget LibraryPage::UpdateSubscription(std::optional<uint32_t> id)
+    {
+        auto const lifetime = get_strong();
+        auto proxyGroupIt =
+            std::ranges::views::transform(lifetime->m_model->ProxyGroups(),
+                                          [](auto const &model) { return model.as<ProxyGroupModel>(); }) |
+            std::ranges::views::filter([&id](auto const &model) {
+                return !model->IsManualGroup() && !model->IsUpdating && (!id.has_value() || model->Id() == *id);
+            });
+        std::vector const proxyGroups(proxyGroupIt.begin(), proxyGroupIt.end());
+        try
+        {
+            for (auto &&model : proxyGroups)
+            {
+                model->IsUpdating = true;
+            }
+            lifetime->ProxySubscriptionUpdatesRunning$.get_subscriber().on_next(1);
+            std::vector<std::pair<com_ptr<ProxyGroupModel>, FfiProxyGroupSubscription>> subscriptionInfoToAttach;
+            subscriptionInfoToAttach.reserve(proxyGroups.size());
+            auto const client = GetHttpClientForSubscription();
+
+            co_await resume_background();
+
+            hstring errors;
+            auto res = std::make_shared<SubscriptionDownloadDecodeResult>();
+            auto conn = FfiDbInstance.Connect();
+            for (auto &&model : proxyGroups)
+            {
+                try
+                {
+                    auto const groupId = model->Id();
+                    auto const subscription = conn.GetProxySubscriptionByProxyGroup(groupId);
+                    co_await DownloadSubscriptionProxies(client, Uri{to_hstring(subscription.url)},
+                                                         ConvertSubscriptionFormatToStatic(subscription.format.data()),
+                                                         res);
+                    conn.BatchUpdateProxyInGroup(groupId, res->proxies.data(), res->proxies.size());
+                    conn.UpdateProxySubscriptionRetrievedByProxyGroup(groupId, res->userinfo.upload_bytes_used,
+                                                                      res->userinfo.download_bytes_used,
+                                                                      res->userinfo.bytes_total, res->expiresAt);
+                    subscriptionInfoToAttach.emplace_back(
+                        std::make_pair(model, conn.GetProxySubscriptionByProxyGroup(groupId)));
+                }
+                catch (hresult_error const &hr)
+                {
+                    errors = errors + hstring{L"\r\n"} + model->Name() + L": " + hr.message();
+                }
+            }
+
+            co_await resume_foreground(lifetime->Dispatcher());
+            for (auto &&[model, subscriptionInfo] : subscriptionInfoToAttach)
+            {
+                model->AttachSubscriptionInfo(subscriptionInfo);
+            }
+            if (!errors.empty())
+            {
+                NotifyUser(errors, L"Update errors");
+            }
+        }
+        catch (...)
+        {
+            NotifyException(L"Updating Subscription");
+        }
+        co_await resume_foreground(lifetime->Dispatcher());
+        for (auto &&model : proxyGroups)
+        {
+            model->IsUpdating = false;
+        }
+        lifetime->ProxySubscriptionUpdatesRunning$.get_subscriber().on_next(-1);
     }
 
     void LibraryPage::ProxyGroupItem_Click(IInspectable const &sender, RoutedEventArgs const &)
@@ -505,5 +633,4 @@ namespace winrt::YtFlowApp::implementation
         ProxyGroupProxyExportText().Text(std::move(text));
         auto const _ = ProxyGroupProxyExportDialog().ShowAsync();
     }
-
 }

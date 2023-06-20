@@ -93,13 +93,28 @@ namespace winrt::YtFlowApp::implementation
         return ret;
     }
 
+    char const *ConvertSubscriptionFormatToStatic(char const *input)
+    {
+        if (input == nullptr)
+        {
+            throw std::invalid_argument("Empty input for subscription format");
+        }
+        if (strcmp(input, "sip008") == 0)
+        {
+            return SIP008_LITERAL;
+        }
+        throw std::invalid_argument(std::string("Unknown subscription format: ") + std::string(input));
+    }
     std::optional<std::vector<uint8_t>> DecodeSubscriptionProxies(std::string_view data, char const *&decodedFormat)
     {
-        auto sip008Res = DecodeSip008(data);
-        if (!sip008Res.empty())
+        if (decodedFormat == nullptr || strcmp(decodedFormat, SIP008_LITERAL) == 0)
         {
-            decodedFormat = "sip008";
-            return {nlohmann::json::to_cbor(std::move(sip008Res))};
+            auto sip008Res = DecodeSip008(data);
+            if (!sip008Res.empty())
+            {
+                decodedFormat = SIP008_LITERAL;
+                return {nlohmann::json::to_cbor(std::move(sip008Res))};
+            }
         }
         decodedFormat = nullptr;
         return std::nullopt;

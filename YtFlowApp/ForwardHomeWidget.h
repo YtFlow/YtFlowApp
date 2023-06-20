@@ -13,8 +13,6 @@ namespace winrt::YtFlowApp::implementation
     };
     struct ForwardHomeWidget : ForwardHomeWidgetT<ForwardHomeWidget>
     {
-        static hstring HumanizeByteSpeed(uint64_t num);
-
         ForwardHomeWidget()
         {
             // Xaml objects should not call InitializeComponent during construction.

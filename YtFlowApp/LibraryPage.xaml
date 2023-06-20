@@ -10,7 +10,9 @@
     xmlns:contract7Present="http://schemas.microsoft.com/winfx/2006/xaml/presentation?IsApiContractPresent(Windows.Foundation.UniversalApiContract,7)"
     xmlns:contract7NotPresent="http://schemas.microsoft.com/winfx/2006/xaml/presentation?IsApiContractNotPresent(Windows.Foundation.UniversalApiContract,7)"
     mc:Ignorable="d"
-    NavigationCacheMode="Required">
+    NavigationCacheMode="Required"
+    Loaded="Page_Loaded"
+>
 
     <Grid x:Name="MainGrid">
         <Grid.ColumnDefinitions>
@@ -34,23 +36,49 @@
                 </ContentControl>
                 <Grid Margin="0, 0, 0, 20">
                     <TextBlock Style="{ThemeResource SubtitleTextBlockStyle}">Proxy Group</TextBlock>
-                    <muxc:DropDownButton Style="{ThemeResource AccentButtonStyle}" HorizontalAlignment="Right">
-                        <muxc:DropDownButton.Flyout>
-                            <MenuFlyout>
-                                <MenuFlyoutItem Click="CreateProxyGroupButton_Click">Group</MenuFlyoutItem>
-                                <MenuFlyoutItem Click="CreateSubscriptionButton_Click">Subscription</MenuFlyoutItem>
-                            </MenuFlyout>
-                        </muxc:DropDownButton.Flyout>
-                        <StackPanel Orientation="Horizontal" Margin="8, 0">
+                    <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                        <Button Margin="0, 0, 8, 0" Click="SyncSubscriptionButton_Click" ToolTipService.ToolTip="Update All">
+                            <Button.Resources>
+                                <Storyboard x:Name="SyncSubscriptionButtonRunStoryboard" RepeatBehavior="Forever">
+                                    <DoubleAnimation
+                                        Storyboard.TargetName="SyncSubscriptionButtonRotateTransform"
+                                        Storyboard.TargetProperty="Angle"
+                                        From="0"
+                                        To="360"
+                                        Duration="0:0:4"
+                                    />
+                                </Storyboard>
+                            </Button.Resources>
                             <FontIcon
+                                Margin="0, 3, 0, 3"
                                 FontFamily="Segoe MDL2 Assets"
-                                Glyph="&#xE8F4;"
-                                Margin="0, 2, 8, 0"
+                                Glyph="&#xE895;"
                                 FontSize="16"
-                            />
-                            <TextBlock FontWeight="SemiBold">Create</TextBlock>
-                        </StackPanel>
-                    </muxc:DropDownButton>
+                                RenderTransformOrigin="0.5, 0.5"
+                            >
+                                <FontIcon.RenderTransform>
+                                    <RotateTransform x:Name="SyncSubscriptionButtonRotateTransform" />
+                                </FontIcon.RenderTransform>
+                            </FontIcon>
+                        </Button>
+                        <muxc:DropDownButton Style="{ThemeResource AccentButtonStyle}">
+                            <muxc:DropDownButton.Flyout>
+                                <MenuFlyout>
+                                    <MenuFlyoutItem Click="CreateProxyGroupButton_Click">Local Group</MenuFlyoutItem>
+                                    <MenuFlyoutItem Click="CreateSubscriptionButton_Click">Subscription</MenuFlyoutItem>
+                                </MenuFlyout>
+                            </muxc:DropDownButton.Flyout>
+                            <StackPanel Orientation="Horizontal" Margin="8, 0">
+                                <FontIcon
+                                    FontFamily="Segoe MDL2 Assets"
+                                    Glyph="&#xE8F4;"
+                                    Margin="0, 2, 8, 0"
+                                    FontSize="16"
+                                />
+                                <TextBlock FontWeight="SemiBold">Create</TextBlock>
+                            </StackPanel>
+                        </muxc:DropDownButton>
+                    </StackPanel>
                 </Grid>
                 <GridView
                     x:Name="ProxyGroupGridView"
@@ -167,6 +195,7 @@
                             x:Name="ProxyGroupAddSubscriptionError"
                             Foreground="{ThemeResource SystemErrorTextColor}"
                             Margin="0, 4, 0, 0"
+                            MaxWidth="400"
                             Visibility="Collapsed"
                             TextWrapping="Wrap"
                             IsTextSelectionEnabled="True"
