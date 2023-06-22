@@ -20,14 +20,19 @@ namespace winrt::YtFlowApp::implementation
         hstring Type() const;
         void Type(hstring const &value);
         bool IsManualGroup() const;
+        bool IsSubscription() const;
         hstring DisplayType() const;
         hstring DisplayTypeIcon() const;
         hstring TooltipText() const;
         hstring SubscriptionUrl() const;
         hstring SubscriptionUploadUsed() const;
         hstring SubscriptionDownloadUsed() const;
+        hstring SubscriptionTotalUsed() const;
+        double SubscriptionPercentUsed() const;
+        bool SubscriptionHasDataUsage() const;
         hstring SubscriptionBytesTotal() const;
         hstring SubscriptionRetrievedAt() const;
+        hstring SubscriptionExpireAt() const;
         IObservableVector<ProxyModel> Proxies() const;
         void Proxies(IObservableVector<ProxyModel> const &value);
         winrt::event_token PropertyChanged(winrt::Windows::UI::Xaml::Data::PropertyChangedEventHandler const &handler);
@@ -38,11 +43,13 @@ namespace winrt::YtFlowApp::implementation
         bool IsUpdating{false};
 
       private:
-        uint32_t m_id;
+        uint32_t m_id{};
         hstring m_name;
         hstring m_type;
-        hstring m_subscriptionUrl, m_subscriptionUploadUsed, m_subscriptionDownloadUsed, m_subscriptionBytesTotal,
-            m_subscriptionRetrievedAt;
+        hstring m_subscriptionUrl, m_subscriptionUploadUsed, m_subscriptionDownloadUsed, m_subscriptionTotalUsed,
+            m_subscriptionBytesTotal, m_subscriptionRetrievedAt, m_subscriptionExpireAt;
+        double m_subscriptionPercentUsed{};
+        bool m_subscriptionHasDataUsage{false};
         IObservableVector<ProxyModel> m_proxies{nullptr};
         winrt::event<Windows::UI::Xaml::Data::PropertyChangedEventHandler> m_propertyChanged;
     };

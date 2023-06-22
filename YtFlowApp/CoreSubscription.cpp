@@ -59,7 +59,8 @@ namespace winrt::YtFlowApp::implementation
                     continue;
                 }
                 std::stringstream ss;
-                ss << std::put_time(&ctime, "%F %T"); // ISO 8601 date + time
+                // ISO 8601 date + time
+                ss << std::put_time(&ctime, "%F") << 'T' << std::put_time(&ctime, "%T");
                 ret.expires_at = {ss.str()};
                 continue;
             }

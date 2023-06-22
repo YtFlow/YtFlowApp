@@ -31,6 +31,7 @@ namespace winrt::YtFlowApp::implementation
         m_type = value;
         m_propertyChanged(*this, PropertyChangedEventArgs(L"Type"));
         m_propertyChanged(*this, PropertyChangedEventArgs(L"IsManualGroup"));
+        m_propertyChanged(*this, PropertyChangedEventArgs(L"IsSubscription"));
         m_propertyChanged(*this, PropertyChangedEventArgs(L"DisplayType"));
         m_propertyChanged(*this, PropertyChangedEventArgs(L"DisplayTypeIcon"));
         m_propertyChanged(*this, PropertyChangedEventArgs(L"TooltipText"));
@@ -39,13 +40,17 @@ namespace winrt::YtFlowApp::implementation
     {
         return m_type == L"manual";
     }
+    bool ProxyGroupModel::IsSubscription() const
+    {
+        return m_type == L"subscription";
+    }
     hstring ProxyGroupModel::DisplayType() const
     {
         if (IsManualGroup())
         {
             return L"Local";
         }
-        else if (m_type == L"subscription")
+        if (IsSubscription())
         {
             return L"Subscription";
         }
@@ -65,7 +70,7 @@ namespace winrt::YtFlowApp::implementation
         {
             return m_name + L" (Local)";
         }
-        else if (m_type == L"subscription")
+        else if (IsSubscription())
         {
             return m_name + L" (Subscription)";
         }
@@ -83,6 +88,18 @@ namespace winrt::YtFlowApp::implementation
     {
         return m_subscriptionDownloadUsed;
     }
+    hstring ProxyGroupModel::SubscriptionTotalUsed() const
+    {
+        return m_subscriptionTotalUsed;
+    }
+    double ProxyGroupModel::SubscriptionPercentUsed() const
+    {
+        return m_subscriptionPercentUsed;
+    }
+    bool ProxyGroupModel::SubscriptionHasDataUsage() const
+    {
+        return m_subscriptionHasDataUsage;
+    }
     hstring ProxyGroupModel::SubscriptionBytesTotal() const
     {
         return m_subscriptionBytesTotal;
@@ -90,6 +107,10 @@ namespace winrt::YtFlowApp::implementation
     hstring ProxyGroupModel::SubscriptionRetrievedAt() const
     {
         return m_subscriptionRetrievedAt;
+    }
+    hstring ProxyGroupModel::SubscriptionExpireAt() const
+    {
+        return m_subscriptionExpireAt;
     }
     void ProxyGroupModel::AttachSubscriptionInfo(FfiProxyGroupSubscription const &subscription)
     {
@@ -100,23 +121,67 @@ namespace winrt::YtFlowApp::implementation
         {
             m_subscriptionUploadUsed = HumanizeByte(subscription.upload_bytes_used.value());
         }
+        else
+        {
+            m_subscriptionUploadUsed = L"";
+        }
         if (subscription.download_bytes_used.has_value())
         {
             m_subscriptionDownloadUsed = HumanizeByte(subscription.download_bytes_used.value());
+        }
+        else
+        {
+            m_subscriptionDownloadUsed = L"";
         }
         if (subscription.bytes_total.has_value())
         {
             m_subscriptionBytesTotal = HumanizeByte(subscription.bytes_total.value());
         }
+        else
+        {
+            m_subscriptionBytesTotal = L"";
+        }
+        if (subscription.upload_bytes_used.has_value() && subscription.download_bytes_used.has_value() &&
+            subscription.bytes_total.has_value())
+        {
+            m_subscriptionHasDataUsage = true;
+            m_subscriptionTotalUsed =
+                HumanizeByte(subscription.upload_bytes_used.value() + subscription.download_bytes_used.value());
+            m_subscriptionPercentUsed =
+                (subscription.upload_bytes_used.value() + subscription.download_bytes_used.value()) /
+                static_cast<double>(subscription.bytes_total.value()) * 100;
+        }
+        else
+        {
+            m_subscriptionHasDataUsage = false;
+            m_subscriptionTotalUsed = L"";
+            m_subscriptionPercentUsed = 0;
+        }
         if (subscription.retrieved_at.has_value())
         {
-            m_subscriptionRetrievedAt = to_hstring(subscription.retrieved_at.value());
+            m_subscriptionRetrievedAt = FormatNaiveDateTime(subscription.retrieved_at.value().c_str());
+        }
+        else
+        {
+            m_subscriptionRetrievedAt = L"Never";
+        }
+        if (subscription.expires_at.has_value())
+        {
+            m_subscriptionExpireAt = FormatNaiveDateTime(subscription.expires_at.value().c_str());
+        }
+        else
+        {
+            m_subscriptionExpireAt = L"";
         }
         m_propertyChanged(*this, PropertyChangedEventArgs(L"SubscriptionUrl"));
         m_propertyChanged(*this, PropertyChangedEventArgs(L"SubscriptionUploadUsed"));
         m_propertyChanged(*this, PropertyChangedEventArgs(L"SubscriptionDownloadUsed"));
+        m_propertyChanged(*this, PropertyChangedEventArgs(L"SubscriptionTotalUsed"));
+        m_propertyChanged(*this, PropertyChangedEventArgs(L"SubscriptionPercentUsed"));
+        m_propertyChanged(*this, PropertyChangedEventArgs(L"SubscriptionHasDataUsage"));
         m_propertyChanged(*this, PropertyChangedEventArgs(L"SubscriptionBytesTotal"));
         m_propertyChanged(*this, PropertyChangedEventArgs(L"SubscriptionRetrievedAt"));
+        m_propertyChanged(*this, PropertyChangedEventArgs(L"SubscriptionExpireAt"));
     }
 
     IObservableVector<ProxyModel> ProxyGroupModel::Proxies() const

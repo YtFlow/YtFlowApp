@@ -256,7 +256,65 @@
                 ItemsSource="{x:Bind Model.CurrentProxyGroupModel.Proxies, Mode=OneWay, FallbackValue={x:Null}}"
                 SelectionMode="Extended"
                 SelectionChanged="ProxyGroupProxyList_SelectionChanged"
+                Header="{x:Bind Model.CurrentProxyGroupModel, Mode=OneWay}"
             >
+                <ListView.HeaderTemplate>
+                    <DataTemplate x:DataType="local:ProxyGroupModel">
+                        <Grid
+                            Visibility="{x:Bind IsSubscription}"
+                            Padding="12, 10, 0, 10"
+                            Background="{ThemeResource LayerFillColorDefaultBrush}"
+                            BorderThickness="0, 1, 0, 1"
+                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        >
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="24" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="24" />
+                                <RowDefinition Height="24" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="URL" Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}" />
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{x:Bind SubscriptionUrl}" IsTextSelectionEnabled="True" />
+                            <TextBlock
+                                Grid.Row="1"
+                                Grid.Column="0"
+                                Text="Data Usage"
+                                Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
+                                Visibility="{x:Bind SubscriptionHasDataUsage, Mode=OneWay}"
+                            />
+                            <Grid Grid.Row="1" Grid.Column="1" Margin="0, 8, 0, 8">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <!-- Hack to align the progress bar to the left -->
+                                    <ColumnDefinition Width="*" MaxWidth="250" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <ProgressBar
+                                    Grid.Row="0"
+                                    x:Name="SubscriptionDataUsedBar"
+                                    Value="{x:Bind SubscriptionPercentUsed, Mode=OneWay}"
+                                    Margin="0, 0, 20, 0"
+                                />
+                                <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal">
+                                    <TextBlock Text="{x:Bind SubscriptionTotalUsed, Mode=OneWay}" />
+                                    <TextBlock Margin="8, 0, 8, 0">/</TextBlock>
+                                    <TextBlock Text="{x:Bind SubscriptionBytesTotal, Mode=OneWay}" />
+                                </StackPanel>
+                            </Grid>
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Expire" Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}" Margin="0, 0, 20, 0" />
+                            <TextBlock Grid.Row="2" Grid.Column="1" Text="{x:Bind SubscriptionExpireAt, Mode=OneWay}" />
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Last Update" Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}" Margin="0, 0, 20, 0" />
+                            <TextBlock Grid.Row="3" Grid.Column="1" Text="{x:Bind SubscriptionRetrievedAt, Mode=OneWay}" />
+                        </Grid>
+                    </DataTemplate>
+                </ListView.HeaderTemplate>
                 <ListView.ItemTemplate>
                     <DataTemplate x:DataType="local:ProxyModel">
                         <Grid>

@@ -12,4 +12,5 @@ namespace winrt::YtFlowApp::implementation
 
     hstring HumanizeByte(uint64_t num);
     hstring HumanizeByteSpeed(uint64_t num);
+    hstring FormatNaiveDateTime(char const *dateStr);
 }

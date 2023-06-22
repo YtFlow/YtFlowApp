@@ -248,7 +248,7 @@ namespace winrt::YtFlowApp::implementation
                                                    .expiresAt = nullptr};
         if (result->userinfo.expires_at.has_value())
         {
-            result->expiresAt = userinfo.expires_at->c_str();
+            result->expiresAt = result->userinfo.expires_at->c_str();
         }
     }
     fire_and_forget LibraryPage::CreateSubscriptionButton_Click(IInspectable const &, RoutedEventArgs const &)
@@ -365,6 +365,11 @@ namespace winrt::YtFlowApp::implementation
             for (auto &&[model, subscriptionInfo] : subscriptionInfoToAttach)
             {
                 model->AttachSubscriptionInfo(subscriptionInfo);
+                if (model->Proxies() != nullptr)
+                {
+                    model->Proxies(nullptr);
+                    LoadProxiesForProxyGroup(*model);
+                }
             }
             if (!errors.empty())
             {

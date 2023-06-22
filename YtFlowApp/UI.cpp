@@ -141,4 +141,31 @@ namespace winrt::YtFlowApp::implementation
         return L"∞";
     }
 
+    hstring FormatNaiveDateTime(char const *dateStr)
+    {
+        if (dateStr == nullptr)
+        {
+            return L"";
+        }
+
+        std::istringstream ss{dateStr};
+
+        using namespace std::chrono;
+        sys_seconds tp;
+        time_zone const *tz{};
+        try
+        {
+            tz = current_zone();
+        }
+        catch (std::runtime_error const &)
+        {
+        }
+        if (tz == nullptr || !(ss >> parse("%Y-%m-%dT%H:%M:%S", tp)))
+        {
+            return L"";
+        }
+
+        auto const ltp = tz->to_local(tp);
+        return to_hstring(std::format("{:%Y-%m-%d %H:%M:%S}", ltp));
+    }
 }

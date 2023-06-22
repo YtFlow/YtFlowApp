@@ -281,6 +281,10 @@ namespace YtFlowApp
         {
             get;
         };
+        Boolean IsSubscription
+        {
+            get;
+        };
         String DisplayType
         {
             get;
@@ -305,11 +309,27 @@ namespace YtFlowApp
         {
             get;
         };
+        String SubscriptionTotalUsed
+        {
+            get;
+        };
+        Double SubscriptionPercentUsed
+        {
+            get;
+        };
+        Boolean SubscriptionHasDataUsage
+        {
+            get;
+        };
         String SubscriptionBytesTotal
         {
             get;
         };
         String SubscriptionRetrievedAt
+        {
+            get;
+        };
+        String SubscriptionExpireAt
         {
             get;
         };
