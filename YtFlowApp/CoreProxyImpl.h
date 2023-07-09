@@ -90,10 +90,10 @@ namespace winrt::YtFlowApp::implementation
 
         std::string DecodeName(ParsedUri const &uri);
         PluginDecodeResult DecodeProtocol(ParsedUri const &uri, ProxyPlugin &plugin, std::string_view tcpNext,
-                                          std::string_view udpNext);
+                                          std::string_view udpNext) const;
         PluginDecodeResult DecodeRedir(ParsedUri const &uri, std::string &host, uint16_t &port);
         PluginDecodeResult DecodeObfs(ParsedUri const &uri, ProxyPlugin &plugin, std::string_view tcpNext,
-                                      std::string_view udpNext);
+                                      std::string_view udpNext) const;
         PluginDecodeResult DecodeTls(ParsedUri const &uri, ProxyPlugin &plugin, std::string_view tcpNext,
                                      std::string_view udpNext);
         PluginDecodeResult DecodeUdp(ParsedUri const &uri);
@@ -120,19 +120,19 @@ namespace winrt::YtFlowApp::implementation
     {
         std::string DecodeName(ParsedUri const &uri);
         PluginDecodeResult DecodeProtocol(ParsedUri const &uri, ProxyPlugin &plugin, std::string_view tcpNext,
-                                          std::string_view udpNext);
+                                          std::string_view udpNext) const;
         PluginDecodeResult DecodeRedir(ParsedUri const &uri, std::string &host, uint16_t &port);
         PluginDecodeResult DecodeObfs(ParsedUri const &uri, ProxyPlugin &plugin, std::string_view tcpNext,
                                       std::string_view udpNext); // TODO: obfs
         PluginDecodeResult DecodeTls(ParsedUri const &uri, ProxyPlugin &plugin, std::string_view tcpNext,
-                                     std::string_view udpNext);
+                                     std::string_view udpNext) const;
         PluginDecodeResult DecodeUdp(ParsedUri const &uri);
     };
     struct Socks5Decoder
     {
         std::string DecodeName(ParsedUri const &uri);
         PluginDecodeResult DecodeProtocol(ParsedUri const &uri, ProxyPlugin &plugin, std::string_view tcpNext,
-                                          std::string_view udpNext);
+                                          std::string_view udpNext) const;
         PluginDecodeResult DecodeRedir(ParsedUri const &uri, std::string &host, uint16_t &port);
         PluginDecodeResult DecodeObfs(ParsedUri const &uri, ProxyPlugin &plugin, std::string_view tcpNext,
                                       std::string_view udpNext); // TODO: obfs
@@ -144,7 +144,7 @@ namespace winrt::YtFlowApp::implementation
     {
         std::string DecodeName(ParsedUri const &uri);
         PluginDecodeResult DecodeProtocol(ParsedUri const &uri, ProxyPlugin &plugin, std::string_view tcpNext,
-                                          std::string_view udpNext);
+                                          std::string_view udpNext) const;
         PluginDecodeResult DecodeRedir(ParsedUri const &uri, std::string &host, uint16_t &port);
         PluginDecodeResult DecodeObfs(ParsedUri const &uri, ProxyPlugin &plugin, std::string_view tcpNext,
                                       std::string_view udpNext); // TODO: obfs

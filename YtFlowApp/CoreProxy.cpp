@@ -76,7 +76,7 @@ namespace winrt::YtFlowApp::implementation
         return proxyName;
     }
     PluginDecodeResult Sip002Decoder::DecodeProtocol(ParsedUri const &uri, ProxyPlugin &plugin,
-                                                     std::string_view tcpNext, std::string_view udpNext)
+                                                     std::string_view tcpNext, std::string_view udpNext) const
     {
         plugin.plugin = std::string(SS_PLUGIN_NAME);
         std::string userinfo;
@@ -164,7 +164,7 @@ namespace winrt::YtFlowApp::implementation
         return PluginDecodeResult::Success;
     }
     PluginDecodeResult Sip002Decoder::DecodeObfs(ParsedUri const &uri, ProxyPlugin &plugin, std::string_view tcpNext,
-                                                 std::string_view)
+                                                 std::string_view) const
     {
         std::string empty{};
         auto const &param = uri.GetQueryValue("plugin").value_or(std::ref(empty)).get();
@@ -289,7 +289,7 @@ namespace winrt::YtFlowApp::implementation
         return proxyName;
     }
     PluginDecodeResult TrojanDecoder::DecodeProtocol(ParsedUri const &uri, ProxyPlugin &plugin,
-                                                     std::string_view tcpNext, std::string_view)
+                                                     std::string_view tcpNext, std::string_view) const
     {
         plugin.plugin = std::string(TROJAN_PLUGIN_NAME);
         std::string userinfo(UriUnescape(std::string(uri.userInfo)));
@@ -335,7 +335,7 @@ namespace winrt::YtFlowApp::implementation
         return alpns;
     }
     PluginDecodeResult TrojanDecoder::DecodeTls(ParsedUri const &uri, ProxyPlugin &plugin, std::string_view tcpNext,
-                                                std::string_view)
+                                                std::string_view) const
     {
         nlohmann::json tlsParam{{"next", tcpNext}};
         auto const allowInsecureParam = uri.GetQueryValue("allowInsecure"), peerParam = uri.GetQueryValue("peer"),
@@ -377,7 +377,7 @@ namespace winrt::YtFlowApp::implementation
         return proxyName;
     }
     PluginDecodeResult Socks5Decoder::DecodeProtocol(ParsedUri const &uri, ProxyPlugin &plugin,
-                                                     std::string_view tcpNext, std::string_view udpNext)
+                                                     std::string_view tcpNext, std::string_view udpNext) const
     {
         plugin.plugin = std::string(SOCKS5_PLUGIN_NAME);
         nlohmann::json userDoc = nullptr, passDoc = nullptr;
@@ -430,7 +430,7 @@ namespace winrt::YtFlowApp::implementation
         return proxyName;
     }
     PluginDecodeResult HttpDecoder::DecodeProtocol(ParsedUri const &uri, ProxyPlugin &plugin, std::string_view tcpNext,
-                                                   std::string_view)
+                                                   std::string_view) const
     {
         plugin.plugin = std::string(HTTP_PROXY_PLUGIN_NAME);
         nlohmann::json userDoc = nlohmann::json::binary_t(std::vector<uint8_t>()),

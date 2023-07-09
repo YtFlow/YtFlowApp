@@ -5,6 +5,7 @@
 namespace winrt::YtFlowApp::implementation
 {
     constexpr static char SIP008_LITERAL[7] = "sip008";
+    constexpr static char SURGE_PROXY_LIST_LITERAL[17] = "surge-proxy-list";
     struct DecodedSubscriptionUserInfo
     {
         std::optional<uint64_t> upload_bytes_used;

@@ -189,7 +189,7 @@
                         <TextBlock Style="{ThemeResource BaseTextBlockStyle}" Margin="4, 8, 0, 4">URL</TextBlock>
                         <TextBox x:Name="ProxyGroupAddSubscriptionUrlText" PlaceholderText="https://" Width="400" InputScope="Url" />
                         <TextBlock Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}" TextWrapping="Wrap" Margin="4, 0, 0, 0">
-                            Supported formats: SIP008
+                            Supported formats: SIP008, Surge Proxy List
                         </TextBlock>
                         <TextBlock
                             x:Name="ProxyGroupAddSubscriptionError"
