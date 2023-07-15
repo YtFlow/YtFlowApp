@@ -222,6 +222,10 @@ namespace winrt::YtFlowApp::implementation
         for (auto &&lineIt : std::views::split(data, '\n'))
         {
             std::string_view const line(lineIt.begin(), lineIt.end());
+            if (TrimSpaces(line).starts_with("#"sv))
+            {
+                continue;
+            }
             auto const lineEqPos = line.find('=');
             if (lineEqPos == std::string_view::npos)
             {
@@ -277,7 +281,7 @@ namespace winrt::YtFlowApp::implementation
                 }
             }
             std::map<std::string_view, std::string_view> params;
-            while (segIt != segView.end())
+            for (; segIt != segView.end(); ++segIt)
             {
                 auto const param = std::string_view((*segIt).begin(), (*segIt).end());
                 auto const paramEqPos = param.find('=');
@@ -292,7 +296,6 @@ namespace winrt::YtFlowApp::implementation
                     continue;
                 }
                 params.emplace(paramName, paramValue);
-                ++segIt;
             }
             auto pullParam = [&params](std::string_view const name) -> std::optional<std::string_view> {
                 auto const it = params.find(name);
