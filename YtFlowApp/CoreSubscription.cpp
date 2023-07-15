@@ -101,11 +101,11 @@ namespace winrt::YtFlowApp::implementation
         {
             throw std::invalid_argument("Empty input for subscription format");
         }
-        if (strcmp(input, "sip008") == 0)
+        if (strcmp(input, SIP008_LITERAL) == 0)
         {
             return SIP008_LITERAL;
         }
-        if (strcmp(input, "surge_proxy_list") == 0)
+        if (strcmp(input, SURGE_PROXY_LIST_LITERAL) == 0)
         {
             return SURGE_PROXY_LIST_LITERAL;
         }
