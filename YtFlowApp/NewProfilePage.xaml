@@ -12,6 +12,7 @@
 
     <Page.Resources>
         <Thickness x:Key="SubheaderMargin">0, 20, 0, 10</Thickness>
+        <local:SplitRoutingModeToDescConverter x:Key="SplitRoutingModeToDescConverter" />
     </Page.Resources>
 
     <ScrollViewer>
@@ -73,24 +74,55 @@
                 <TextBlock Margin="{StaticResource SubheaderMargin}" Style="{ThemeResource BaseTextBlockStyle}">
                     Split Routing
                 </TextBlock>
-                <RadioButton x:Name="AllProxyButton" Tag="all" GroupName="SplitRoutingTypeGroup" IsChecked="True">All Proxy</RadioButton>
-                <RadioButton x:Name="WhitelistButton" Tag="whitelist" GroupName="SplitRoutingTypeGroup">Proxy all but CN</RadioButton>
-                <TextBlock Margin="0, 4, 0, 8" TextWrapping="Wrap" Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}">
-                    Connection requests to Chinese websites are handled by direct forwarder. All remaining connections are handled by proxy forwarder. Also called whitelist mode.
-                </TextBlock>
-                <!-- RadioButton GroupName="SplitRoutingTypeGroup">Proxy non-CN only</RadioButton>
-                <TextBlock Margin="0, 4, 0, 8" TextWrapping="Wrap" Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}">
-                    Connection requests to known, overseas websites are handled by proxy forwarder. All remaining connections are handled by direct forwarder. Also called blacklist mode.
-                </TextBlock -->
-                <RadioButton x:Name="OverseasButton" Tag="overseas" GroupName="SplitRoutingTypeGroup">Proxy CN only</RadioButton>
-                <TextBlock Margin="0, 4, 0, 8" TextWrapping="Wrap" Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}">
-                    Connection requests to Chinese websites are handled by proxy forwarder. All remaining connections are handled by direct forwarder. Suitable for overseas users.
-                </TextBlock>
+                <muxc:RadioButtons x:Name="SplitRoutingModeButtons" SelectedIndex="0" SelectionChanged="SplitRoutingModeButtons_SelectionChanged">
+                    <muxc:RadioButtons.Template>
+                        <!-- Overriding the template to allow heterogeneous item size -->
+                        <ControlTemplate TargetType="muxc:RadioButtons">
+                            <StackPanel>
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroup x:Name="CommonStates">
+                                        <VisualState x:Name="Normal" />
+                                        <VisualState x:Name="Disabled">
+                                            <VisualState.Setters>
+                                                <Setter Target="HeaderContentPresenter.Foreground" Value="{ThemeResource RadioButtonsHeaderForegroundDisabled}"/>
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                    </VisualStateGroup>
+                                </VisualStateManager.VisualStateGroups>
+                                <ContentPresenter x:Name="HeaderContentPresenter"
+                                Content="{TemplateBinding Header}"
+                                ContentTemplate="{TemplateBinding HeaderTemplate}"
+                                Foreground="{ThemeResource RadioButtonsHeaderForeground}"
+                                Margin="{ThemeResource RadioButtonsTopHeaderMargin}"/>
+                                <muxc:ItemsRepeater x:Name="InnerRepeater">
+                                    <muxc:ItemsRepeater.Layout />
+                                    <!-- primitives:ColumnMajorUniformToLargestGridLayout
+                                        MaxColumns="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=MaxColumns}"
+                                        ColumnSpacing="{ThemeResource RadioButtonsColumnSpacing}"
+                                        RowSpacing="{ThemeResource RadioButtonsRowSpacing}"/ -->
+                                </muxc:ItemsRepeater>
+                            </StackPanel>
+                        </ControlTemplate>
+                    </muxc:RadioButtons.Template>
+                    <RadioButton Tag="all" IsChecked="True">All Proxy</RadioButton>
+                    <RadioButton Tag="whitelist">Proxy all but CN</RadioButton>
+                    <RadioButton Tag="blacklist">Proxy non-CN only</RadioButton>
+                    <RadioButton Tag="overseas">Proxy CN only</RadioButton>
+                </muxc:RadioButtons>
+                <TextBlock
+                    Margin="0, 4, 0, 8"
+                    TextWrapping="Wrap"
+                    Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
+                    Text="{x:Bind ((RadioButton)SplitRoutingModeButtons.SelectedItem).Tag,
+                    Mode=OneWay,
+                    Converter={StaticResource SplitRoutingModeToDescConverter},
+                    FallbackValue=''}"
+                />
                 <TextBlock Margin="{StaticResource SubheaderMargin}" Style="{ThemeResource BaseTextBlockStyle}">
-                    Ruleset
+                    Rulesets
                 </TextBlock>
                 <StackPanel Orientation="Horizontal">
-                    <Button Content="Select..." Click="SelectRulesetButton_Click" />
+                    <Button x:Name="SelectRulesetButton" Content="Select..." Click="SelectRulesetButton_Click" />
                     <TextBlock x:Name="SelectedRulesetNameText" Margin="8, 0, 0, 0" VerticalAlignment="Center" />
                 </StackPanel>
                 <TextBlock Margin="{StaticResource SubheaderMargin}" Style="{ThemeResource BaseTextBlockStyle}">
@@ -152,7 +184,7 @@
                         <AdaptiveTrigger MinWindowWidth="{StaticResource MediumAdaptiveWidth}" />
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
-                        <Setter Target="MainGrid.Margin" Value="80, 0, 80, 0" />
+                        <Setter Target="MainGrid.Margin" Value="80, 0, 80, 20" />
                         <Setter Target="LeftCol.Width" Value="1*" />
                         <Setter Target="MiddleCol.Width" Value="1*" />
                         <Setter Target="RightCol.Width" Value="1*" />

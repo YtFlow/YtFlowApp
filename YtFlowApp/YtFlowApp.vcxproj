@@ -224,6 +224,7 @@
     </ClInclude>
     <ClInclude Include="RawEditorParam.h" />
     <ClInclude Include="CoreProxy.h" />
+    <ClInclude Include="SplitRoutingModeToDescConverter.h" />
     <ClInclude Include="SwitchChoiceItem.h" />
     <ClInclude Include="SwitchHomeWidget.h">
       <DependentUpon>SwitchHomeWidget.xaml</DependentUpon>
@@ -422,6 +423,7 @@
     </ClCompile>
     <ClCompile Include="RawEditorParam.cpp" />
     <ClCompile Include="CoreProxy.cpp" />
+    <ClCompile Include="SplitRoutingModeToDescConverter.cpp" />
     <ClCompile Include="SwitchChoiceItem.cpp" />
     <ClCompile Include="SwitchHomeWidget.cpp">
       <DependentUpon>SwitchHomeWidget.xaml</DependentUpon>

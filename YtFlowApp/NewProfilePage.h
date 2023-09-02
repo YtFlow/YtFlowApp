@@ -21,7 +21,8 @@ namespace winrt::YtFlowApp::implementation
 
         fire_and_forget SaveButton_Click(IInspectable const &sender, Windows::UI::Xaml::RoutedEventArgs const &e);
         void OutboundTypeButton_Checked(IInspectable const &sender, Windows::UI::Xaml::RoutedEventArgs const &e);
-        void SplitRoutingTypeButton_Checked(IInspectable const &sender, Windows::UI::Xaml::RoutedEventArgs const &e);
+        void SplitRoutingModeButtons_SelectionChanged(IInspectable const &sender,
+                                                      Windows::UI::Xaml::Controls::SelectionChangedEventArgs const &e);
         void DynOutboundButton_Unchecked(IInspectable const &sender, Windows::UI::Xaml::RoutedEventArgs const &e);
         void Page_Loaded(IInspectable const &sender, Windows::UI::Xaml::RoutedEventArgs const &e);
         void Page_Unloaded(IInspectable const &sender, winrt::Windows::UI::Xaml::RoutedEventArgs const &e);
@@ -35,8 +36,7 @@ namespace winrt::YtFlowApp::implementation
 
         event_token m_dynOutboundCheckedToken, m_ssCheckedToken, m_trojanCheckedToken, m_vmessWsTlsCheckedToken,
             m_httpCheckedToken;
-        event_token m_allProxyToken, m_whitelistToken, m_overseasToken;
-        hstring m_selectedOutboundType{L"dyn"}, m_selectedSplitRoutingType{L"all"};
+        hstring m_selectedOutboundType{L"dyn"};
     };
 }
 

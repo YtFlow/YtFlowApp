@@ -22,9 +22,20 @@ namespace winrt::YtFlowApp::implementation
 
     void NewProfilePage::OnNavigatedTo(Windows::UI::Xaml::Navigation::NavigationEventArgs const &args)
     {
-        bool isWelcoming = args.Parameter().try_as<bool>().value_or(false);
+        bool const isWelcoming = args.Parameter().try_as<bool>().value_or(false);
         HeaderControl().Visibility(isWelcoming ? Visibility::Collapsed : Visibility::Visible);
         WelcomeHeaderControl().Visibility(isWelcoming ? Visibility::Visible : Visibility::Collapsed);
+
+        hstring suggestedName;
+        try
+        {
+            auto conn{FfiDbInstance.Connect()};
+            suggestedName = hstring{L"New Profile "} + to_hstring(conn.GetProfiles().size() + 1);
+        }
+        catch (...)
+        {
+        }
+        NewProfileNameText().Text(suggestedName);
     }
 
     void NewProfilePage::OnNavigatingFrom(Windows::UI::Xaml::Navigation::NavigatingCancelEventArgs const &args)
@@ -48,7 +59,9 @@ namespace winrt::YtFlowApp::implementation
                 co_return;
             }
 
-            if (m_selectedSplitRoutingType != L"all")
+            auto selectedSplitRoutingType =
+                SplitRoutingModeButtons().SelectedItem().as<RadioButton>().Tag().as<hstring>();
+            if (selectedSplitRoutingType != L"all")
             {
                 if (SelectedRulesetNameText().Text() == L"")
                 {
@@ -63,16 +76,16 @@ namespace winrt::YtFlowApp::implementation
             NewProfileConfig config;
             config.InboundMode = InboundModeButtons().SelectedItem().as<RadioButton>().Tag().as<hstring>();
             config.OutboundType = m_selectedOutboundType;
-            config.SplitRoutingMode = m_selectedSplitRoutingType;
+            config.SplitRoutingMode = std::move(selectedSplitRoutingType);
             config.SplitRoutingRuleset = SelectedRulesetNameText().Text();
             config.RuleResolver = RuleResolverComboBox().SelectedItem().as<ComboBoxItem>().Tag().as<hstring>();
 
             co_await resume_background();
 
             auto conn{FfiDbInstance.Connect()};
-            for (const auto &profile : conn.GetProfiles())
+            for (auto const &[_id, name, _locale] : conn.GetProfiles())
             {
-                if (profile.name == newProfileName)
+                if (name == newProfileName)
                 {
                     nameDuplicated = true;
                     break;
@@ -121,10 +134,22 @@ namespace winrt::YtFlowApp::implementation
             HttpButton().IsEnabled(false);
         }
     }
-    void NewProfilePage::SplitRoutingTypeButton_Checked(IInspectable const &sender, RoutedEventArgs const & /* e */)
+    void NewProfilePage::SplitRoutingModeButtons_SelectionChanged(IInspectable const &,
+                                                                  SelectionChangedEventArgs const &e)
     {
-        auto const btn = sender.as<FrameworkElement>();
-        m_selectedSplitRoutingType = btn.Tag().as<hstring>();
+        auto const selectedIt = e.AddedItems().First();
+        if (!selectedIt.HasCurrent())
+        {
+            return;
+        }
+        auto const selected = selectedIt.Current().as<FrameworkElement>();
+        if (!selected)
+        {
+            return;
+        }
+        bool const splitRoutingEnabled = selected.Tag().as<hstring>() != L"all";
+        SelectRulesetButton().IsEnabled(splitRoutingEnabled);
+        RuleResolverComboBox().IsEnabled(splitRoutingEnabled);
     }
     void NewProfilePage::DynOutboundButton_Unchecked(IInspectable const &, RoutedEventArgs const &)
     {
@@ -144,9 +169,6 @@ namespace winrt::YtFlowApp::implementation
         m_trojanCheckedToken = TrojanButton().Checked({this, &NewProfilePage::OutboundTypeButton_Checked});
         m_vmessWsTlsCheckedToken = VmessWsTlsButton().Checked({this, &NewProfilePage::OutboundTypeButton_Checked});
         m_httpCheckedToken = HttpButton().Checked({this, &NewProfilePage::OutboundTypeButton_Checked});
-        m_allProxyToken = AllProxyButton().Checked({this, &NewProfilePage::SplitRoutingTypeButton_Checked});
-        m_whitelistToken = WhitelistButton().Checked({this, &NewProfilePage::SplitRoutingTypeButton_Checked});
-        m_overseasToken = OverseasButton().Checked({this, &NewProfilePage::SplitRoutingTypeButton_Checked});
     }
 
     void NewProfilePage::Page_Unloaded(IInspectable const & /* sender */, RoutedEventArgs const & /* e */)

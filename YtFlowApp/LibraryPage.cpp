@@ -197,7 +197,7 @@ namespace winrt::YtFlowApp::implementation
         {
             auto const lifetime = get_strong();
 
-            auto const newGroupName = std::string("New Group ") + std::to_string(m_model->ProxyGroups().Size());
+            auto const newGroupName = std::string("New Group ") + std::to_string(m_model->ProxyGroups().Size() + 1);
             co_await resume_background();
             auto conn = FfiDbInstance.Connect();
             auto const newGroupId = conn.CreateProxyGroup(newGroupName.c_str(), "manual");

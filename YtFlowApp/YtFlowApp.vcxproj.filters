@@ -133,6 +133,9 @@
     <ClCompile Include="CoreSubscription.cpp">
       <Filter>CoreInterop</Filter>
     </ClCompile>
+    <ClCompile Include="SplitRoutingModeToDescConverter.cpp">
+      <Filter>Converter</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -207,6 +210,9 @@
     </ClInclude>
     <ClInclude Include="CoreSubscription.h">
       <Filter>CoreInterop</Filter>
+    </ClInclude>
+    <ClInclude Include="SplitRoutingModeToDescConverter.h">
+      <Filter>Converter</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

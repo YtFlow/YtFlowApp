@@ -44,6 +44,11 @@ namespace YtFlowApp
     [default_interface] runtimeclass NewProfilePage : Windows.UI.Xaml.Controls.Page
     {
         NewProfilePage();
+
+        Microsoft.UI.Xaml.Controls.RadioButtons SplitRoutingModeButtons
+        {
+            get;
+        };
     }
 
     [default_interface] runtimeclass EditProfilePage : Windows.UI.Xaml.Controls.Page
@@ -388,5 +393,9 @@ namespace YtFlowApp
     [default_interface] runtimeclass BoolToFontWeightConverter : Windows.UI.Xaml.Data.IValueConverter
     {
         BoolToFontWeightConverter();
+    }
+    [default_interface] runtimeclass SplitRoutingModeToDescConverter : Windows.UI.Xaml.Data.IValueConverter
+    {
+        SplitRoutingModeToDescConverter();
     }
 }
