@@ -1,0 +1,70 @@
+﻿<UserControl
+    x:Class="YtFlowApp.SplitRoutingRulesetControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:YtFlowApp"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <UserControl.Resources>
+        <local:BoolTemplateSelector x:Key="RuleTemplateSelector" Value="{x:Bind CanModifyRuleList, Mode=OneWay}">
+            <local:BoolTemplateSelector.TrueTemplate>
+                <DataTemplate x:DataType="local:SplitRoutingRuleModel">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="40" />
+                        </Grid.ColumnDefinitions>
+                        <TextBox Text="{x:Bind Rule, Mode=TwoWay}" />
+                        <ComboBox SelectedIndex="{x:Bind DecisionIndex, Mode=TwoWay}">
+                            <x:String>Next</x:String>
+                            <x:String>Direct</x:String>
+                            <x:String>Proxy</x:String>
+                            <x:String>Reject</x:String>
+                        </ComboBox>
+                    </Grid>
+                </DataTemplate>
+            </local:BoolTemplateSelector.TrueTemplate>
+            <local:BoolTemplateSelector.FalseTemplate>
+                <DataTemplate x:DataType="local:SplitRoutingRuleModel">
+                    <Grid HorizontalAlignment="Stretch">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="40" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{x:Bind Rule, Mode=OneWay}" />
+                        <ComboBox SelectedIndex="{x:Bind DecisionIndex, Mode=TwoWay}">
+                            <x:String>Next</x:String>
+                            <x:String>Direct</x:String>
+                            <x:String>Proxy</x:String>
+                            <x:String>Reject</x:String>
+                        </ComboBox>
+                    </Grid>
+                </DataTemplate>
+            </local:BoolTemplateSelector.FalseTemplate>
+
+        </local:BoolTemplateSelector>
+    </UserControl.Resources>
+
+    <StackPanel>
+        <TextBlock Text="{x:Bind RulesetName, Mode=OneWay}" />
+        <StackPanel Orientation="Horizontal" Visibility="{x:Bind CanModifyRuleList, Mode=OneWay}">
+            <Button>Add</Button>
+            <Button>Remove</Button>
+        </StackPanel>
+        <ListView
+            ItemsSource="{x:Bind RuleList, Mode=OneWay}"
+            ScrollViewer.VerticalScrollMode="Disabled"
+            ScrollViewer.VerticalScrollBarVisibility="Hidden"
+            ItemTemplateSelector="{StaticResource RuleTemplateSelector}"
+        >
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                </Style>
+            </ListView.ItemContainerStyle>
+        </ListView>
+
+    </StackPanel>
+</UserControl>

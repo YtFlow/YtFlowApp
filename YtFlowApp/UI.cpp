@@ -3,15 +3,15 @@
 
 #include "WinrtScheduler.h"
 
-using namespace winrt::Windows::Foundation::Metadata;
+using namespace Metadata;
 using namespace winrt::Windows::UI::Xaml::Input;
 using namespace winrt::Windows::UI::Xaml::Controls;
 
 namespace winrt::YtFlowApp::implementation
 {
-    void NotifyUser(hstring msg, hstring title, Windows::UI::Core::CoreDispatcher inputDispatcher)
+    void NotifyUser(hstring msg, hstring title, CoreDispatcher inputDispatcher)
     {
-        static Windows::UI::Core::CoreDispatcher dispatcher{nullptr};
+        static CoreDispatcher dispatcher{nullptr};
         if (inputDispatcher != nullptr)
         {
             dispatcher = std::move(inputDispatcher);
@@ -19,7 +19,7 @@ namespace winrt::YtFlowApp::implementation
         }
         static std::vector<std::pair<hstring, hstring>> messages{};
         dispatcher.RunAsync(Windows::UI::Core::CoreDispatcherPriority::Normal,
-                            [msg = std::move(msg), title = std::move(title)]() -> winrt::fire_and_forget {
+                            [msg = std::move(msg), title = std::move(title)]() -> fire_and_forget {
                                 messages.push_back(std::make_pair(msg, title));
 
                                 static bool isQueueRunning{false};

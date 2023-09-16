@@ -10,7 +10,7 @@
 
 using namespace winrt;
 using namespace Windows::UI::Xaml;
-using winrt::Windows::UI::Core::CoreWindowActivationState;
+using Windows::UI::Core::CoreWindowActivationState;
 
 namespace winrt::YtFlowApp::implementation
 {
@@ -19,11 +19,11 @@ namespace winrt::YtFlowApp::implementation
         InitializeComponent();
     }
 
-    void FirstTimePage::OnNavigatedTo(Windows::UI::Xaml::Navigation::NavigationEventArgs const &)
+    void FirstTimePage::OnNavigatedTo(Navigation::NavigationEventArgs const &)
     {
         m_currentActivated = Window::Current().Activated({this, &FirstTimePage::Current_Activated});
     }
-    void FirstTimePage::OnNavigatedFrom(Windows::UI::Xaml::Navigation::NavigationEventArgs const &)
+    void FirstTimePage::OnNavigatedFrom(Navigation::NavigationEventArgs const &)
     {
         if (m_currentActivated)
         {

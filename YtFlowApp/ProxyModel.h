@@ -20,14 +20,14 @@ namespace winrt::YtFlowApp::implementation
         void Proxy(array_view<uint8_t const> value);
         uint16_t ProxyVersion() const;
         void ProxyVersion(uint16_t value);
-        winrt::event_token PropertyChanged(winrt::Windows::UI::Xaml::Data::PropertyChangedEventHandler const &handler);
-        void PropertyChanged(winrt::event_token const &token) noexcept;
+        event_token PropertyChanged(Windows::UI::Xaml::Data::PropertyChangedEventHandler const &handler);
+        void PropertyChanged(event_token const &token) noexcept;
 
       private:
         uint32_t m_id;
         hstring m_name;
         std::vector<uint8_t> m_proxy;
         uint16_t m_proxyVersion;
-        winrt::event<Windows::UI::Xaml::Data::PropertyChangedEventHandler> m_propertyChanged;
+        event<Windows::UI::Xaml::Data::PropertyChangedEventHandler> m_propertyChanged;
     };
 }

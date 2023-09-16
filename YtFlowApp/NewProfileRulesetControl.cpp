@@ -13,11 +13,11 @@
 using namespace winrt;
 using namespace Windows::UI::Core;
 using namespace Windows::UI::Xaml;
-using namespace Windows::UI::Xaml::Controls;
+using namespace Controls;
 using namespace Windows::Storage;
-using namespace Windows::Storage::Streams;
+using namespace Streams;
 using namespace Windows::Web::Http;
-using namespace Windows::Web::Http::Filters;
+using namespace Filters;
 
 namespace winrt::YtFlowApp::implementation
 {
@@ -84,7 +84,7 @@ namespace winrt::YtFlowApp::implementation
 
             if (folder == nullptr)
             {
-                folder = co_await Windows::Storage::ApplicationData::Current().LocalFolder().CreateFolderAsync(
+                folder = co_await ApplicationData::Current().LocalFolder().CreateFolderAsync(
                     L"resource", CreationCollisionOption::OpenIfExists);
             }
 

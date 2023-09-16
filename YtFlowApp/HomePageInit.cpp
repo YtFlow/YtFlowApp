@@ -12,7 +12,7 @@ namespace winrt::YtFlowApp::implementation
     using namespace std::literals::chrono_literals;
     using namespace Windows::UI::Xaml;
 
-    fire_and_forget HomePage::OnNavigatedTo(Windows::UI::Xaml::Navigation::NavigationEventArgs const & /* args */)
+    fire_and_forget HomePage::OnNavigatedTo(Navigation::NavigationEventArgs const & /* args */)
     {
         try
         {
@@ -31,7 +31,7 @@ namespace winrt::YtFlowApp::implementation
                 {
                     co_await 400ms;
                     co_await resume_foreground(Dispatcher());
-                    Frame().Navigate(xaml_typename<YtFlowApp::FirstTimePage>());
+                    Frame().Navigate(xaml_typename<FirstTimePage>());
                     co_return;
                 }
                 else
@@ -48,15 +48,15 @@ namespace winrt::YtFlowApp::implementation
             std::vector<YtFlowApp::ProfileModel> profileModels;
             profileModels.reserve(profiles.size());
             std::transform(profiles.begin(), profiles.end(), std::back_inserter(profileModels),
-                           [](auto const &p) { return winrt::make<YtFlowApp::implementation::ProfileModel>(p); });
+                           [](auto const &p) { return winrt::make<ProfileModel>(p); });
             co_await resume_foreground(Dispatcher());
             if (profileModels.empty() &&
                 Frame().CurrentSourcePageType().Name == xaml_typename<YtFlowApp::HomePage>().Name)
             {
-                Frame().Navigate(xaml_typename<YtFlowApp::NewProfilePage>(), box_value(true));
+                Frame().Navigate(xaml_typename<NewProfilePage>(), box_value(true));
                 co_return;
             }
-            m_profiles = winrt::single_threaded_observable_vector(std::move(profileModels));
+            m_profiles = single_threaded_observable_vector(std::move(profileModels));
             auto mainContainer = MainContainer();
             m_connStatusChangeSubscription$ =
                 ConnectionState::Instance->ConnectStatusChange$.observe_on(ObserveOnDispatcher())

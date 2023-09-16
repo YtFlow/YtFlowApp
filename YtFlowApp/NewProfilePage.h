@@ -25,11 +25,11 @@ namespace winrt::YtFlowApp::implementation
                                                       Windows::UI::Xaml::Controls::SelectionChangedEventArgs const &e);
         void DynOutboundButton_Unchecked(IInspectable const &sender, Windows::UI::Xaml::RoutedEventArgs const &e);
         void Page_Loaded(IInspectable const &sender, Windows::UI::Xaml::RoutedEventArgs const &e);
-        void Page_Unloaded(IInspectable const &sender, winrt::Windows::UI::Xaml::RoutedEventArgs const &e);
+        void Page_Unloaded(IInspectable const &sender, Windows::UI::Xaml::RoutedEventArgs const &e);
         void NewProfileNameText_TextChanged(IInspectable const &sender,
                                             Windows::UI::Xaml::Controls::TextChangedEventArgs const &e);
-        fire_and_forget SelectRulesetButton_Click(winrt::Windows::Foundation::IInspectable const &sender,
-                                                  winrt::Windows::UI::Xaml::RoutedEventArgs const &e);
+        fire_and_forget SelectRulesetButton_Click(Windows::Foundation::IInspectable const &sender,
+                                                  Windows::UI::Xaml::RoutedEventArgs const &e);
 
       private:
         static void CreatePresetPlugins(uint32_t profileId, NewProfileConfig config);

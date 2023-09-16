@@ -22,30 +22,30 @@ namespace winrt::YtFlowApp::implementation
         YtFlowApp::AssetModel Model() const;
         fire_and_forget LoadModel();
         void OnNavigatingFrom(Windows::UI::Xaml::Navigation::NavigatingCancelEventArgs const &args);
-        void Page_Loaded(winrt::Windows::Foundation::IInspectable const &sender,
-                         winrt::Windows::UI::Xaml::RoutedEventArgs const &e);
-        fire_and_forget ProxyGroupItemDelete_Click(winrt::Windows::Foundation::IInspectable const &sender,
-                                                   winrt::Windows::UI::Xaml::RoutedEventArgs const &e);
-        void ProxyGroupItemRename_Click(winrt::Windows::Foundation::IInspectable const &sender,
-                                        winrt::Windows::UI::Xaml::RoutedEventArgs const &e);
-        fire_and_forget RenameProxyGroupItem(YtFlowApp::ProxyGroupModel const &item);
-        fire_and_forget CreateProxyGroupButton_Click(winrt::Windows::Foundation::IInspectable const &sender,
-                                                     winrt::Windows::UI::Xaml::RoutedEventArgs const &e);
-        fire_and_forget CreateSubscriptionButton_Click(winrt::Windows::Foundation::IInspectable const &sender,
-                                                       winrt::Windows::UI::Xaml::RoutedEventArgs const &e);
-        void SyncSubscriptionButton_Click(winrt::Windows::Foundation::IInspectable const &sender,
-                                          winrt::Windows::UI::Xaml::RoutedEventArgs const &e);
-        void ProxyGroupItem_Click(winrt::Windows::Foundation::IInspectable const &sender,
-                                  winrt::Windows::UI::Xaml::RoutedEventArgs const &e);
+        void Page_Loaded(Windows::Foundation::IInspectable const &sender,
+                         Windows::UI::Xaml::RoutedEventArgs const &e);
+        fire_and_forget ProxyGroupItemDelete_Click(Windows::Foundation::IInspectable const &sender,
+                                                   Windows::UI::Xaml::RoutedEventArgs const &e);
+        void ProxyGroupItemRename_Click(Windows::Foundation::IInspectable const &sender,
+                                        Windows::UI::Xaml::RoutedEventArgs const &e);
+        fire_and_forget RenameProxyGroupItem(ProxyGroupModel const &item);
+        fire_and_forget CreateProxyGroupButton_Click(Windows::Foundation::IInspectable const &sender,
+                                                     Windows::UI::Xaml::RoutedEventArgs const &e);
+        fire_and_forget CreateSubscriptionButton_Click(Windows::Foundation::IInspectable const &sender,
+                                                       Windows::UI::Xaml::RoutedEventArgs const &e);
+        void SyncSubscriptionButton_Click(Windows::Foundation::IInspectable const &sender,
+                                          Windows::UI::Xaml::RoutedEventArgs const &e);
+        void ProxyGroupItem_Click(Windows::Foundation::IInspectable const &sender,
+                                  Windows::UI::Xaml::RoutedEventArgs const &e);
         void ProxyGroupProxyList_SelectionChanged(
-            winrt::Windows::Foundation::IInspectable const &sender,
-            winrt::Windows::UI::Xaml::Controls::SelectionChangedEventArgs const &e);
-        fire_and_forget ProxyGroupDeleteProxyButton_Click(winrt::Windows::Foundation::IInspectable const &sender,
-                                                          winrt::Windows::UI::Xaml::RoutedEventArgs const &e);
-        fire_and_forget ProxyGroupAddProxyButton_Click(winrt::Windows::Foundation::IInspectable const &sender,
-                                                       winrt::Windows::UI::Xaml::RoutedEventArgs const &e);
-        void ProxyGroupShareProxyButton_Click(winrt::Windows::Foundation::IInspectable const &sender,
-                                              winrt::Windows::UI::Xaml::RoutedEventArgs const &e);
+            Windows::Foundation::IInspectable const &sender,
+            Windows::UI::Xaml::Controls::SelectionChangedEventArgs const &e);
+        fire_and_forget ProxyGroupDeleteProxyButton_Click(Windows::Foundation::IInspectable const &sender,
+                                                          Windows::UI::Xaml::RoutedEventArgs const &e);
+        fire_and_forget ProxyGroupAddProxyButton_Click(Windows::Foundation::IInspectable const &sender,
+                                                       Windows::UI::Xaml::RoutedEventArgs const &e);
+        void ProxyGroupShareProxyButton_Click(Windows::Foundation::IInspectable const &sender,
+                                              Windows::UI::Xaml::RoutedEventArgs const &e);
 
       private:
         static Windows::Web::Http::HttpClient GetHttpClientForSubscription();

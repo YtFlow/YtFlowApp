@@ -9,10 +9,10 @@ using namespace Windows::UI::Text;
 
 namespace winrt::YtFlowApp::implementation
 {
-    winrt::Windows::Foundation::IInspectable SplitRoutingModeToDescConverter::Convert(IInspectable const &value,
-                                                                                      TypeName const &,
-                                                                                      IInspectable const &,
-                                                                                      hstring const &) const
+    IInspectable SplitRoutingModeToDescConverter::Convert(IInspectable const &value,
+                                                          TypeName const &,
+                                                          IInspectable const &,
+                                                          hstring const &) const
     {
         auto const modeOpt = value.try_as<hstring>();
         if (!modeOpt.has_value())
@@ -47,10 +47,10 @@ namespace winrt::YtFlowApp::implementation
         return nullptr;
     }
 
-    winrt::Windows::Foundation::IInspectable SplitRoutingModeToDescConverter::ConvertBack(IInspectable const &,
-                                                                                          TypeName const &,
-                                                                                          IInspectable const &,
-                                                                                          hstring const &) const
+    IInspectable SplitRoutingModeToDescConverter::ConvertBack(IInspectable const &,
+                                                              TypeName const &,
+                                                              IInspectable const &,
+                                                              hstring const &) const
     {
         throw hresult_not_implemented();
     }

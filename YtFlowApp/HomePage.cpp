@@ -13,7 +13,7 @@ using namespace concurrency;
 
 using namespace winrt;
 using namespace Windows::UI::Xaml;
-using namespace Windows::UI::Xaml::Controls;
+using namespace Controls;
 
 namespace winrt::YtFlowApp::implementation
 {
@@ -22,7 +22,7 @@ namespace winrt::YtFlowApp::implementation
         InitializeComponent();
     }
 
-    void HomePage::OnNavigatedFrom(Windows::UI::Xaml::Navigation::NavigationEventArgs const & /* args */)
+    void HomePage::OnNavigatedFrom(Navigation::NavigationEventArgs const & /* args */)
     {
         m_connStatusChangeSubscription$.unsubscribe();
         m_refreshPluginStatus$.unsubscribe();
@@ -61,13 +61,13 @@ namespace winrt::YtFlowApp::implementation
         };
     }
 
-    Windows::Foundation::Collections::IObservableVector<YtFlowApp::ProfileModel> HomePage::Profiles() const
+    Collections::IObservableVector<YtFlowApp::ProfileModel> HomePage::Profiles() const
     {
         return m_profiles;
     }
 
     void HomePage::OnConnectRequested(Windows::Foundation::IInspectable const & /* sender */,
-                                      winrt::YtFlowApp::HomeProfileControl const &control)
+                                      HomeProfileControl const &control)
     {
         try
         {
@@ -83,13 +83,13 @@ namespace winrt::YtFlowApp::implementation
         }
     }
     void HomePage::OnEditRequested(Windows::Foundation::IInspectable const & /* sender */,
-                                   winrt::YtFlowApp::HomeProfileControl const &control)
+                                   HomeProfileControl const &control)
     {
         Frame().Navigate(xaml_typename<YtFlowApp::EditProfilePage>(), control.Profile(),
                          Media::Animation::DrillInNavigationTransitionInfo{});
     }
     fire_and_forget HomePage::OnDeleteRequested(Windows::Foundation::IInspectable const & /* sender */,
-                                                winrt::YtFlowApp::HomeProfileControl const &control)
+                                                HomeProfileControl const &control)
     {
         try
         {
@@ -131,7 +131,7 @@ namespace winrt::YtFlowApp::implementation
         auto const localSettings = appData.LocalSettings().Values();
         localSettings.Insert(L"YTFLOW_PROFILE_ID", box_value(id));
         auto connectTask{ConnectionState::Instance->Connect()};
-        auto const cancelToken{co_await winrt::get_cancellation_token()};
+        auto const cancelToken{co_await get_cancellation_token()};
         cancelToken.callback([=]() {
             connectTask.Cancel();
             localSettings.TryRemove(YTFLOW_CORE_ERROR_LOAD);
@@ -155,7 +155,7 @@ namespace winrt::YtFlowApp::implementation
     }
 
     void HomePage::ConnectCancelButton_Click(IInspectable const & /* sender */,
-                                             Windows::UI::Xaml::RoutedEventArgs const & /* e */)
+                                             RoutedEventArgs const & /* e */)
     {
         if (m_vpnTask != nullptr)
         {
@@ -165,7 +165,7 @@ namespace winrt::YtFlowApp::implementation
     }
 
     void HomePage::DisconnectButton_Click(IInspectable const & /* sender */,
-                                          winrt::Windows::UI::Xaml::RoutedEventArgs const & /* e */)
+                                          RoutedEventArgs const & /* e */)
     {
         if (m_vpnTask != nullptr)
         {
@@ -174,8 +174,8 @@ namespace winrt::YtFlowApp::implementation
         m_vpnTask = []() -> IAsyncAction { co_await ConnectionState::Instance->Disconnect(); }();
     }
     void HomePage::CreateProfileButton_Click(IInspectable const & /* sender */,
-                                             winrt::Windows::UI::Xaml::RoutedEventArgs const & /* e */)
+                                             RoutedEventArgs const & /* e */)
     {
-        Frame().Navigate(xaml_typename<YtFlowApp::NewProfilePage>());
+        Frame().Navigate(xaml_typename<NewProfilePage>());
     }
 }

@@ -40,7 +40,7 @@ namespace winrt::YtFlowApp::implementation
         Windows::Networking::Sockets::StreamSocket m_socket{nullptr};
 
       private:
-        CoreRpc(winrt::Windows::Networking::Sockets::StreamSocket socket) : m_socket(socket)
+        CoreRpc(Windows::Networking::Sockets::StreamSocket socket) : m_socket(socket)
         {
         }
 

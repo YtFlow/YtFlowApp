@@ -57,19 +57,20 @@ namespace winrt::YtFlowApp::implementation
         m_param = std::vector(value.begin(), value.end());
         m_propertyChanged(*this, Windows::UI::Xaml::Data::PropertyChangedEventArgs{L"Param"});
     }
-    winrt::event_token PluginModel::PropertyChanged(
-        winrt::Windows::UI::Xaml::Data::PropertyChangedEventHandler const &handler)
+
+    event_token PluginModel::PropertyChanged(
+        Windows::UI::Xaml::Data::PropertyChangedEventHandler const &handler)
     {
         return m_propertyChanged.add(handler);
     }
-    void PluginModel::PropertyChanged(winrt::event_token const &token) noexcept
+    void PluginModel::PropertyChanged(event_token const &token) noexcept
     {
         m_propertyChanged.remove(token);
     }
 
     FfiPluginVerifyResult PluginModel::Verify() const &
     {
-        return FfiPlugin::verify(winrt::to_string(m_plugin).data(), m_pluginVersion, m_param.data(), m_param.size());
+        return FfiPlugin::verify(to_string(m_plugin).data(), m_pluginVersion, m_param.data(), m_param.size());
     }
     std::set<hstring> PluginModel::GetDependencyPlugins() const &
     {
@@ -113,7 +114,7 @@ namespace winrt::YtFlowApp::implementation
     void PluginModel::Update() const &
     {
         auto conn{FfiDbInstance.Connect()};
-        conn.UpdatePlugin(m_id, m_profileId, winrt::to_string(m_name).data(), winrt::to_string(m_desc).data(),
-                          winrt::to_string(m_plugin).data(), m_pluginVersion, m_param.data(), m_param.size());
+        conn.UpdatePlugin(m_id, m_profileId, to_string(m_name).data(), to_string(m_desc).data(),
+                          to_string(m_plugin).data(), m_pluginVersion, m_param.data(), m_param.size());
     }
 }

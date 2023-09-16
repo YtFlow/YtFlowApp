@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "App.xaml.g.h"
 
+#include "BoolTemplateSelector.h"
 #include "BoolToFontWeightConverter.h"
 #include "EditPluginTreeViewItemTemplateSelector.h"
 #include "PluginTypeToDescConverter.h"

@@ -16,14 +16,14 @@ namespace winrt::YtFlowApp::implementation
         }
         DynOutboundHomeWidget(hstring pluginName, std::shared_ptr<std::vector<uint8_t>> sharedInfo,
                               RequestSender sendRequest);
-        void UserControl_Loaded(winrt::Windows::Foundation::IInspectable const &sender,
-                                winrt::Windows::UI::Xaml::RoutedEventArgs const &e);
-        fire_and_forget SelectProxyButton_Click(winrt::Windows::Foundation::IInspectable const &sender,
-                                                winrt::Windows::UI::Xaml::RoutedEventArgs const &e);
-        void ProxySelectionBackButton_Click(winrt::Windows::Foundation::IInspectable const &sender,
-                                            winrt::Windows::UI::Xaml::RoutedEventArgs const &e);
-        fire_and_forget ProxyItem_Click(winrt::Windows::Foundation::IInspectable const &sender,
-                                        winrt::Windows::UI::Xaml::RoutedEventArgs const &e);
+        void UserControl_Loaded(Windows::Foundation::IInspectable const &sender,
+                                Windows::UI::Xaml::RoutedEventArgs const &e);
+        fire_and_forget SelectProxyButton_Click(Windows::Foundation::IInspectable const &sender,
+                                                Windows::UI::Xaml::RoutedEventArgs const &e);
+        void ProxySelectionBackButton_Click(Windows::Foundation::IInspectable const &sender,
+                                            Windows::UI::Xaml::RoutedEventArgs const &e);
+        fire_and_forget ProxyItem_Click(Windows::Foundation::IInspectable const &sender,
+                                        Windows::UI::Xaml::RoutedEventArgs const &e);
 
         void UpdateInfo();
 

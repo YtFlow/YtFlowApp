@@ -16,12 +16,13 @@ namespace winrt::YtFlowApp::implementation
     {
         return m_idx;
     }
-    winrt::event_token DynOutboundProxyModel::PropertyChanged(
-        winrt::Windows::UI::Xaml::Data::PropertyChangedEventHandler const &handler)
+
+    event_token DynOutboundProxyModel::PropertyChanged(
+        Windows::UI::Xaml::Data::PropertyChangedEventHandler const &handler)
     {
         return m_propertyChanged.add(handler);
     }
-    void DynOutboundProxyModel::PropertyChanged(winrt::event_token const &token) noexcept
+    void DynOutboundProxyModel::PropertyChanged(event_token const &token) noexcept
     {
         m_propertyChanged.remove(token);
     }

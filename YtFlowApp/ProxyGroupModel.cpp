@@ -194,12 +194,12 @@ namespace winrt::YtFlowApp::implementation
         m_propertyChanged(*this, PropertyChangedEventArgs(L"Proxies"));
     }
 
-    winrt::event_token ProxyGroupModel::PropertyChanged(
-        winrt::Windows::UI::Xaml::Data::PropertyChangedEventHandler const &handler)
+    event_token ProxyGroupModel::PropertyChanged(
+        Windows::UI::Xaml::Data::PropertyChangedEventHandler const &handler)
     {
         return m_propertyChanged.add(handler);
     }
-    void ProxyGroupModel::PropertyChanged(winrt::event_token const &token) noexcept
+    void ProxyGroupModel::PropertyChanged(event_token const &token) noexcept
     {
         m_propertyChanged.remove(token);
     }

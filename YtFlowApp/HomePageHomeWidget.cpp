@@ -10,7 +10,7 @@ namespace winrt::YtFlowApp::implementation
 {
     std::optional<HomePage::WidgetHandle> HomePage::CreateWidgetHandle(RpcPluginInfo const &info)
     {
-        HomePage::WidgetHandle handle;
+        WidgetHandle handle;
         handle.info = std::make_shared<std::vector<uint8_t>>();
         if (info.plugin == "netif")
         {

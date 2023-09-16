@@ -22,18 +22,18 @@ namespace winrt::YtFlowApp::implementation
         void IsDirty(bool value);
         bool HasNamingConflict();
         void HasNamingConflict(bool value);
-        YtFlowApp::IPluginEditorParam EditorParam();
-        void EditorParam(YtFlowApp::IPluginEditorParam const &value);
-        event_token PropertyChanged(winrt::Windows::UI::Xaml::Data::PropertyChangedEventHandler const &handler);
-        void PropertyChanged(winrt::event_token const &token) noexcept;
+        IPluginEditorParam EditorParam();
+        void EditorParam(IPluginEditorParam const &value);
+        event_token PropertyChanged(Windows::UI::Xaml::Data::PropertyChangedEventHandler const &handler);
+        void PropertyChanged(event_token const &token) noexcept;
 
       private:
         com_ptr<PluginModel> m_plugin{nullptr};
         bool m_isEntry{false};
         bool m_isDirty{false};
         bool m_hasNamingConflict{false};
-        YtFlowApp::IPluginEditorParam m_editorParam;
-        winrt::event<Windows::UI::Xaml::Data::PropertyChangedEventHandler> m_propertyChanged;
+        IPluginEditorParam m_editorParam;
+        event<Windows::UI::Xaml::Data::PropertyChangedEventHandler> m_propertyChanged;
     };
 }
 namespace winrt::YtFlowApp::factory_implementation

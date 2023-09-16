@@ -6,12 +6,13 @@
 
 #include "CoreFfi.h"
 #include "RawEditorParam.h"
+#include "SplitRoutingRulesetControl.h"
 #include "UI.h"
 
 using namespace nlohmann;
 using namespace winrt;
 using namespace Windows::UI::Xaml;
-using namespace Windows::UI::Xaml::Controls;
+using namespace Controls;
 
 namespace winrt::YtFlowApp::implementation
 {
@@ -20,7 +21,7 @@ namespace winrt::YtFlowApp::implementation
         InitializeComponent();
     }
 
-    void NewProfilePage::OnNavigatedTo(Windows::UI::Xaml::Navigation::NavigationEventArgs const &args)
+    void NewProfilePage::OnNavigatedTo(Navigation::NavigationEventArgs const &args)
     {
         bool const isWelcoming = args.Parameter().try_as<bool>().value_or(false);
         HeaderControl().Visibility(isWelcoming ? Visibility::Collapsed : Visibility::Visible);
@@ -38,7 +39,7 @@ namespace winrt::YtFlowApp::implementation
         NewProfileNameText().Text(suggestedName);
     }
 
-    void NewProfilePage::OnNavigatingFrom(Windows::UI::Xaml::Navigation::NavigatingCancelEventArgs const &args)
+    void NewProfilePage::OnNavigatingFrom(Navigation::NavigatingCancelEventArgs const &args)
     {
         if ((!SaveButton().IsEnabled() || WelcomeHeaderControl().Visibility() == Visibility::Visible) &&
             NewProfileNameText().IsEnabled())
@@ -552,6 +553,14 @@ namespace winrt::YtFlowApp::implementation
         co_await RulesetDialog().ShowAsync();
         if (RulesetDialog().RulesetSelected())
         {
+            auto newControl = make_self<SplitRoutingRulesetControl>();
+            newControl->RulesetName(RulesetDialog().RulesetName());
+            newControl->CanModifyRuleList(false);
+            auto rules = single_threaded_observable_vector<YtFlowApp::SplitRoutingRuleModel>();
+            rules.Append(make<SplitRoutingRuleModel>(L"match", SplitRoutingRuleDecision::Direct));
+            rules.Append(make<SplitRoutingRuleModel>(L"unmatch", SplitRoutingRuleDecision::Direct));
+            newControl->RuleList(std::move(rules));
+            RulesetListView().Items().Append(*std::move(newControl));
             SelectedRulesetNameText().Text(RulesetDialog().RulesetName());
         }
     }

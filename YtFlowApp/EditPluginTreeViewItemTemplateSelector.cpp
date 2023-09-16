@@ -6,19 +6,20 @@
 
 namespace winrt::YtFlowApp::implementation
 {
-    winrt::Windows::UI::Xaml::DataTemplate EditPluginTreeViewItemTemplateSelector::CategoryTemplate()
+    Windows::UI::Xaml::DataTemplate EditPluginTreeViewItemTemplateSelector::CategoryTemplate()
     {
         return m_categoryTemplate;
     }
-    void EditPluginTreeViewItemTemplateSelector::CategoryTemplate(winrt::Windows::UI::Xaml::DataTemplate const &value)
+    void EditPluginTreeViewItemTemplateSelector::CategoryTemplate(Windows::UI::Xaml::DataTemplate const &value)
     {
         m_categoryTemplate = value;
     }
-    winrt::Windows::UI::Xaml::DataTemplate EditPluginTreeViewItemTemplateSelector::PluginTemplate()
+
+    Windows::UI::Xaml::DataTemplate EditPluginTreeViewItemTemplateSelector::PluginTemplate()
     {
         return m_pluginTemplate;
     }
-    void EditPluginTreeViewItemTemplateSelector::PluginTemplate(winrt::Windows::UI::Xaml::DataTemplate const &value)
+    void EditPluginTreeViewItemTemplateSelector::PluginTemplate(Windows::UI::Xaml::DataTemplate const &value)
     {
         m_pluginTemplate = value;
     }

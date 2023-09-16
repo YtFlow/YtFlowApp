@@ -35,8 +35,8 @@ namespace winrt::YtFlowApp::implementation
         hstring SubscriptionExpireAt() const;
         IObservableVector<ProxyModel> Proxies() const;
         void Proxies(IObservableVector<ProxyModel> const &value);
-        winrt::event_token PropertyChanged(winrt::Windows::UI::Xaml::Data::PropertyChangedEventHandler const &handler);
-        void PropertyChanged(winrt::event_token const &token) noexcept;
+        event_token PropertyChanged(Windows::UI::Xaml::Data::PropertyChangedEventHandler const &handler);
+        void PropertyChanged(event_token const &token) noexcept;
 
         void AttachSubscriptionInfo(FfiProxyGroupSubscription const &subscription);
 
@@ -51,6 +51,6 @@ namespace winrt::YtFlowApp::implementation
         double m_subscriptionPercentUsed{};
         bool m_subscriptionHasDataUsage{false};
         IObservableVector<ProxyModel> m_proxies{nullptr};
-        winrt::event<Windows::UI::Xaml::Data::PropertyChangedEventHandler> m_propertyChanged;
+        event<Windows::UI::Xaml::Data::PropertyChangedEventHandler> m_propertyChanged;
     };
 }

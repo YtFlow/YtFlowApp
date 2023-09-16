@@ -9,9 +9,9 @@ namespace winrt::YtFlowApp::implementation
         EditPluginTreeViewItemTemplateSelector() = default;
 
         Windows::UI::Xaml::DataTemplate CategoryTemplate();
-        void CategoryTemplate(winrt::Windows::UI::Xaml::DataTemplate const &value);
+        void CategoryTemplate(Windows::UI::Xaml::DataTemplate const &value);
         Windows::UI::Xaml::DataTemplate PluginTemplate();
-        void PluginTemplate(winrt::Windows::UI::Xaml::DataTemplate const &value);
+        void PluginTemplate(Windows::UI::Xaml::DataTemplate const &value);
 
         Windows::UI::Xaml::DataTemplate SelectTemplateCore(IInspectable const &item);
         Windows::UI::Xaml::DataTemplate SelectTemplateCore(IInspectable const &item,

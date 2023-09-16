@@ -27,7 +27,7 @@ namespace winrt::YtFlowApp::implementation
     }
     com_array<uint8_t> RawEditorParam::ToCbor()
     {
-        auto doc{json::parse(winrt::to_string(m_rawJson))};
+        auto doc{json::parse(to_string(m_rawJson))};
         UnescapeCborBuf(doc);
         return com_array<uint8_t>{json::to_cbor(doc)};
     }
@@ -35,7 +35,7 @@ namespace winrt::YtFlowApp::implementation
     {
         try
         {
-            auto const _{json::parse(winrt::to_string(m_rawJson))};
+            auto const _{json::parse(to_string(m_rawJson))};
         }
         catch (json::parse_error &e)
         {
@@ -46,7 +46,7 @@ namespace winrt::YtFlowApp::implementation
     }
     void RawEditorParam::Prettify()
     {
-        auto doc{json::parse(winrt::to_string(m_rawJson))};
+        auto doc{json::parse(to_string(m_rawJson))};
         m_rawJson = to_hstring(doc.dump(2));
     }
 

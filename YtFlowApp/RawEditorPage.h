@@ -20,7 +20,7 @@ namespace winrt::YtFlowApp::implementation
         void ResetButton_Click(Windows::Foundation::IInspectable const &sender,
                                Windows::UI::Xaml::RoutedEventArgs const &e);
         fire_and_forget SaveButton_Click(Windows::Foundation::IInspectable const &sender,
-                               Windows::UI::Xaml::RoutedEventArgs const &e);
+                                         Windows::UI::Xaml::RoutedEventArgs const &e);
 
         Windows::UI::Xaml::Media::SolidColorBrush PluginNameColor(bool hasNamingConflict);
 

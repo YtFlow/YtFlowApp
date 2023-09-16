@@ -43,7 +43,8 @@ namespace winrt::YtFlowApp::implementation
         m_hasNamingConflict = value;
         m_propertyChanged(*this, Windows::UI::Xaml::Data::PropertyChangedEventArgs(L"HasNamingConflict"));
     }
-    YtFlowApp::IPluginEditorParam EditPluginModel::EditorParam()
+
+    IPluginEditorParam EditPluginModel::EditorParam()
     {
         return m_editorParam;
     }

@@ -32,12 +32,12 @@ namespace winrt::YtFlowApp::implementation
         m_propertyChanged(*this, Windows::UI::Xaml::Data::PropertyChangedEventArgs{L"IsActive"});
     }
 
-    winrt::event_token SwitchChoiceItem::PropertyChanged(
-        winrt::Windows::UI::Xaml::Data::PropertyChangedEventHandler const &handler)
+    event_token SwitchChoiceItem::PropertyChanged(
+        Windows::UI::Xaml::Data::PropertyChangedEventHandler const &handler)
     {
         return m_propertyChanged.add(handler);
     }
-    void SwitchChoiceItem::PropertyChanged(winrt::event_token const &token) noexcept
+    void SwitchChoiceItem::PropertyChanged(event_token const &token) noexcept
     {
         m_propertyChanged.remove(token);
     }

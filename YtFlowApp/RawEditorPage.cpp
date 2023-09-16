@@ -10,7 +10,7 @@
 using namespace winrt;
 using namespace Windows::UI::Text;
 using namespace Windows::UI::Xaml;
-using namespace Windows::UI::Xaml::Media;
+using namespace Media;
 
 namespace winrt::YtFlowApp::implementation
 {
@@ -21,17 +21,17 @@ namespace winrt::YtFlowApp::implementation
         InitializeComponent();
     }
 
-    YtFlowApp::EditPluginModel RawEditorPage::Model()
+    EditPluginModel RawEditorPage::Model()
     {
         return m_model;
     }
 
-    void RawEditorPage::Model(YtFlowApp::EditPluginModel const &value)
+    void RawEditorPage::Model(EditPluginModel const &value)
     {
         m_model = value;
     }
 
-    void RawEditorPage::OnNavigatedTo(Windows::UI::Xaml::Navigation::NavigationEventArgs const &args)
+    void RawEditorPage::OnNavigatedTo(Navigation::NavigationEventArgs const &args)
     {
         auto model{std::move(args.Parameter().as<EditPluginModel>())};
         auto editorParam{model.EditorParam().try_as<YtFlowApp::RawEditorParam>()};
@@ -49,7 +49,7 @@ namespace winrt::YtFlowApp::implementation
         m_paramEditTextChangedStage = 0;
         ParamEdit().Document().SetText(TextSetOptions::None, editorParam.RawJson());
     }
-    void RawEditorPage::OnNavigatedFrom(Windows::UI::Xaml::Navigation::NavigationEventArgs const & /* args */)
+    void RawEditorPage::OnNavigatedFrom(Navigation::NavigationEventArgs const & /* args */)
     {
         auto const editorParam{m_model.EditorParam().as<YtFlowApp::RawEditorParam>()};
         hstring text;
@@ -155,8 +155,8 @@ namespace winrt::YtFlowApp::implementation
 
         auto original{pluginModel->OriginalPlugin};
 
-        original.name = winrt::to_string(pluginModel->Name());
-        original.desc = winrt::to_string(pluginModel->Desc());
+        original.name = to_string(pluginModel->Name());
+        original.desc = to_string(pluginModel->Desc());
         original.param = std::vector<uint8_t>(cbor.begin(), cbor.end());
         pluginModel->OriginalPlugin = std::move(original);
 

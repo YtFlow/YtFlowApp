@@ -30,12 +30,13 @@ namespace winrt::YtFlowApp::implementation
     {
         return m_proxyGroups == nullptr || m_proxyGroups.Size() == 0;
     }
-    winrt::event_token AssetModel::PropertyChanged(
-        winrt::Windows::UI::Xaml::Data::PropertyChangedEventHandler const &handler)
+
+    event_token AssetModel::PropertyChanged(
+        Windows::UI::Xaml::Data::PropertyChangedEventHandler const &handler)
     {
         return m_propertyChanged.add(handler);
     }
-    void AssetModel::PropertyChanged(winrt::event_token const &token) noexcept
+    void AssetModel::PropertyChanged(event_token const &token) noexcept
     {
         m_propertyChanged.remove(token);
     }

@@ -17,7 +17,7 @@
 using namespace std::string_view_literals;
 using namespace winrt;
 using namespace Windows::UI::Xaml;
-using namespace Windows::UI::Xaml::Controls;
+using namespace Controls;
 
 namespace winrt::YtFlowApp::implementation
 {

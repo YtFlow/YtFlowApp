@@ -10,7 +10,7 @@ namespace winrt::YtFlowApp::implementation
 {
     worker_interface::clock_type::time_point RxDispatcherScheduler::dispatcher_worker::now() const
     {
-        return worker_interface::clock_type::now();
+        return clock_type::now();
     }
     void RxDispatcherScheduler::dispatcher_worker::schedule(const schedulable &scbl) const
     {
@@ -30,15 +30,15 @@ namespace winrt::YtFlowApp::implementation
                               });
         m_workCount->fetch_add(1);
     }
-    void RxDispatcherScheduler::dispatcher_worker::schedule(worker_interface::clock_type::time_point when,
+    void RxDispatcherScheduler::dispatcher_worker::schedule(clock_type::time_point when,
                                                             const schedulable &scbl) const
     {
         if (!scbl.is_subscribed())
         {
             return;
         }
-        const auto run = [](auto when, auto scbl, auto const dispatcher, auto weakCount) -> winrt::fire_and_forget {
-            auto timeSpan = when - worker_interface::clock_type::now();
+        const auto run = [](auto when, auto scbl, auto const dispatcher, auto weakCount) -> fire_and_forget {
+            auto timeSpan = when - clock_type::now();
             // Ensure lifetime of captured variables
             co_await winrt::resume_after(std::chrono::duration_cast<TimeSpan>(timeSpan));
             co_await winrt::resume_foreground(dispatcher);
@@ -66,7 +66,7 @@ namespace winrt::YtFlowApp::implementation
 
     worker_interface::clock_type::time_point RxWinrtThreadPoolScheduler::dispatcher_worker::now() const
     {
-        return worker_interface::clock_type::now();
+        return clock_type::now();
     }
     void RxWinrtThreadPoolScheduler::dispatcher_worker::schedule(const schedulable &scbl) const
     {
@@ -74,7 +74,7 @@ namespace winrt::YtFlowApp::implementation
         {
             return;
         }
-        const auto run = [](auto scbl, auto weakCount) -> winrt::fire_and_forget {
+        const auto run = [](auto scbl, auto weakCount) -> fire_and_forget {
             // Ensure lifetime of captured variables
             co_await resume_background();
             auto strong_count = weakCount.lock();
@@ -88,15 +88,15 @@ namespace winrt::YtFlowApp::implementation
         run(scbl, static_cast<std::weak_ptr<std::atomic<uint32_t>>>(m_workCount));
         m_workCount->fetch_add(1);
     }
-    void RxWinrtThreadPoolScheduler::dispatcher_worker::schedule(worker_interface::clock_type::time_point when,
+    void RxWinrtThreadPoolScheduler::dispatcher_worker::schedule(clock_type::time_point when,
                                                                  const schedulable &scbl) const
     {
         if (!scbl.is_subscribed())
         {
             return;
         }
-        const auto run = [](auto when, auto scbl, auto weakCount) -> winrt::fire_and_forget {
-            auto timeSpan = when - worker_interface::clock_type::now();
+        const auto run = [](auto when, auto scbl, auto weakCount) -> fire_and_forget {
+            auto timeSpan = when - clock_type::now();
             co_await winrt::resume_after(std::chrono::duration_cast<TimeSpan>(timeSpan));
             auto strong_count = weakCount.lock();
             if (strong_count == nullptr)

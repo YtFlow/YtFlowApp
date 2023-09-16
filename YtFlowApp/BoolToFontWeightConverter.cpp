@@ -9,10 +9,10 @@ using namespace Windows::UI::Text;
 
 namespace winrt::YtFlowApp::implementation
 {
-    winrt::Windows::Foundation::IInspectable BoolToFontWeightConverter::Convert(IInspectable const &value,
-                                                                                TypeName const &,
-                                                                                IInspectable const &,
-                                                                                hstring const &)
+    IInspectable BoolToFontWeightConverter::Convert(IInspectable const &value,
+                                                    TypeName const &,
+                                                    IInspectable const &,
+                                                    hstring const &)
     {
         if (value == nullptr)
         {
@@ -26,10 +26,10 @@ namespace winrt::YtFlowApp::implementation
         return m_defaultFontWeight;
     }
 
-    winrt::Windows::Foundation::IInspectable BoolToFontWeightConverter::ConvertBack(IInspectable const &,
-                                                                                    TypeName const &,
-                                                                                    IInspectable const &,
-                                                                                    hstring const &)
+    IInspectable BoolToFontWeightConverter::ConvertBack(IInspectable const &,
+                                                        TypeName const &,
+                                                        IInspectable const &,
+                                                        hstring const &)
     {
         throw hresult_not_implemented();
     }

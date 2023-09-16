@@ -11,18 +11,18 @@
 using namespace std::chrono_literals;
 using namespace winrt;
 using namespace Windows::UI::Xaml;
-using namespace Windows::UI::Xaml::Media;
+using namespace Media;
 using Windows::UI::Colors;
 using Windows::UI::ViewManagement::ApplicationView;
-using Windows::UI::Xaml::Controls::TextBlock;
-namespace muxc = winrt::Microsoft::UI::Xaml::Controls;
+using Controls::TextBlock;
+namespace muxc = Microsoft::UI::Xaml::Controls;
 
 namespace winrt::YtFlowApp::implementation
 {
-    std::vector<std::pair<std::wstring, Windows::UI::Xaml::Interop::TypeName>> MainPage::m_pages = {
-        {L"home", xaml_typename<YtFlowApp::HomePage>()},
-        {L"library", xaml_typename<YtFlowApp::LibraryPage>()},
-        {L"about", xaml_typename<YtFlowApp::AboutPage>()}};
+    std::vector<std::pair<std::wstring, Interop::TypeName>> MainPage::m_pages = {
+        {L"home", xaml_typename<HomePage>()},
+        {L"library", xaml_typename<LibraryPage>()},
+        {L"about", xaml_typename<AboutPage>()}};
 
     MainPage::MainPage()
     {
@@ -119,10 +119,10 @@ namespace winrt::YtFlowApp::implementation
 
         // Listen to the window directly so the app responds
         // to accelerator keys regardless of which element has focus.
-        winrt::Windows::UI::Xaml::Window::Current().CoreWindow().Dispatcher().AcceleratorKeyActivated(
+        Window::Current().CoreWindow().Dispatcher().AcceleratorKeyActivated(
             {this, &MainPage::CoreDispatcher_AcceleratorKeyActivated});
 
-        winrt::Windows::UI::Xaml::Window::Current().CoreWindow().PointerPressed(
+        Window::Current().CoreWindow().PointerPressed(
             {this, &MainPage::CoreWindow_PointerPressed});
 
         Windows::UI::Core::SystemNavigationManager::GetForCurrentView().BackRequested(
@@ -140,15 +140,15 @@ namespace winrt::YtFlowApp::implementation
     {
         if (args.SelectedItemContainer())
         {
-            NavView_Navigate(winrt::unbox_value_or<winrt::hstring>(args.SelectedItemContainer().Tag(), L"").c_str(),
+            NavView_Navigate(winrt::unbox_value_or<hstring>(args.SelectedItemContainer().Tag(), L"").c_str(),
                              args.RecommendedNavigationTransitionInfo());
         }
     }
 
     void MainPage::NavView_Navigate(std::wstring navItemTag,
-                                    Windows::UI::Xaml::Media::Animation::NavigationTransitionInfo const &transitionInfo)
+                                    Animation::NavigationTransitionInfo const &transitionInfo)
     {
-        Windows::UI::Xaml::Interop::TypeName pageTypeName;
+        Interop::TypeName pageTypeName;
         for (auto &&eachPage : m_pages)
         {
             if (eachPage.first == navItemTag)
@@ -159,9 +159,9 @@ namespace winrt::YtFlowApp::implementation
         }
         // Get the page type before navigation so you can prevent duplicate
         // entries in the backstack.
-        Windows::UI::Xaml::Interop::TypeName preNavPageType = ContentFrame().CurrentSourcePageType();
+        Interop::TypeName preNavPageType = ContentFrame().CurrentSourcePageType();
 
-        if (preNavPageType.Name == xaml_typename<YtFlowApp::FirstTimePage>().Name)
+        if (preNavPageType.Name == xaml_typename<FirstTimePage>().Name)
         {
             // Not allowed to skip first time page
             return;
@@ -180,7 +180,7 @@ namespace winrt::YtFlowApp::implementation
         TryGoBack();
     }
 
-    void MainPage::CoreDispatcher_AcceleratorKeyActivated(Windows::UI::Core::CoreDispatcher const & /* sender */,
+    void MainPage::CoreDispatcher_AcceleratorKeyActivated(CoreDispatcher const & /* sender */,
                                                           Windows::UI::Core::AcceleratorKeyEventArgs const &args)
     {
         // When Alt+Left are pressed navigate back
@@ -220,8 +220,8 @@ namespace winrt::YtFlowApp::implementation
              NavigationViewControl().DisplayMode() == muxc::NavigationViewDisplayMode::Minimal))
             return false;
 
-        Windows::UI::Xaml::Interop::TypeName preNavPageType = ContentFrame().CurrentSourcePageType();
-        if (preNavPageType.Name == xaml_typename<YtFlowApp::FirstTimePage>().Name)
+        Interop::TypeName preNavPageType = ContentFrame().CurrentSourcePageType();
+        if (preNavPageType.Name == xaml_typename<FirstTimePage>().Name)
         {
             // Not allowed to skip first time page
             return false;

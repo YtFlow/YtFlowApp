@@ -27,7 +27,7 @@ namespace winrt::YtFlowApp::implementation
         else
         {
             FfiException ex(r);
-            ytflow_core::ytflow_result_free(&r);
+            ytflow_result_free(&r);
             throw ex;
         }
     }

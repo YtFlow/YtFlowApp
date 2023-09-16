@@ -10,8 +10,8 @@
 
 using namespace winrt;
 using namespace Windows::UI::Xaml;
-using namespace Windows::UI::Xaml::Controls;
-using namespace Windows::UI::Xaml::Controls::Primitives;
+using namespace Controls;
+using namespace Primitives;
 
 namespace winrt::YtFlowApp::implementation
 {
@@ -30,7 +30,7 @@ namespace winrt::YtFlowApp::implementation
 
     void SwitchHomeWidget::UpdateInfo()
     {
-        SwitchHomeWidget::SwitchInfo info = nlohmann::json::from_cbor(*m_sharedInfo);
+        SwitchInfo info = nlohmann::json::from_cbor(*m_sharedInfo);
         if (info.current >= info.choices.size())
         {
             return;

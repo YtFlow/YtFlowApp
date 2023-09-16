@@ -7,13 +7,13 @@
 
 using namespace winrt;
 using namespace Windows::ApplicationModel;
-using namespace Windows::ApplicationModel::Activation;
+using namespace Activation;
 using namespace Windows::Foundation;
 using namespace Windows::UI::Xaml;
-using namespace Windows::UI::Xaml::Controls;
-using namespace Windows::UI::Xaml::Navigation;
+using namespace Controls;
+using namespace Navigation;
 using namespace YtFlowApp;
-using namespace YtFlowApp::implementation;
+using namespace implementation;
 
 /// <summary>
 /// Initializes the singleton application object.  This is the first line of authored code

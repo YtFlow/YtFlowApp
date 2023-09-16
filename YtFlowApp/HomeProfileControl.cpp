@@ -14,45 +14,48 @@ namespace winrt::YtFlowApp::implementation
         InitializeComponent();
     }
 
-    YtFlowApp::ProfileModel HomeProfileControl::Profile()
+    ProfileModel HomeProfileControl::Profile()
     {
         return m_profile;
     }
-    void HomeProfileControl::Profile(winrt::YtFlowApp::ProfileModel const &value)
+    void HomeProfileControl::Profile(ProfileModel const &value)
     {
         m_profile = value;
         Bindings->Update();
     }
-    winrt::event_token HomeProfileControl::ConnectRequested(
-        winrt::Windows::Foundation::EventHandler<winrt::YtFlowApp::HomeProfileControl> const &handler)
+
+    event_token HomeProfileControl::ConnectRequested(
+        Windows::Foundation::EventHandler<YtFlowApp::HomeProfileControl> const &handler)
     {
         return m_connectRequested.add(handler);
     }
-    void HomeProfileControl::ConnectRequested(winrt::event_token const &token) noexcept
+    void HomeProfileControl::ConnectRequested(event_token const &token) noexcept
     {
         m_connectRequested.remove(token);
     }
-    winrt::event_token HomeProfileControl::EditRequested(
-        winrt::Windows::Foundation::EventHandler<winrt::YtFlowApp::HomeProfileControl> const &handler)
+
+    event_token HomeProfileControl::EditRequested(
+        Windows::Foundation::EventHandler<YtFlowApp::HomeProfileControl> const &handler)
     {
         return m_editRequested.add(handler);
     }
-    void HomeProfileControl::EditRequested(winrt::event_token const &token) noexcept
+    void HomeProfileControl::EditRequested(event_token const &token) noexcept
     {
         m_editRequested.remove(token);
     }
-    winrt::event_token HomeProfileControl::DeleteRequested(
-        winrt::Windows::Foundation::EventHandler<winrt::YtFlowApp::HomeProfileControl> const &handler)
+
+    event_token HomeProfileControl::DeleteRequested(
+        Windows::Foundation::EventHandler<YtFlowApp::HomeProfileControl> const &handler)
     {
         return m_deleteRequested.add(handler);
     }
-    void HomeProfileControl::DeleteRequested(winrt::event_token const &token) noexcept
+    void HomeProfileControl::DeleteRequested(event_token const &token) noexcept
     {
         m_deleteRequested.remove(token);
     }
 
     void HomeProfileControl::ConnectButton_Click(IInspectable const & /* sender */,
-                                                 Windows::UI::Xaml::RoutedEventArgs const & /* e */)
+                                                 RoutedEventArgs const & /* e */)
     {
         m_connectRequested(*this, *this);
     }
@@ -62,12 +65,12 @@ namespace winrt::YtFlowApp::implementation
         m_editRequested(*this, *this);
     }
     void HomeProfileControl::EditButton_Click(IInspectable const & /* sender */,
-                                              Windows::UI::Xaml::RoutedEventArgs const & /* e */)
+                                              RoutedEventArgs const & /* e */)
     {
         m_editRequested(*this, *this);
     }
     void HomeProfileControl::DeleteButton_Click(IInspectable const & /* sender */,
-                                                Windows::UI::Xaml::RoutedEventArgs const & /* e */)
+                                                RoutedEventArgs const & /* e */)
     {
         m_deleteRequested(*this, *this);
     }

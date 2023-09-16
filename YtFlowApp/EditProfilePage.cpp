@@ -13,10 +13,10 @@ using namespace std::chrono_literals;
 using namespace winrt;
 using namespace Windows::UI::Text;
 using namespace Windows::UI::Xaml;
-using namespace Windows::UI::Xaml::Controls;
-using namespace Windows::UI::Xaml::Input;
-using namespace Windows::UI::Xaml::Navigation;
-namespace muxc = winrt::Microsoft::UI::Xaml::Controls;
+using namespace Controls;
+using namespace Input;
+using namespace Navigation;
+namespace muxc = Microsoft::UI::Xaml::Controls;
 
 namespace winrt::YtFlowApp::implementation
 {
@@ -112,11 +112,11 @@ namespace winrt::YtFlowApp::implementation
         }
         editPluginModel->HasNamingConflict(false);
     }
-    com_ptr<YtFlowApp::implementation::EditPluginModel> EditProfilePage::CreateEditPluginModel(FfiPlugin const &p,
-                                                                                               bool isEntry)
+    com_ptr<EditPluginModel> EditProfilePage::CreateEditPluginModel(FfiPlugin const &p,
+                                                                    bool isEntry)
     {
-        auto const pluginModel{winrt::make_self<YtFlowApp::implementation::PluginModel>(p, m_profile->Id())};
-        auto const editPluginModel{winrt::make_self<YtFlowApp::implementation::EditPluginModel>(pluginModel, isEntry)};
+        auto const pluginModel{winrt::make_self<PluginModel>(p, m_profile->Id())};
+        auto const editPluginModel{winrt::make_self<EditPluginModel>(pluginModel, isEntry)};
         auto const editPluginModelWeak{weak_ref{editPluginModel}};
         auto const weakThis{get_weak()};
         pluginModel->PropertyChanged([=](auto const &, auto const &args) {
@@ -148,7 +148,7 @@ namespace winrt::YtFlowApp::implementation
         return editPluginModel;
     }
     fire_and_forget EditProfilePage::OnNavigatingFrom(
-        Windows::UI::Xaml::Navigation::NavigatingCancelEventArgs const &args)
+        NavigatingCancelEventArgs const &args)
     {
         try
         {
@@ -280,8 +280,8 @@ namespace winrt::YtFlowApp::implementation
             co_await resume_background();
 
             auto conn{FfiDbInstance.Connect()};
-            conn.UpdateProfile(profile->Id(), winrt::to_string(newProfileName).data(),
-                               winrt::to_string(profile->Locale()).data());
+            conn.UpdateProfile(profile->Id(), to_string(newProfileName).data(),
+                               to_string(profile->Locale()).data());
 
             co_await resume_foreground(lifetime->Dispatcher());
             profile->Name(newProfileName);
@@ -305,15 +305,15 @@ namespace winrt::YtFlowApp::implementation
         SortByCategoryItem().Icon().Visibility(Visibility::Collapsed);
         switch (m_sortType)
         {
-        case winrt::YtFlowApp::implementation::EditProfilePage::SortType::ByName:
+        case SortType::ByName:
             SortByNameItem().Icon().Visibility(Visibility::Visible);
             LoadTreeNodesByName();
             break;
-        case winrt::YtFlowApp::implementation::EditProfilePage::SortType::ByDependency:
+        case SortType::ByDependency:
             SortByDependencyItem().Icon().Visibility(Visibility::Visible);
             LoadTreeNodesByDependency();
             break;
-        case winrt::YtFlowApp::implementation::EditProfilePage::SortType::ByCategory:
+        case SortType::ByCategory:
             SortByCategoryItem().Icon().Visibility(Visibility::Visible);
             break;
         }
@@ -688,10 +688,10 @@ namespace winrt::YtFlowApp::implementation
             auto const pluginType{NewPluginTypeBox().SelectedValue().as<hstring>()};
             auto const pluginName{NewPluginNameText().Text()};
             FfiPlugin ffiPlugin;
-            ffiPlugin.name = winrt::to_string(pluginName);
+            ffiPlugin.name = to_string(pluginName);
             ffiPlugin.desc =
-                winrt::to_string(PluginTypeToDescConverter::DescMap.find(pluginType)->second.as<hstring>());
-            ffiPlugin.plugin = winrt::to_string(pluginType);
+                to_string(PluginTypeToDescConverter::DescMap.find(pluginType)->second.as<hstring>());
+            ffiPlugin.plugin = to_string(pluginType);
             ffiPlugin.plugin_version = 0;
             ffiPlugin.param = std::vector<uint8_t>{0xf6}; // TODO: param?
 
@@ -743,7 +743,7 @@ namespace winrt::YtFlowApp::implementation
                 args.Cancel(true);
                 return;
             }
-            auto const pluginNameStr = winrt::to_string(pluginName);
+            auto const pluginNameStr = to_string(pluginName);
             auto const it{std::find_if(m_pluginModels.begin(), m_pluginModels.end(), [&](auto const &model) {
                 return get_self<PluginModel>(model->Plugin())->OriginalPlugin.name == pluginNameStr;
             })};

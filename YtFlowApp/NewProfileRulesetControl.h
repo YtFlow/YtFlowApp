@@ -16,19 +16,19 @@ namespace winrt::YtFlowApp::implementation
         hstring RulesetName();
         std::string_view GetResourceKeyFromSelectedRuleset();
         fire_and_forget InitSelectedRuleset();
-        void SelectionComboBox_SelectionChanged(winrt::Windows::Foundation::IInspectable const &sender,
-                                                winrt::Windows::UI::Xaml::Controls::SelectionChangedEventArgs const &e);
-        void ContentDialog_Opened(winrt::Windows::UI::Xaml::Controls::ContentDialog const &sender,
-                                  winrt::Windows::UI::Xaml::Controls::ContentDialogOpenedEventArgs const &args);
-        void ContentDialog_Closing(winrt::Windows::UI::Xaml::Controls::ContentDialog const &sender,
-                                   winrt::Windows::UI::Xaml::Controls::ContentDialogClosingEventArgs const &args);
-        void CancelUpdateButton_Click(winrt::Windows::Foundation::IInspectable const &sender,
-                                      winrt::Windows::UI::Xaml::RoutedEventArgs const &e);
-        fire_and_forget UpdateButton_Click(winrt::Windows::Foundation::IInspectable const &sender,
-                                           winrt::Windows::UI::Xaml::RoutedEventArgs const &e);
+        void SelectionComboBox_SelectionChanged(Windows::Foundation::IInspectable const &sender,
+                                                Windows::UI::Xaml::Controls::SelectionChangedEventArgs const &e);
+        void ContentDialog_Opened(Windows::UI::Xaml::Controls::ContentDialog const &sender,
+                                  Windows::UI::Xaml::Controls::ContentDialogOpenedEventArgs const &args);
+        void ContentDialog_Closing(Windows::UI::Xaml::Controls::ContentDialog const &sender,
+                                   Windows::UI::Xaml::Controls::ContentDialogClosingEventArgs const &args);
+        void CancelUpdateButton_Click(Windows::Foundation::IInspectable const &sender,
+                                      Windows::UI::Xaml::RoutedEventArgs const &e);
+        fire_and_forget UpdateButton_Click(Windows::Foundation::IInspectable const &sender,
+                                           Windows::UI::Xaml::RoutedEventArgs const &e);
         void ContentDialog_PrimaryButtonClick(
-            winrt::Windows::UI::Xaml::Controls::ContentDialog const &sender,
-            winrt::Windows::UI::Xaml::Controls::ContentDialogButtonClickEventArgs const &args);
+            Windows::UI::Xaml::Controls::ContentDialog const &sender,
+            Windows::UI::Xaml::Controls::ContentDialogButtonClickEventArgs const &args);
 
       private:
         static inline Windows::Storage::StorageFolder m_resourceFolder{nullptr};

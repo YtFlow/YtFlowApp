@@ -8,7 +8,7 @@ using namespace Windows::UI::Xaml::Interop;
 
 namespace winrt::YtFlowApp::implementation
 {
-    std::map<hstring, Windows::Foundation::IInspectable> const PluginTypeToDescConverter::DescMap{
+    std::map<hstring, IInspectable> const PluginTypeToDescConverter::DescMap{
         {L"reject", box_value(L"Silently reject any incoming requests.")},
         {L"null", box_value(L"Silently drop any outgoing requests.")},
         {L"ip-stack", box_value(L"Handle TCP or UDP connections from a TUN.")},

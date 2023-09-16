@@ -21,10 +21,10 @@ namespace winrt::YtFlowApp::implementation
 
         ForwardHomeWidget(hstring pluginName, std::shared_ptr<std::vector<uint8_t>> sharedInfo);
 
-        void UserControl_Loaded(winrt::Windows::Foundation::IInspectable const &sender,
-                                winrt::Windows::UI::Xaml::RoutedEventArgs const &e);
-        void UserControl_Unloaded(winrt::Windows::Foundation::IInspectable const &sender,
-                                  winrt::Windows::UI::Xaml::RoutedEventArgs const &e);
+        void UserControl_Loaded(Windows::Foundation::IInspectable const &sender,
+                                Windows::UI::Xaml::RoutedEventArgs const &e);
+        void UserControl_Unloaded(Windows::Foundation::IInspectable const &sender,
+                                  Windows::UI::Xaml::RoutedEventArgs const &e);
 
         void UpdateInfo();
 

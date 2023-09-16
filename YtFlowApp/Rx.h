@@ -10,7 +10,7 @@ namespace winrt::YtFlowApp::implementation
         {
             return rxcpp::observable<>::create<R>(
                 [r = std::move(r), t = std::move(t), d = std::move(d)](rxcpp::subscriber<R> s) {
-                    winrt::event_token token = r([t, s](auto &&...Args) {
+                    event_token token = r([t, s](auto &&...Args) {
                         try
                         {
                             s.on_next(std::move(t(Args...)));

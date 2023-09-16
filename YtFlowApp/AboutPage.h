@@ -12,10 +12,10 @@ namespace winrt::YtFlowApp::implementation
             // See https://github.com/microsoft/cppwinrt/tree/master/nuget#initializecomponent
         }
 
-        void Page_Loaded(winrt::Windows::Foundation::IInspectable const &sender,
-                         winrt::Windows::UI::Xaml::RoutedEventArgs const &e);
-        fire_and_forget LicenseButton_Click(winrt::Windows::Foundation::IInspectable const &sender,
-                                            winrt::Windows::UI::Xaml::RoutedEventArgs const &e);
+        void Page_Loaded(Windows::Foundation::IInspectable const &sender,
+                         Windows::UI::Xaml::RoutedEventArgs const &e);
+        fire_and_forget LicenseButton_Click(Windows::Foundation::IInspectable const &sender,
+                                            Windows::UI::Xaml::RoutedEventArgs const &e);
     };
 }
 

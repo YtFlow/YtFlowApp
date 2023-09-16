@@ -31,7 +31,7 @@ namespace winrt::YtFlowApp::implementation
     {
         try
         {
-            NetifHomeWidget::NetifInfo info{nlohmann::json::from_cbor(*m_sharedInfo)};
+            NetifInfo info{nlohmann::json::from_cbor(*m_sharedInfo)};
 
             PreviewInterfaceNameText().Text(to_hstring(info.netif.name));
             InterfaceNameText().Text(to_hstring(info.netif.name));

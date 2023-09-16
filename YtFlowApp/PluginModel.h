@@ -8,8 +8,8 @@ namespace winrt::YtFlowApp::implementation
     struct PluginModel : PluginModelT<PluginModel>
     {
         PluginModel(FfiPlugin const &plugin, uint32_t profileId)
-            : OriginalPlugin(plugin), m_id(plugin.id), m_profileId(profileId), m_name(winrt::to_hstring(plugin.name)),
-              m_desc(winrt::to_hstring(plugin.desc)), m_plugin(winrt::to_hstring(plugin.plugin)),
+            : OriginalPlugin(plugin), m_id(plugin.id), m_profileId(profileId), m_name(to_hstring(plugin.name)),
+              m_desc(to_hstring(plugin.desc)), m_plugin(to_hstring(plugin.plugin)),
               m_pluginVersion(plugin.plugin_version), m_param(plugin.param)
         {
         }
@@ -29,8 +29,8 @@ namespace winrt::YtFlowApp::implementation
 
         FfiPlugin OriginalPlugin;
 
-        winrt::event_token PropertyChanged(winrt::Windows::UI::Xaml::Data::PropertyChangedEventHandler const &handler);
-        void PropertyChanged(winrt::event_token const &token) noexcept;
+        event_token PropertyChanged(Windows::UI::Xaml::Data::PropertyChangedEventHandler const &handler);
+        void PropertyChanged(event_token const &token) noexcept;
 
         FfiPluginVerifyResult Verify() const &;
         std::set<hstring> GetDependencyPlugins() const &;
@@ -46,7 +46,7 @@ namespace winrt::YtFlowApp::implementation
         hstring m_plugin;
         uint16_t m_pluginVersion;
         std::vector<uint8_t> m_param;
-        winrt::event<Windows::UI::Xaml::Data::PropertyChangedEventHandler> m_propertyChanged;
+        event<Windows::UI::Xaml::Data::PropertyChangedEventHandler> m_propertyChanged;
     };
 }
 /*

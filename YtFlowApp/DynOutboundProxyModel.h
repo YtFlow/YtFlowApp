@@ -14,14 +14,14 @@ namespace winrt::YtFlowApp::implementation
         hstring Name() const;
         hstring GroupName() const;
         uint32_t Idx() const;
-        winrt::event_token PropertyChanged(winrt::Windows::UI::Xaml::Data::PropertyChangedEventHandler const &handler);
-        void PropertyChanged(winrt::event_token const &token) noexcept;
+        event_token PropertyChanged(Windows::UI::Xaml::Data::PropertyChangedEventHandler const &handler);
+        void PropertyChanged(event_token const &token) noexcept;
 
       private:
         uint32_t m_idx;
         hstring m_name;
         hstring m_groupName;
-        winrt::event<Windows::UI::Xaml::Data::PropertyChangedEventHandler> m_propertyChanged;
+        event<Windows::UI::Xaml::Data::PropertyChangedEventHandler> m_propertyChanged;
     };
 }
 namespace winrt::YtFlowApp::factory_implementation

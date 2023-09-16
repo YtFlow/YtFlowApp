@@ -46,6 +46,9 @@
     <Page Include="NewProfileRulesetControl.xaml">
       <Filter>Controls</Filter>
     </Page>
+    <Page Include="SplitRoutingRulesetControl.xaml">
+      <Filter>Controls</Filter>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Midl Include="App.idl" />
@@ -136,6 +139,12 @@
     <ClCompile Include="SplitRoutingModeToDescConverter.cpp">
       <Filter>Converter</Filter>
     </ClCompile>
+    <ClCompile Include="SplitRoutingRuleModel.cpp">
+      <Filter>Models</Filter>
+    </ClCompile>
+    <ClCompile Include="BoolTemplateSelector.cpp">
+      <Filter>TemplateSelector</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -213,6 +222,12 @@
     </ClInclude>
     <ClInclude Include="SplitRoutingModeToDescConverter.h">
       <Filter>Converter</Filter>
+    </ClInclude>
+    <ClInclude Include="SplitRoutingRuleModel.h">
+      <Filter>Models</Filter>
+    </ClInclude>
+    <ClInclude Include="BoolTemplateSelector.h">
+      <Filter>TemplateSelector</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

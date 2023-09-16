@@ -12,16 +12,16 @@ namespace winrt::YtFlowApp::implementation
     {
         MainPage();
 
-        void Page_Loaded(winrt::Windows::Foundation::IInspectable const &sender,
-                         winrt::Windows::UI::Xaml::RoutedEventArgs const &e);
+        void Page_Loaded(Windows::Foundation::IInspectable const &sender,
+                         Windows::UI::Xaml::RoutedEventArgs const &e);
         void NavigationViewControl_DisplayModeChanged(muxc::NavigationView const &sender,
                                                       muxc::NavigationViewDisplayModeChangedEventArgs const &args);
         void CoreTitleBar_IsVisibleChanged(CoreApplicationViewTitleBar const &sender, IInspectable const &args);
         void Current_Activated(IInspectable const &sender, WindowActivatedEventArgs const &args);
-        void NavigationViewControl_Loaded(winrt::Windows::Foundation::IInspectable const &sender,
-                                          winrt::Windows::UI::Xaml::RoutedEventArgs const &e);
-        void NavigationViewControl_Unloaded(winrt::Windows::Foundation::IInspectable const &sender,
-                                            winrt::Windows::UI::Xaml::RoutedEventArgs const &e);
+        void NavigationViewControl_Loaded(Windows::Foundation::IInspectable const &sender,
+                                          Windows::UI::Xaml::RoutedEventArgs const &e);
+        void NavigationViewControl_Unloaded(Windows::Foundation::IInspectable const &sender,
+                                            Windows::UI::Xaml::RoutedEventArgs const &e);
         void NavView_SelectionChanged(muxc::NavigationView const & /* sender */,
                                       muxc::NavigationViewSelectionChangedEventArgs const &args);
         void NavView_Navigate(std::wstring navItemTag,
@@ -35,8 +35,8 @@ namespace winrt::YtFlowApp::implementation
         void System_BackRequested(Windows::Foundation::IInspectable const & /* sender */,
                                   Windows::UI::Core::BackRequestedEventArgs const &args);
         bool TryGoBack();
-        void ContentFrame_Navigated(winrt::Windows::Foundation::IInspectable const &sender,
-                                    winrt::Windows::UI::Xaml::Navigation::NavigationEventArgs const &e);
+        void ContentFrame_Navigated(Windows::Foundation::IInspectable const &sender,
+                                    Windows::UI::Xaml::Navigation::NavigationEventArgs const &e);
 
       private:
         // Vector of std::pair holding the Navigation Tag and the relative Navigation Page.

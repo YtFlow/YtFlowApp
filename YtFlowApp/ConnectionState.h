@@ -1,8 +1,8 @@
 #pragma once
 
 using namespace winrt;
-using namespace winrt::Windows::Foundation;
-using namespace winrt::Windows::Networking::Vpn;
+using namespace Windows::Foundation;
+using namespace Windows::Networking::Vpn;
 
 namespace winrt::YtFlowApp::implementation
 {

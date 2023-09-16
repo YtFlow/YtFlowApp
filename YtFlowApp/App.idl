@@ -116,6 +116,42 @@ namespace YtFlowApp
         };
     }
 
+    [default_interface] runtimeclass SplitRoutingRulesetControl : Windows.UI.Xaml.Controls.UserControl
+    {
+        SplitRoutingRulesetControl();
+
+        static Windows.UI.Xaml.DependencyProperty RulesetNameProperty
+        {
+            get;
+        };
+        static Windows.UI.Xaml.DependencyProperty CanModifyRuleListProperty
+        {
+            get;
+        };
+        static Windows.UI.Xaml.DependencyProperty RuleListProperty
+        {
+            get;
+        };
+
+        String RulesetName
+        {
+            get;
+            set;
+        };
+        Boolean CanModifyRuleList
+        {
+            get;
+            set;
+        };
+        Windows.Foundation.Collections.IObservableVector<SplitRoutingRuleModel> RuleList
+        {
+            get;
+            set;
+        };
+
+        event Windows.Foundation.TypedEventHandler<SplitRoutingRulesetControl, IInspectable> RemoveRequested;
+    }
+
     [default_interface] runtimeclass NetifHomeWidget : Windows.UI.Xaml.Controls.UserControl, IHomeWidget
     {
         NetifHomeWidget();
@@ -377,6 +413,34 @@ namespace YtFlowApp
         };
     }
 
+    enum SplitRoutingRuleDecision
+    {
+        Next,
+        Direct,
+        Proxy,
+        Reject,
+    };
+    runtimeclass SplitRoutingRuleModel : Windows.UI.Xaml.Data.INotifyPropertyChanged
+    {
+        SplitRoutingRuleModel();
+
+        String Rule
+        {
+            get;
+            set;
+        };
+        SplitRoutingRuleDecision Decision
+        {
+            get;
+            set;
+        };
+        Int32 DecisionIndex
+        {
+            get;
+            set;
+        };
+    }
+
     [default_interface] runtimeclass EditPluginTreeViewItemTemplateSelector
         : Windows.UI.Xaml.Controls.DataTemplateSelector
     {
@@ -384,6 +448,19 @@ namespace YtFlowApp
 
         Windows.UI.Xaml.DataTemplate CategoryTemplate;
         Windows.UI.Xaml.DataTemplate PluginTemplate;
+    }
+    [default_interface] runtimeclass BoolTemplateSelector : Windows.UI.Xaml.Controls.DataTemplateSelector
+    {
+        BoolTemplateSelector();
+
+        Boolean Value
+        {
+            get;
+            set;
+        };
+
+        Windows.UI.Xaml.DataTemplate TrueTemplate;
+        Windows.UI.Xaml.DataTemplate FalseTemplate;
     }
 
     [default_interface] runtimeclass PluginTypeToDescConverter : Windows.UI.Xaml.Data.IValueConverter

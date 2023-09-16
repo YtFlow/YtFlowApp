@@ -8,7 +8,7 @@
 using namespace nlohmann;
 using namespace winrt;
 using namespace Windows::Networking;
-using namespace Windows::Networking::Sockets;
+using namespace Sockets;
 using namespace Windows::Storage::Streams;
 
 namespace winrt::YtFlowApp::implementation

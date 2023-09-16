@@ -75,6 +75,9 @@
                     Split Routing
                 </TextBlock>
                 <muxc:RadioButtons x:Name="SplitRoutingModeButtons" SelectedIndex="0" SelectionChanged="SplitRoutingModeButtons_SelectionChanged">
+                    <muxc:RadioButtons.Header>
+                        Presets
+                    </muxc:RadioButtons.Header>
                     <muxc:RadioButtons.Template>
                         <!-- Overriding the template to allow heterogeneous item size -->
                         <ControlTemplate TargetType="muxc:RadioButtons">
@@ -118,9 +121,26 @@
                     Converter={StaticResource SplitRoutingModeToDescConverter},
                     FallbackValue=''}"
                 />
-                <TextBlock Margin="{StaticResource SubheaderMargin}" Style="{ThemeResource BaseTextBlockStyle}">
-                    Rulesets
-                </TextBlock>
+                <Border
+                    Background="{ThemeResource LayerFillColorDefaultBrush}"
+                    CornerRadius="{StaticResource AppControlCornerRadius}"
+                    BorderThickness="1"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                >
+                    <ListView
+                        x:Name="RulesetListView"
+                        SelectionMode="None"
+                        ScrollViewer.VerticalScrollMode="Disabled"
+                        ScrollViewer.VerticalScrollBarVisibility="Hidden"
+                    >
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                    </ListView>
+                </Border>
+                <Button>Update Rulesets</Button>
                 <StackPanel Orientation="Horizontal">
                     <Button x:Name="SelectRulesetButton" Content="Select..." Click="SelectRulesetButton_Click" />
                     <TextBlock x:Name="SelectedRulesetNameText" Margin="8, 0, 0, 0" VerticalAlignment="Center" />

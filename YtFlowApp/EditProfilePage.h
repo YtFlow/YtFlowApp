@@ -22,8 +22,8 @@ namespace winrt::YtFlowApp::implementation
         fire_and_forget OnNavigatingFrom(Windows::UI::Xaml::Navigation::NavigatingCancelEventArgs const &args);
         void OnNavigatedFrom(Windows::UI::Xaml::Navigation::NavigationEventArgs const &args);
         void CheckRenamingPlugin(EditPluginModel *editPluginModel) const &;
-        com_ptr<YtFlowApp::implementation::EditPluginModel> CreateEditPluginModel(FfiPlugin const &plugin,
-                                                                                  bool isEntry);
+        com_ptr<EditPluginModel> CreateEditPluginModel(FfiPlugin const &plugin,
+                                                       bool isEntry);
 
         void AdaptiveWidth_StateChanged(Windows::Foundation::IInspectable const &sender,
                                         Windows::UI::Xaml::VisualStateChangedEventArgs const &e);
@@ -60,7 +60,7 @@ namespace winrt::YtFlowApp::implementation
 
         bool m_forceQuit{false};
         com_ptr<ProfileModel> m_profile{nullptr};
-        std::vector<com_ptr<YtFlowApp::implementation::EditPluginModel>> m_pluginModels;
+        std::vector<com_ptr<EditPluginModel>> m_pluginModels;
         SortType m_sortType{appData.LocalSettings()
                                 .Values()
                                 .TryLookup(L"YTFLOW_APP_PROFILE_EDIT_PLUGIN_SORT_TYPE")

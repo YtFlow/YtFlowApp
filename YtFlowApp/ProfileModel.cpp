@@ -4,12 +4,12 @@
 
 namespace winrt::YtFlowApp::implementation
 {
-    winrt::event_token ProfileModel::PropertyChanged(
-        winrt::Windows::UI::Xaml::Data::PropertyChangedEventHandler const &handler)
+    event_token ProfileModel::PropertyChanged(
+        Windows::UI::Xaml::Data::PropertyChangedEventHandler const &handler)
     {
         return m_propertyChanged.add(handler);
     }
-    void ProfileModel::PropertyChanged(winrt::event_token const &token) noexcept
+    void ProfileModel::PropertyChanged(event_token const &token) noexcept
     {
         m_propertyChanged.remove(token);
     }

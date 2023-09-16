@@ -24,12 +24,10 @@ namespace winrt::YtFlowApp::implementation
         void OnNavigatedFrom(Windows::UI::Xaml::Navigation::NavigationEventArgs const &args);
         static Windows::Foundation::IAsyncAction EnsureDatabase();
 
-        void OnConnectRequested(Windows::Foundation::IInspectable const &sender,
-                                YtFlowApp::HomeProfileControl const &control);
-        void OnEditRequested(Windows::Foundation::IInspectable const &sender,
-                             YtFlowApp::HomeProfileControl const &control);
+        void OnConnectRequested(Windows::Foundation::IInspectable const &sender, HomeProfileControl const &control);
+        void OnEditRequested(Windows::Foundation::IInspectable const &sender, HomeProfileControl const &control);
         fire_and_forget OnDeleteRequested(Windows::Foundation::IInspectable const &sender,
-                                          YtFlowApp::HomeProfileControl const &control);
+                                          HomeProfileControl const &control);
         void ConnectCancelButton_Click(Windows::Foundation::IInspectable const &sender,
                                        Windows::UI::Xaml::RoutedEventArgs const &e);
         void DisconnectButton_Click(Windows::Foundation::IInspectable const &sender,
@@ -37,13 +35,13 @@ namespace winrt::YtFlowApp::implementation
         void CreateProfileButton_Click(Windows::Foundation::IInspectable const &sender,
                                        Windows::UI::Xaml::RoutedEventArgs const &e);
 
-        Windows::Foundation::Collections::IObservableVector<YtFlowApp::ProfileModel> Profiles() const;
+        Collections::IObservableVector<YtFlowApp::ProfileModel> Profiles() const;
         RequestSender MakeRequestSender(uint32_t pluginId);
 
       private:
         static inline Windows::Storage::ApplicationData appData{Windows::Storage::ApplicationData::Current()};
 
-        static Windows::Foundation::IAsyncAction connectToProfile(uint32_t id);
+        static IAsyncAction connectToProfile(uint32_t id);
 
         void SubscribeRefreshPluginStatus();
         std::optional<WidgetHandle> CreateWidgetHandle(RpcPluginInfo const &info);
@@ -52,8 +50,8 @@ namespace winrt::YtFlowApp::implementation
         rxcpp::composite_subscription m_refreshPluginStatus$;
         rxcpp::subjects::subject<bool> m_triggerInfoUpdate$;
         std::map<uint32_t, WidgetHandle> m_widgets;
-        winrt::Windows::Foundation::Collections::IObservableVector<YtFlowApp::ProfileModel> m_profiles{nullptr};
-        Windows::Foundation::IAsyncAction m_vpnTask{nullptr};
+        Collections::IObservableVector<YtFlowApp::ProfileModel> m_profiles{nullptr};
+        IAsyncAction m_vpnTask{nullptr};
         std::atomic<std::shared_ptr<CoreRpc>> m_rpc;
     };
 }
