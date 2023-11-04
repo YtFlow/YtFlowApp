@@ -40,7 +40,7 @@ namespace winrt::YtFlowApp::implementation
     {
         return Select(item);
     }
-    Windows::UI::Xaml::DataTemplate BoolTemplateSelector::Select(IInspectable const &item)
+    Windows::UI::Xaml::DataTemplate BoolTemplateSelector::Select(IInspectable const &)
     {
         if (m_value)
         {

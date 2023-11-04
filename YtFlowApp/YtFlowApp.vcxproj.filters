@@ -49,6 +49,9 @@
     <Page Include="SplitRoutingRulesetControl.xaml">
       <Filter>Controls</Filter>
     </Page>
+    <Page Include="ResourceManageControl.xaml">
+      <Filter>Controls</Filter>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Midl Include="App.idl" />
@@ -145,6 +148,9 @@
     <ClCompile Include="BoolTemplateSelector.cpp">
       <Filter>TemplateSelector</Filter>
     </ClCompile>
+    <ClCompile Include="ResourceModel.cpp">
+      <Filter>Models</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -228,6 +234,9 @@
     </ClInclude>
     <ClInclude Include="BoolTemplateSelector.h">
       <Filter>TemplateSelector</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceModel.h">
+      <Filter>Models</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

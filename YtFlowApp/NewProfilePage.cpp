@@ -5,6 +5,7 @@
 #endif
 
 #include "CoreFfi.h"
+#include "NewProfileRulesetControl.h"
 #include "RawEditorParam.h"
 #include "SplitRoutingRulesetControl.h"
 #include "UI.h"
@@ -62,14 +63,6 @@ namespace winrt::YtFlowApp::implementation
 
             auto selectedSplitRoutingType =
                 SplitRoutingModeButtons().SelectedItem().as<RadioButton>().Tag().as<hstring>();
-            if (selectedSplitRoutingType != L"all")
-            {
-                if (SelectedRulesetNameText().Text() == L"")
-                {
-                    SelectRulesetButton_Click(nullptr, nullptr);
-                    co_return;
-                }
-            }
 
             SaveButton().IsEnabled(false);
             const auto lifetime{get_strong()};
@@ -78,7 +71,6 @@ namespace winrt::YtFlowApp::implementation
             config.InboundMode = InboundModeButtons().SelectedItem().as<RadioButton>().Tag().as<hstring>();
             config.OutboundType = m_selectedOutboundType;
             config.SplitRoutingMode = std::move(selectedSplitRoutingType);
-            config.SplitRoutingRuleset = SelectedRulesetNameText().Text();
             config.RuleResolver = RuleResolverComboBox().SelectedItem().as<ComboBoxItem>().Tag().as<hstring>();
 
             co_await resume_background();
@@ -135,22 +127,115 @@ namespace winrt::YtFlowApp::implementation
             HttpButton().IsEnabled(false);
         }
     }
-    void NewProfilePage::SplitRoutingModeButtons_SelectionChanged(IInspectable const &,
-                                                                  SelectionChangedEventArgs const &e)
+    fire_and_forget NewProfilePage::SplitRoutingModeButtons_SelectionChanged(IInspectable const &,
+                                                                             SelectionChangedEventArgs const &e)
     {
+        auto const lifetime = get_strong();
         auto const selectedIt = e.AddedItems().First();
         if (!selectedIt.HasCurrent())
         {
-            return;
+            co_return;
         }
         auto const selected = selectedIt.Current().as<FrameworkElement>();
         if (!selected)
         {
-            return;
+            co_return;
         }
-        bool const splitRoutingEnabled = selected.Tag().as<hstring>() != L"all";
-        SelectRulesetButton().IsEnabled(splitRoutingEnabled);
-        RuleResolverComboBox().IsEnabled(splitRoutingEnabled);
+        auto const selectedMode = selected.Tag().as<hstring>();
+        static uint32_t lastSelectedIndex = 0; // Workaround for e.RemovedItems().First() -> nullptr
+        auto const idx = SplitRoutingModeButtons().SelectedIndex();
+        if (lastSelectedIndex == idx)
+        {
+            co_return;
+        }
+
+        bool const splitRoutingEnabled = selectedMode != L"all";
+        if (splitRoutingEnabled)
+        {
+            if (co_await DownloadRulesetConsentDialog().ShowAsync() != ContentDialogResult::Primary)
+            {
+                SplitRoutingModeButtons().SelectedIndex(lastSelectedIndex);
+                co_return;
+            }
+        }
+
+        RulesetListView().Items().Clear();
+        if (!splitRoutingEnabled)
+        {
+            lastSelectedIndex = 0;
+            co_return;
+        }
+
+        (void)RulesetDialog().ShowAsync();
+        bool updated{};
+        if (selectedMode == L"whitelist")
+        {
+            updated = co_await get_self<NewProfileRulesetControl>(RulesetDialog())
+                          ->BatchUpdateRulesetsIfNotExistAsync({
+                              L"loyalsoldier-country-only-cn-private",
+                              L"loyalsoldier-surge-proxy",
+                              L"loyalsoldier-surge-direct",
+                              L"loyalsoldier-surge-private",
+                              L"loyalsoldier-surge-reject",
+                          });
+            if (updated)
+            {
+                AddListRuleset(L"loyalsoldier-surge-private", SplitRoutingRuleDecision::Direct);
+                AddListRuleset(L"loyalsoldier-surge-reject", SplitRoutingRuleDecision::Reject);
+                AddListRuleset(L"loyalsoldier-surge-proxy", SplitRoutingRuleDecision::Proxy);
+                AddListRuleset(L"loyalsoldier-surge-direct", SplitRoutingRuleDecision::Direct);
+                AddRuleRuleset(L"loyalsoldier-country-only-cn-private", L"cn", SplitRoutingRuleDecision::Direct);
+            }
+        }
+        else if (selectedMode == L"blacklist")
+        {
+            updated = co_await get_self<NewProfileRulesetControl>(RulesetDialog())
+                          ->BatchUpdateRulesetsIfNotExistAsync({
+                              L"loyalsoldier-surge-proxy",
+                              L"loyalsoldier-surge-tld-not-cn",
+                              L"loyalsoldier-surge-private",
+                              L"loyalsoldier-surge-reject",
+                          });
+            if (updated)
+            {
+                AddListRuleset(L"loyalsoldier-surge-private", SplitRoutingRuleDecision::Direct);
+                AddListRuleset(L"loyalsoldier-surge-reject", SplitRoutingRuleDecision::Reject);
+                AddListRuleset(L"loyalsoldier-surge-proxy", SplitRoutingRuleDecision::Proxy);
+                AddListRuleset(L"loyalsoldier-surge-tld-not-cn", SplitRoutingRuleDecision::Proxy,
+                               SplitRoutingRuleDecision::Direct);
+            }
+        }
+        else if (selectedMode == L"overseas")
+        {
+            updated = co_await get_self<NewProfileRulesetControl>(RulesetDialog())
+                          ->BatchUpdateRulesetsIfNotExistAsync({
+                              L"loyalsoldier-country-only-cn-private",
+                              L"loyalsoldier-surge-proxy",
+                              L"loyalsoldier-surge-direct",
+                              L"loyalsoldier-surge-tld-not-cn",
+                              L"loyalsoldier-surge-private",
+                              L"loyalsoldier-surge-reject",
+                          });
+            if (updated)
+            {
+                AddListRuleset(L"loyalsoldier-surge-private", SplitRoutingRuleDecision::Direct);
+                AddListRuleset(L"loyalsoldier-surge-reject", SplitRoutingRuleDecision::Reject);
+                AddListRuleset(L"loyalsoldier-surge-proxy", SplitRoutingRuleDecision::Direct);
+                AddListRuleset(L"loyalsoldier-surge-direct", SplitRoutingRuleDecision::Proxy);
+                AddListRuleset(L"loyalsoldier-surge-tld-not-cn", SplitRoutingRuleDecision::Direct);
+                AddRuleRuleset(L"loyalsoldier-country-only-cn-private", L"cn", SplitRoutingRuleDecision::Proxy,
+                               SplitRoutingRuleDecision::Direct);
+            }
+        }
+        if (updated)
+        {
+            RulesetDialog().Hide();
+            lastSelectedIndex = idx;
+        }
+        else
+        {
+            SplitRoutingModeButtons().SelectedIndex(lastSelectedIndex);
+        }
     }
     void NewProfilePage::DynOutboundButton_Unchecked(IInspectable const &, RoutedEventArgs const &)
     {
@@ -548,20 +633,66 @@ namespace winrt::YtFlowApp::implementation
         }
     }
 
-    fire_and_forget NewProfilePage::SelectRulesetButton_Click(IInspectable const &, RoutedEventArgs const &)
+    void NewProfilePage::AddListRuleset(hstring name, SplitRoutingRuleDecision const match,
+                                        SplitRoutingRuleDecision const unmatch)
+    {
+        auto newControl = make_self<SplitRoutingRulesetControl>();
+        newControl->RulesetName(std::move(name));
+        newControl->CanModifyRuleList(false);
+        auto rules = single_threaded_observable_vector<YtFlowApp::SplitRoutingRuleModel>();
+        rules.Append(make<SplitRoutingRuleModel>(L"match", match));
+        newControl->FallbackRule(make<SplitRoutingRuleModel>(L"unmatch", unmatch));
+        newControl->RuleList(std::move(rules));
+        newControl->RemoveRequested([weak = get_weak()](auto const &control, auto const &) {
+            if (auto const self{weak.get()})
+            {
+                uint32_t idx{};
+                if (self->RulesetListView().Items().IndexOf(control, idx))
+                {
+                    self->RulesetListView().Items().RemoveAt(idx);
+                }
+            }
+        });
+        RulesetListView().Items().Append(*std::move(newControl));
+    }
+    void NewProfilePage::AddRuleRuleset(hstring name, hstring matchRule, SplitRoutingRuleDecision const match,
+                                        SplitRoutingRuleDecision const unmatch)
+    {
+        auto newControl = make_self<SplitRoutingRulesetControl>();
+        newControl->RulesetName(std::move(name));
+        newControl->CanModifyRuleList(true);
+        auto rules = single_threaded_observable_vector<YtFlowApp::SplitRoutingRuleModel>();
+        rules.Append(make<SplitRoutingRuleModel>(std::move(matchRule), match));
+        newControl->FallbackRule(make<SplitRoutingRuleModel>(L"unmatch", unmatch));
+        newControl->RuleList(std::move(rules));
+        newControl->RemoveRequested([weak = get_weak()](auto const &control, auto const &) {
+            if (auto const self{weak.get()})
+            {
+                uint32_t idx{};
+                if (self->RulesetListView().Items().IndexOf(control, idx))
+                {
+                    self->RulesetListView().Items().RemoveAt(idx);
+                }
+            }
+        });
+        RulesetListView().Items().Append(*std::move(newControl));
+    }
+
+    fire_and_forget NewProfilePage::AddRulesetButton_Click(IInspectable const &, RoutedEventArgs const &)
     {
         co_await RulesetDialog().ShowAsync();
         if (RulesetDialog().RulesetSelected())
         {
-            auto newControl = make_self<SplitRoutingRulesetControl>();
-            newControl->RulesetName(RulesetDialog().RulesetName());
-            newControl->CanModifyRuleList(false);
-            auto rules = single_threaded_observable_vector<YtFlowApp::SplitRoutingRuleModel>();
-            rules.Append(make<SplitRoutingRuleModel>(L"match", SplitRoutingRuleDecision::Direct));
-            rules.Append(make<SplitRoutingRuleModel>(L"unmatch", SplitRoutingRuleDecision::Direct));
-            newControl->RuleList(std::move(rules));
-            RulesetListView().Items().Append(*std::move(newControl));
-            SelectedRulesetNameText().Text(RulesetDialog().RulesetName());
+            auto const rulesetName = RulesetDialog().RulesetName();
+            auto const rulesetNameView = static_cast<std::wstring_view>(rulesetName);
+            if (rulesetNameView.contains(L"country") || rulesetNameView.contains(L"geoip"))
+            {
+                AddRuleRuleset(std::move(rulesetName), L"cn", SplitRoutingRuleDecision::Direct);
+            }
+            else
+            {
+                AddListRuleset(std::move(rulesetName), SplitRoutingRuleDecision::Direct);
+            }
         }
     }
 

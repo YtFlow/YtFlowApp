@@ -5,7 +5,8 @@
     xmlns:local="using:YtFlowApp"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
+    mc:Ignorable="d"
+    Margin="0, 8, 0, 8">
 
     <UserControl.Resources>
         <local:BoolTemplateSelector x:Key="RuleTemplateSelector" Value="{x:Bind CanModifyRuleList, Mode=OneWay}">
@@ -13,11 +14,13 @@
                 <DataTemplate x:DataType="local:SplitRoutingRuleModel">
                     <Grid>
                         <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="40" />
+                            <ColumnDefinition Width="90" />
                         </Grid.ColumnDefinitions>
-                        <TextBox Text="{x:Bind Rule, Mode=TwoWay}" />
-                        <ComboBox SelectedIndex="{x:Bind DecisionIndex, Mode=TwoWay}">
+                        <SymbolIcon Grid.Column="0" Margin="0, 0, 4, 0" Symbol="List" />
+                        <TextBox Grid.Column="1" VerticalAlignment="Stretch" VerticalContentAlignment="Center" Text="{x:Bind Rule, Mode=TwoWay}" />
+                        <ComboBox Grid.Column="2" HorizontalAlignment="Stretch" SelectedIndex="{x:Bind DecisionIndex, Mode=TwoWay}">
                             <x:String>Next</x:String>
                             <x:String>Direct</x:String>
                             <x:String>Proxy</x:String>
@@ -31,10 +34,10 @@
                     <Grid HorizontalAlignment="Stretch">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="40" />
+                            <ColumnDefinition Width="90" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="{x:Bind Rule, Mode=OneWay}" />
-                        <ComboBox SelectedIndex="{x:Bind DecisionIndex, Mode=TwoWay}">
+                        <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{x:Bind Rule, Mode=OneWay}" />
+                        <ComboBox Grid.Column="1" HorizontalAlignment="Stretch" SelectedIndex="{x:Bind DecisionIndex, Mode=TwoWay}">
                             <x:String>Next</x:String>
                             <x:String>Direct</x:String>
                             <x:String>Proxy</x:String>
@@ -47,14 +50,33 @@
         </local:BoolTemplateSelector>
     </UserControl.Resources>
 
-    <StackPanel>
-        <TextBlock Text="{x:Bind RulesetName, Mode=OneWay}" />
-        <StackPanel Orientation="Horizontal" Visibility="{x:Bind CanModifyRuleList, Mode=OneWay}">
-            <Button>Add</Button>
-            <Button>Remove</Button>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Column="0" Grid.Row="0" Margin="12, 0, 0, 0" FontWeight="SemiBold" VerticalAlignment="Center" Text="{x:Bind RulesetName, Mode=OneWay}" TextWrapping="Wrap" />
+        <StackPanel Grid.Column="1" Grid.Row="0" Margin="0, 0, 12, 0" HorizontalAlignment="Right" Orientation="Horizontal">
+            <Button Padding="6" Margin="4, 0, 0, 0" Visibility="{x:Bind CanModifyRuleList, Mode=OneWay}" Click="AddRuleButton_Click">
+                <FontIcon Glyph="&#xE109;" FontSize="12" />
+            </Button>
+            <Button Padding="6" Margin="4, 0, 0, 0" Visibility="{x:Bind CanModifyRuleList, Mode=OneWay}" Click="RemoveRuleButton_Click">
+                <FontIcon Glyph="&#xE949;" FontSize="12" />
+            </Button>
+            <Button Padding="6" Margin="4, 0, 0, 0" Click="DeleteRulesetButton_Click">
+                <FontIcon Glyph="&#xE107;" FontSize="12" />
+            </Button>
         </StackPanel>
         <ListView
+            x:Name="RuleListView"
+            Grid.ColumnSpan="2"
+            Grid.Row="1"
             ItemsSource="{x:Bind RuleList, Mode=OneWay}"
+            SelectionMode="{x:Bind CanModifyToListSelectionMode(CanModifyRuleList), Mode=OneWay}"
             ScrollViewer.VerticalScrollMode="Disabled"
             ScrollViewer.VerticalScrollBarVisibility="Hidden"
             ItemTemplateSelector="{StaticResource RuleTemplateSelector}"
@@ -64,7 +86,23 @@
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                 </Style>
             </ListView.ItemContainerStyle>
+            <ListView.Footer>
+                <Grid Padding="12, 4, 12, 0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="90" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" VerticalAlignment="Center" Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}">fallback</TextBlock>
+                    <ComboBox Grid.Column="1" HorizontalAlignment="Stretch" SelectedIndex="{x:Bind FallbackRule.DecisionIndex, Mode=TwoWay}">
+                        <x:String>Next</x:String>
+                        <x:String>Direct</x:String>
+                        <x:String>Proxy</x:String>
+                        <x:String>Reject</x:String>
+                    </ComboBox>
+
+                </Grid>
+            </ListView.Footer>
         </ListView>
 
-    </StackPanel>
+    </Grid>
 </UserControl>

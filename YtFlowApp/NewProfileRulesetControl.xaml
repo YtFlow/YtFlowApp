@@ -23,8 +23,13 @@
 
     <StackPanel>
         <ComboBox x:Name="SelectionComboBox" SelectedIndex="0" Width="300">
-            <ComboBoxItem Tag="dreamacro">GeoIP Country (Dreamacro/maxmind-geoip)</ComboBoxItem>
-            <ComboBoxItem Tag="loyalsoldier">Enhanced GeoIP (only CN, private) (Loyalsoldier/geoip)</ComboBoxItem>
+            <ComboBoxItem Tag="dreamacro-geoip">GeoIP Country (Dreamacro/maxmind-geoip)</ComboBoxItem>
+            <ComboBoxItem Tag="loyalsoldier-country-only-cn-private">Enhanced GeoIP (only CN, private) (Loyalsoldier/geoip)</ComboBoxItem>
+            <ComboBoxItem Tag="loyalsoldier-surge-proxy">Surge Domain List - Proxy (Loyalsoldier/surge-rules)</ComboBoxItem>
+            <ComboBoxItem Tag="loyalsoldier-surge-direct">Surge Domain List - Direct (Loyalsoldier/surge-rules)</ComboBoxItem>
+            <ComboBoxItem Tag="loyalsoldier-surge-private">Surge Domain List - Private (Loyalsoldier/surge-rules)</ComboBoxItem>
+            <ComboBoxItem Tag="loyalsoldier-surge-reject">Surge Domain List - Reject (Loyalsoldier/surge-rules)</ComboBoxItem>
+            <ComboBoxItem Tag="loyalsoldier-surge-tld-not-cn">Surge Domain List - non-CN TLD (Loyalsoldier/surge-rules)</ComboBoxItem>
         </ComboBox>
         <StackPanel Orientation="Horizontal" Margin="0, 8, 0, 8">
             <TextBlock Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}">Last update:</TextBlock>

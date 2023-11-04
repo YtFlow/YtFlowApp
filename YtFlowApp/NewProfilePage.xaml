@@ -6,9 +6,12 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    xmlns:contract7Present="http://schemas.microsoft.com/winfx/2006/xaml/presentation?IsApiContractPresent(Windows.Foundation.UniversalApiContract,7)"
+    xmlns:contract7NotPresent="http://schemas.microsoft.com/winfx/2006/xaml/presentation?IsApiContractNotPresent(Windows.Foundation.UniversalApiContract,7)"
     mc:Ignorable="d"
     Loaded="Page_Loaded"
-    Unloaded="Page_Unloaded">
+    Unloaded="Page_Unloaded"
+    NavigationCacheMode="Enabled">
 
     <Page.Resources>
         <Thickness x:Key="SubheaderMargin">0, 20, 0, 10</Thickness>
@@ -121,30 +124,39 @@
                     Converter={StaticResource SplitRoutingModeToDescConverter},
                     FallbackValue=''}"
                 />
-                <Border
-                    Background="{ThemeResource LayerFillColorDefaultBrush}"
-                    CornerRadius="{StaticResource AppControlCornerRadius}"
-                    BorderThickness="1"
-                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                >
-                    <ListView
-                        x:Name="RulesetListView"
-                        SelectionMode="None"
-                        ScrollViewer.VerticalScrollMode="Disabled"
-                        ScrollViewer.VerticalScrollBarVisibility="Hidden"
-                    >
-                        <ListView.ItemContainerStyle>
-                            <Style TargetType="ListViewItem">
-                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                            </Style>
-                        </ListView.ItemContainerStyle>
-                    </ListView>
-                </Border>
-                <Button>Update Rulesets</Button>
-                <StackPanel Orientation="Horizontal">
-                    <Button x:Name="SelectRulesetButton" Content="Select..." Click="SelectRulesetButton_Click" />
-                    <TextBlock x:Name="SelectedRulesetNameText" Margin="8, 0, 0, 0" VerticalAlignment="Center" />
-                </StackPanel>
+                <muxc:Expander HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Padding="0, 0, 0, 20">
+                    <muxc:Expander.Header>
+                        <TextBlock Style="{ThemeResource BaseTextBlockStyle}">
+                            Rulesets
+                        </TextBlock>
+                    </muxc:Expander.Header>
+
+                    <StackPanel HorizontalAlignment="Stretch">
+                        <ListView
+                            x:Name="RulesetListView"
+                            SelectionMode="None"
+                            CanReorderItems="True"
+                            CanDragItems="True"
+                            AllowDrop="True"
+                            ScrollViewer.VerticalScrollMode="Disabled"
+                            ScrollViewer.VerticalScrollBarVisibility="Hidden"
+                        >
+                            <ListView.ItemContainerStyle>
+                                <Style TargetType="ListViewItem">
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                </Style>
+                            </ListView.ItemContainerStyle>
+
+                            <ListView.Footer>
+                                <StackPanel Margin="24, 16, 24, 0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button x:Name="AddRulesetButton" Content="Add..." Click="AddRulesetButton_Click" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </ListView.Footer>
+                        </ListView>
+                    </StackPanel>
+                </muxc:Expander>
                 <TextBlock Margin="{StaticResource SubheaderMargin}" Style="{ThemeResource BaseTextBlockStyle}">
                     DNS provider for Rule Matching
                 </TextBlock>
@@ -178,7 +190,7 @@
                     </Run>
                 </TextBlock>
                 <TextBlock x:Name="DynOutboundDisabledText" Margin="0, 4, 0, 8" Visibility="Collapsed" TextWrapping="Wrap" Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}">
-                    Manually configure parameters for outbound plugins in the Profile Editor.
+                    Manually configure parameters for outbound plugins in the Profile Editor. Not recommended for beginners.
                 </TextBlock>
                 <RadioButton x:Name="SsButton" Tag="ss" IsEnabled="False" GroupName="OutboundType">Shadowsocks</RadioButton>
                 <RadioButton x:Name="TrojanButton" Tag="trojan" IsEnabled="False" GroupName="OutboundType">Trojan</RadioButton>
@@ -195,6 +207,26 @@
             </StackPanel>
 
             <local:NewProfileRulesetControl x:Name="RulesetDialog" Grid.RowSpan="5" />
+            <ContentDialog
+                x:Name="DownloadRulesetConsentDialog"
+                Grid.RowSpan="5"
+                PrimaryButtonText="Continue"
+                contract7NotPresent:SecondaryButtonText="Close"
+            >
+                <contract7Present:ContentDialog.SecondaryButtonCommand>
+                    <contract7Present:StandardUICommand Kind="Close"/>
+                </contract7Present:ContentDialog.SecondaryButtonCommand>
+                <TextBlock TextWrapping="Wrap" HorizontalAlignment="Stretch">
+                    <Run>Rulesets from the following sources will be downloaded if necessary:</Run>
+                    <LineBreak />
+                    <Hyperlink NavigateUri="https://github.com/Loyalsoldier/surge-rules">Loyalsoldier/surge-rules</Hyperlink>
+                    <LineBreak />
+                    <Hyperlink NavigateUri="https://github.com/Loyalsoldier/geoip">Loyalsoldier/geoip</Hyperlink>
+                    <LineBreak />
+                    <LineBreak />
+                    <Run>By clicking "Continue", you are agreeing to the terms and conditions stated in the sources above.</Run>
+                </TextBlock>
+            </ContentDialog>
         </Grid>
 
         <VisualStateManager.VisualStateGroups>
@@ -205,9 +237,9 @@
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="MainGrid.Margin" Value="80, 0, 80, 20" />
-                        <Setter Target="LeftCol.Width" Value="1*" />
-                        <Setter Target="MiddleCol.Width" Value="1*" />
-                        <Setter Target="RightCol.Width" Value="1*" />
+                        <Setter Target="LeftCol.Width" Value="4*" />
+                        <Setter Target="MiddleCol.Width" Value="5*" />
+                        <Setter Target="RightCol.Width" Value="4*" />
                         <Setter Target="HeaderControl.Margin" Value="0, 40, 0, 0" />
                         <Setter Target="HeaderControl.Height" Value="80" />
                         <Setter Target="WelcomeHeaderControl.Margin" Value="0, 40, 0, 0" />

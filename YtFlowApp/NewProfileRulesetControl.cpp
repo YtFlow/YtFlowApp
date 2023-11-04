@@ -39,18 +39,69 @@ namespace winrt::YtFlowApp::implementation
         }
 
         auto const tag = selectedItemControl.Tag().as<hstring>();
-        if (tag == L"dreamacro")
+        if (tag == L"dreamacro-geoip")
         {
             return "dreamacro-geoip";
         }
-        if (tag == L"loyalsoldier")
+        if (tag == L"loyalsoldier-country-only-cn-private")
         {
             return "loyalsoldier-country-only-cn-private";
+        }
+        if (tag == L"loyalsoldier-surge-proxy")
+        {
+            return "loyalsoldier-surge-proxy";
+        }
+        if (tag == L"loyalsoldier-surge-direct")
+        {
+            return "loyalsoldier-surge-direct";
+        }
+        if (tag == L"loyalsoldier-surge-private")
+        {
+            return "loyalsoldier-surge-private";
+        }
+        if (tag == L"loyalsoldier-surge-reject")
+        {
+            return "loyalsoldier-surge-reject";
+        }
+        if (tag == L"loyalsoldier-surge-tld-not-cn")
+        {
+            return "loyalsoldier-surge-tld-not-cn";
         }
         return "";
     }
 
-    fire_and_forget NewProfileRulesetControl::InitSelectedRuleset()
+    IAsyncOperation<bool> NewProfileRulesetControl::BatchUpdateRulesetsIfNotExistAsync(std::vector<hstring> rulesetKeys)
+    {
+        auto const lifetime = get_strong();
+        for (auto const &rulesetKey : rulesetKeys)
+        {
+            auto const items = SelectionComboBox().Items();
+            auto const item = std::ranges::find_if(
+                items, [&](auto const it) { return it.as<ComboBoxItem>().Tag().as<hstring>() == rulesetKey; });
+            if (item == items.end())
+            {
+                continue;
+            }
+
+            SelectionComboBox().SelectedItem(*item);
+            if (!co_await InitSelectedRuleset())
+            {
+                co_return false;
+            }
+            if (IsPrimaryButtonEnabled())
+            {
+                continue;
+            }
+
+            if (!co_await UpdateAsync())
+            {
+                co_return false;
+            }
+        }
+        co_return true;
+    }
+
+    IAsyncOperation<bool> NewProfileRulesetControl::InitSelectedRuleset()
     {
         auto const lifetime = get_strong();
         std::exception_ptr ex{nullptr};
@@ -59,7 +110,7 @@ namespace winrt::YtFlowApp::implementation
             auto const resourceKey = lifetime->GetResourceKeyFromSelectedRuleset();
             if (resourceKey == "")
             {
-                co_return;
+                co_return false;
             }
 
             lifetime->SelectionComboBox().IsEnabled(false);
@@ -160,20 +211,22 @@ namespace winrt::YtFlowApp::implementation
         }
         lifetime->SelectionComboBox().IsEnabled(true);
         lifetime->UpdateButton().IsEnabled(true);
+        co_return ex == nullptr;
     }
 
-    void NewProfileRulesetControl::SelectionComboBox_SelectionChanged(IInspectable const &,
-                                                                      SelectionChangedEventArgs const &)
+    fire_and_forget NewProfileRulesetControl::SelectionComboBox_SelectionChanged(IInspectable const &,
+                                                                                 SelectionChangedEventArgs const &)
     {
-        InitSelectedRuleset();
+        co_await InitSelectedRuleset();
     }
 
-    void NewProfileRulesetControl::ContentDialog_Opened(ContentDialog const &, ContentDialogOpenedEventArgs const &)
+    fire_and_forget NewProfileRulesetControl::ContentDialog_Opened(ContentDialog const &,
+                                                                   ContentDialogOpenedEventArgs const &)
     {
         m_rulesetSelected = false;
         m_selectionChangeToken =
             SelectionComboBox().SelectionChanged({this, &NewProfileRulesetControl::SelectionComboBox_SelectionChanged});
-        InitSelectedRuleset();
+        co_await InitSelectedRuleset();
     }
 
     void NewProfileRulesetControl::ContentDialog_Closing(ContentDialog const &,
@@ -202,6 +255,11 @@ namespace winrt::YtFlowApp::implementation
 
     fire_and_forget NewProfileRulesetControl::UpdateButton_Click(IInspectable const &, RoutedEventArgs const &)
     {
+        co_await UpdateAsync();
+    }
+
+    IAsyncOperation<bool> NewProfileRulesetControl::UpdateAsync()
+    {
         auto const lifetime = get_strong();
         std::exception_ptr ex{nullptr};
         StorageFile file{nullptr};
@@ -214,6 +272,7 @@ namespace winrt::YtFlowApp::implementation
             m_client = HttpClient(clientFilter);
         }
         auto const client = m_client;
+        bool finishedUpdate{};
         try
         {
             lifetime->m_updateCancelled.store(false);
@@ -271,6 +330,26 @@ namespace winrt::YtFlowApp::implementation
                 else if (resourceKey == "loyalsoldier-country-only-cn-private")
                 {
                     url = "https://cdn.jsdelivr.net/gh/Loyalsoldier/geoip@release/Country-only-cn-private.mmdb";
+                }
+                else if (resourceKey == "loyalsoldier-surge-proxy")
+                {
+                    url = "https://cdn.jsdelivr.net/gh/Loyalsoldier/surge-rules@release/proxy.txt";
+                }
+                else if (resourceKey == "loyalsoldier-surge-direct")
+                {
+                    url = "https://cdn.jsdelivr.net/gh/Loyalsoldier/surge-rules@release/direct.txt";
+                }
+                else if (resourceKey == "loyalsoldier-surge-private")
+                {
+                    url = "https://cdn.jsdelivr.net/gh/Loyalsoldier/surge-rules@release/private.txt";
+                }
+                else if (resourceKey == "loyalsoldier-surge-reject")
+                {
+                    url = "https://cdn.jsdelivr.net/gh/Loyalsoldier/surge-rules@release/reject.txt";
+                }
+                else if (resourceKey == "loyalsoldier-surge-tld-not-cn")
+                {
+                    url = "https://cdn.jsdelivr.net/gh/Loyalsoldier/surge-rules@release/tld-not-cn.txt";
                 }
                 else
                 {
@@ -370,6 +449,7 @@ namespace winrt::YtFlowApp::implementation
                 conn.UpdateResourceUrlRetrievedByResourceId(
                     resourceId, newEtag.has_value() ? to_string(*newEtag).c_str() : nullptr,
                     newLastModified.has_value() ? to_string(*newLastModified).c_str() : nullptr);
+                finishedUpdate = true;
             }
             catch (hresult_canceled const &)
             {
@@ -383,7 +463,7 @@ namespace winrt::YtFlowApp::implementation
 
             lifetime->m_resources.clear();
             lifetime->m_updating = false;
-            lifetime->InitSelectedRuleset();
+            (void)lifetime->InitSelectedRuleset();
             lifetime->UpdateErrorText().Text(std::move(errMsg));
         }
         catch (...)
@@ -414,12 +494,13 @@ namespace winrt::YtFlowApp::implementation
             {
                 NotifyException(L"Updating");
             }
-            lifetime->InitSelectedRuleset();
+            (void)lifetime->InitSelectedRuleset();
         }
         *transferFinished = true;
         lifetime->UpdateButton().IsEnabled(true);
         lifetime->CancelUpdateButton().Visibility(Visibility::Collapsed);
         lifetime->UpdateProgressBar().Visibility(Visibility::Collapsed);
+        co_return (ex == nullptr) && finishedUpdate;
     }
     void NewProfileRulesetControl::ContentDialog_PrimaryButtonClick(ContentDialog const &,
                                                                     ContentDialogButtonClickEventArgs const &)

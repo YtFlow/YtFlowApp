@@ -15,10 +15,11 @@ namespace winrt::YtFlowApp::implementation
         bool RulesetSelected();
         hstring RulesetName();
         std::string_view GetResourceKeyFromSelectedRuleset();
-        fire_and_forget InitSelectedRuleset();
-        void SelectionComboBox_SelectionChanged(Windows::Foundation::IInspectable const &sender,
+        Windows::Foundation::IAsyncOperation<bool> InitSelectedRuleset();
+        Windows::Foundation::IAsyncOperation<bool> BatchUpdateRulesetsIfNotExistAsync(std::vector<hstring> rulesetKeys);
+        fire_and_forget SelectionComboBox_SelectionChanged(Windows::Foundation::IInspectable const &sender,
                                                 Windows::UI::Xaml::Controls::SelectionChangedEventArgs const &e);
-        void ContentDialog_Opened(Windows::UI::Xaml::Controls::ContentDialog const &sender,
+        fire_and_forget ContentDialog_Opened(Windows::UI::Xaml::Controls::ContentDialog const &sender,
                                   Windows::UI::Xaml::Controls::ContentDialogOpenedEventArgs const &args);
         void ContentDialog_Closing(Windows::UI::Xaml::Controls::ContentDialog const &sender,
                                    Windows::UI::Xaml::Controls::ContentDialogClosingEventArgs const &args);
@@ -33,11 +34,13 @@ namespace winrt::YtFlowApp::implementation
       private:
         static inline Windows::Storage::StorageFolder m_resourceFolder{nullptr};
 
+        Windows::Foundation::IAsyncOperation<bool> UpdateAsync();
+
         bool m_rulesetSelected{false};
         hstring m_rulesetName;
         Windows::Web::Http::HttpClient m_client{nullptr};
         event_token m_selectionChangeToken;
-        std::vector<FfiResource> m_resources;
+        std::vector<FfiResource> m_resources{};
         bool m_updating{false};
         std::atomic_bool m_updateCancelled{false};
     };

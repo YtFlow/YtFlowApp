@@ -120,6 +120,8 @@ namespace YtFlowApp
     {
         SplitRoutingRulesetControl();
 
+        Windows.UI.Xaml.Controls.ListViewSelectionMode CanModifyToListSelectionMode(Boolean canModify);
+
         static Windows.UI.Xaml.DependencyProperty RulesetNameProperty
         {
             get;
@@ -129,6 +131,10 @@ namespace YtFlowApp
             get;
         };
         static Windows.UI.Xaml.DependencyProperty RuleListProperty
+        {
+            get;
+        };
+        static Windows.UI.Xaml.DependencyProperty FallbackRuleProperty
         {
             get;
         };
@@ -148,8 +154,18 @@ namespace YtFlowApp
             get;
             set;
         };
+        SplitRoutingRuleModel FallbackRule
+        {
+            get;
+            set;
+        };
 
         event Windows.Foundation.TypedEventHandler<SplitRoutingRulesetControl, IInspectable> RemoveRequested;
+    }
+
+    [default_interface] runtimeclass ResourceManageControl : Windows.UI.Xaml.Controls.UserControl
+    {
+        ResourceManageControl();
     }
 
     [default_interface] runtimeclass NetifHomeWidget : Windows.UI.Xaml.Controls.UserControl, IHomeWidget
@@ -411,6 +427,11 @@ namespace YtFlowApp
         {
             get;
         };
+    }
+
+    [default_interface] runtimeclass ResourceModel : Windows.UI.Xaml.Data.INotifyPropertyChanged
+    {
+        ResourceModel();
     }
 
     enum SplitRoutingRuleDecision
