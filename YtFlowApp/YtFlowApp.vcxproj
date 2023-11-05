@@ -416,6 +416,7 @@
       <DependentUpon>NewProfilePage.xaml</DependentUpon>
       <SubType>Code</SubType>
     </ClCompile>
+    <ClCompile Include="NewProfilePagePresets.cpp" />
     <ClCompile Include="NewProfileRulesetControl.cpp">
       <DependentUpon>NewProfileRulesetControl.xaml</DependentUpon>
       <SubType>Code</SubType>

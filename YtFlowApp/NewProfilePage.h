@@ -8,6 +8,8 @@ namespace winrt::YtFlowApp::implementation
     {
         NewProfilePage();
 
+        static nlohmann::json GenPresetDoc();
+
         void OnNavigatedTo(Windows::UI::Xaml::Navigation::NavigationEventArgs const &args);
         void OnNavigatingFrom(Windows::UI::Xaml::Navigation::NavigatingCancelEventArgs const &args);
 
