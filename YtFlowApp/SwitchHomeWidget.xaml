@@ -81,6 +81,7 @@
                             <TextBlock FontWeight="SemiBold" Margin="0, 4, 0, 2" Text="{x:Bind Name}" />
                             <TextBlock
                                 Text="{x:Bind Description}"
+                                TextWrapping="Wrap"
                                 Opacity=".7"
                             />
                         </StackPanel>

@@ -124,7 +124,11 @@
                     Converter={StaticResource SplitRoutingModeToDescConverter},
                     FallbackValue=''}"
                 />
-                <muxc:Expander HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Padding="0, 0, 0, 20">
+                <muxc:Expander
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Stretch"
+                    Padding="0, 0, 0, 20"
+                >
                     <muxc:Expander.Header>
                         <TextBlock Style="{ThemeResource BaseTextBlockStyle}">
                             Rulesets
@@ -155,6 +159,41 @@
                                 </StackPanel>
                             </ListView.Footer>
                         </ListView>
+                    </StackPanel>
+                </muxc:Expander>
+                <muxc:Expander
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Stretch"
+                    Padding="0"
+                    Margin="0, 8, 0, 0"
+                >
+                    <muxc:Expander.Header>
+                        <TextBlock Style="{ThemeResource BaseTextBlockStyle}">
+                            Custom Rules
+                        </TextBlock>
+                    </muxc:Expander.Header>
+                    <StackPanel HorizontalAlignment="Stretch">
+                        <Button
+                            x:Name="CreateCustomRuleButton"
+                            Margin="24, 20, 0, 0"
+                            Click="CreateCustomRuleButton_Click"
+                        >
+                            Create
+                        </Button>
+                        <TextBox
+                            x:Name="CustomRuleTextBox"
+                            Height="250"
+                            AcceptsReturn="True"
+                            Visibility="Collapsed"
+                            TextWrapping="Wrap"
+                        ></TextBox>
+                        <TextBlock
+                            Margin="24, 8, 24, 16"
+                            Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
+                            TextWrapping="Wrap"
+                        >
+                            Custom rules will take precedence over rulesets.
+                        </TextBlock>
                     </StackPanel>
                 </muxc:Expander>
                 <TextBlock Margin="{StaticResource SubheaderMargin}" Style="{ThemeResource BaseTextBlockStyle}">

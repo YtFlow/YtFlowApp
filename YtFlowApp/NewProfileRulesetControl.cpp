@@ -323,32 +323,40 @@ namespace winrt::YtFlowApp::implementation
             }
             else
             {
+                char const *type;
                 if (resourceKey == "dreamacro-geoip")
                 {
+                    type = "geoip-country";
                     url = "https://cdn.jsdelivr.net/gh/Dreamacro/maxmind-geoip@release/Country.mmdb";
                 }
                 else if (resourceKey == "loyalsoldier-country-only-cn-private")
                 {
+                    type = "geoip-country";
                     url = "https://cdn.jsdelivr.net/gh/Loyalsoldier/geoip@release/Country-only-cn-private.mmdb";
                 }
                 else if (resourceKey == "loyalsoldier-surge-proxy")
                 {
+                    type = "surge-domain-set";
                     url = "https://cdn.jsdelivr.net/gh/Loyalsoldier/surge-rules@release/proxy.txt";
                 }
                 else if (resourceKey == "loyalsoldier-surge-direct")
                 {
+                    type = "surge-domain-set";
                     url = "https://cdn.jsdelivr.net/gh/Loyalsoldier/surge-rules@release/direct.txt";
                 }
                 else if (resourceKey == "loyalsoldier-surge-private")
                 {
+                    type = "surge-domain-set";
                     url = "https://cdn.jsdelivr.net/gh/Loyalsoldier/surge-rules@release/private.txt";
                 }
                 else if (resourceKey == "loyalsoldier-surge-reject")
                 {
+                    type = "surge-domain-set";
                     url = "https://cdn.jsdelivr.net/gh/Loyalsoldier/surge-rules@release/reject.txt";
                 }
                 else if (resourceKey == "loyalsoldier-surge-tld-not-cn")
                 {
+                    type = "surge-domain-set";
                     url = "https://cdn.jsdelivr.net/gh/Loyalsoldier/surge-rules@release/tld-not-cn.txt";
                 }
                 else
@@ -356,8 +364,8 @@ namespace winrt::YtFlowApp::implementation
                     throw std::invalid_argument("Unknown resource key for URL");
                 }
                 auto conn = FfiDbInstance.Connect();
-                resourceId = conn.CreateResourceWithUrl(std::string(resourceKey).c_str(), "geoip-country",
-                                                        newFileName.c_str(), url.c_str());
+                resourceId = conn.CreateResourceWithUrl(std::string(resourceKey).c_str(), type, newFileName.c_str(),
+                                                        url.c_str());
                 oldFileName = newFileName;
             }
 

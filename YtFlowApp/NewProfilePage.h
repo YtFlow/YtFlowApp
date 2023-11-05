@@ -4,14 +4,6 @@
 
 namespace winrt::YtFlowApp::implementation
 {
-    struct NewProfileConfig
-    {
-        hstring InboundMode;
-        hstring SplitRoutingMode;
-        hstring SplitRoutingRuleset;
-        hstring RuleResolver;
-        hstring OutboundType;
-    };
     struct NewProfilePage : NewProfilePageT<NewProfilePage>
     {
         NewProfilePage();
@@ -30,10 +22,10 @@ namespace winrt::YtFlowApp::implementation
                                             Windows::UI::Xaml::Controls::TextChangedEventArgs const &e);
         fire_and_forget AddRulesetButton_Click(Windows::Foundation::IInspectable const &sender,
                                                Windows::UI::Xaml::RoutedEventArgs const &e);
+        void CreateCustomRuleButton_Click(Windows::Foundation::IInspectable const &sender,
+                                          Windows::UI::Xaml::RoutedEventArgs const &e);
 
       private:
-        static void CreatePresetPlugins(uint32_t profileId, NewProfileConfig config);
-
         void AddListRuleset(hstring name, SplitRoutingRuleDecision match,
                             SplitRoutingRuleDecision unmatch = SplitRoutingRuleDecision::Next);
         void AddRuleRuleset(hstring name, hstring matchRule, SplitRoutingRuleDecision match,
