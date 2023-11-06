@@ -55,6 +55,7 @@ namespace winrt::YtFlowApp::implementation
         {
         }
         NewProfileNameText().Text(suggestedName);
+        NewProfileNameText().IsEnabled(true);
     }
 
     void NewProfilePage::OnNavigatingFrom(Navigation::NavigatingCancelEventArgs const &args)
@@ -129,14 +130,15 @@ namespace winrt::YtFlowApp::implementation
             }
 
             co_await resume_foreground(Dispatcher());
-            NewProfileNameText().IsEnabled(true);
             SaveButton().IsEnabled(true);
             if (nameDuplicated)
             {
+                NewProfileNameText().IsEnabled(true);
                 NewProfileNameText().Foreground(Media::SolidColorBrush{Windows::UI::Colors::Red()});
             }
             else
             {
+                NewProfileNameText().IsEnabled(false);
                 Frame().GoBack();
             }
         }
