@@ -2,6 +2,8 @@
 
 #include "MainPage.g.h"
 
+#include <rxcpp/rx.hpp>
+
 using namespace winrt::Windows::ApplicationModel::Core;
 using winrt::Windows::UI::Core::WindowActivatedEventArgs;
 namespace muxc = winrt::Microsoft::UI::Xaml::Controls;

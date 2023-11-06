@@ -2,6 +2,8 @@
 
 #include "EditProfilePage.g.h"
 
+#include <rxcpp/rx.hpp>
+
 #include "EditPluginModel.h"
 #include "ProfileModel.h"
 

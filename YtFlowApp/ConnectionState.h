@@ -1,5 +1,7 @@
 #pragma once
 
+#include <rxcpp/rx.hpp>
+
 using namespace winrt;
 using namespace Windows::Foundation;
 using namespace Windows::Networking::Vpn;

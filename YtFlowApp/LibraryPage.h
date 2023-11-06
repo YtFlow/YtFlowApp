@@ -2,6 +2,8 @@
 
 #include "LibraryPage.g.h"
 
+#include <rxcpp/rx.hpp>
+
 #include "AssetModel.h"
 #include "CoreSubscription.h"
 

@@ -2,6 +2,8 @@
 
 #include "ForwardHomeWidget.g.h"
 
+#include <rxcpp/rx.hpp>
+
 namespace winrt::YtFlowApp::implementation
 {
     struct ForwardStatSnapshot

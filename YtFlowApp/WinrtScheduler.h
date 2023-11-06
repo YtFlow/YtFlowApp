@@ -1,5 +1,7 @@
 #pragma once
 
+#include <rxcpp/rx.hpp>
+
 using winrt::Windows::UI::Core::CoreDispatcher;
 
 namespace winrt::YtFlowApp::implementation

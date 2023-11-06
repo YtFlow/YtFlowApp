@@ -2,6 +2,8 @@
 
 #include "HomePage.g.h"
 
+#include <rxcpp/rx.hpp>
+
 #include "CoreRpc.h"
 
 namespace winrt::YtFlowApp::implementation
