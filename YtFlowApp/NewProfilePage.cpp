@@ -425,6 +425,7 @@ namespace winrt::YtFlowApp::implementation
             if (config.OutboundType == L"ss")
             {
                 doc["proxy-forward"]["param"]["tcp_next"] = "ss-client.tcp";
+                doc["proxy-forward"]["param"]["udp_next"] = "ss-client.udp";
             }
             else if (config.OutboundType == L"http")
             {
@@ -433,6 +434,7 @@ namespace winrt::YtFlowApp::implementation
             else if (config.OutboundType == L"trojan")
             {
                 doc["proxy-forward"]["param"]["tcp_next"] = "trojan-client.tcp";
+                doc["proxy-forward"]["param"]["udp_next"] = "trojan-client.udp";
                 doc["proxy-redir"]["param"]["tcp_next"] = "client-tls.tcp";
                 doc["client-tls"]["param"]["alpn"] = {"h2", "http/1.1"};
             }
