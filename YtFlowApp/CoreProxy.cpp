@@ -126,7 +126,7 @@ namespace winrt::YtFlowApp::implementation
             return PluginDecodeResult::Fail;
         }
         std::map<std::string_view, std::string_view> obfsMap;
-        for (auto const kv : std::views::split(pluginOpts, ';'))
+        for (auto const &kv : std::views::split(pluginOpts, ';'))
         {
             std::string_view kvStr(kv.begin(), kv.end());
             auto const eqPos = kvStr.find('=');
@@ -324,7 +324,7 @@ namespace winrt::YtFlowApp::implementation
     nlohmann::json ParseAlpn(std::string_view alpnStr)
     {
         nlohmann::json alpns;
-        for (auto const s : std::views::split(alpnStr, ','))
+        for (auto const &s : std::views::split(alpnStr, ','))
         {
             if (s.empty())
             {
@@ -388,7 +388,7 @@ namespace winrt::YtFlowApp::implementation
             {
                 return PluginDecodeResult::Fail;
             }
-            auto const [user, pass] = std::move(userPassSplit).value();
+            auto const &[user, pass] = userPassSplit.value();
             userDoc = nlohmann::json::binary_t(std::vector<uint8_t>(user.data(), user.data() + user.size()));
             passDoc = nlohmann::json::binary_t(std::vector<uint8_t>(pass.data(), pass.data() + pass.size()));
         }
@@ -442,7 +442,7 @@ namespace winrt::YtFlowApp::implementation
             {
                 return PluginDecodeResult::Fail;
             }
-            auto const [user, pass] = std::move(userPassSplit).value();
+            auto const &[user, pass] = userPassSplit.value();
             userDoc = nlohmann::json::binary_t(std::vector<uint8_t>(user.data(), user.data() + user.size()));
             passDoc = nlohmann::json::binary_t(std::vector<uint8_t>(pass.data(), pass.data() + pass.size()));
         }
@@ -667,7 +667,11 @@ namespace winrt::YtFlowApp::implementation
                 return PluginDecodeResult::Fail;
             }
             // TODO: fingerprint
-            nlohmann::json sniDoc = nullptr, alpnDoc = nullptr;
+            nlohmann::json tlsParamDoc =
+                               {// TODO: allow insecure or not?
+                                {"skip_cert_check", true},
+                                {"next", tcpNext}},
+                           alpnDoc = nullptr;
             auto const isWs = m_linkDoc.value("net", "tcp") == "ws";
             auto const rawAlpn = m_linkDoc.value("alpn", "");
             if (isWs && rawAlpn == "h2,http/1.1")
@@ -678,15 +682,15 @@ namespace winrt::YtFlowApp::implementation
             {
                 alpnDoc = ParseAlpn(rawAlpn);
             }
+            if (alpnDoc.type() == nlohmann::json::value_t::array && !alpnDoc.empty())
+            {
+                tlsParamDoc["alpn"] = std::move(alpnDoc);
+            }
             if (m_linkDoc.value("sni", "") != "")
             {
-                sniDoc = m_linkDoc.at("sni").get<std::string>();
+                tlsParamDoc["sni"] = m_linkDoc.at("sni").get<std::string>();
             }
-            tlsPlugin.param = nlohmann::json::to_cbor({{"alpn", std::move(alpnDoc)},
-                                                       // TODO: allow insecure or not?
-                                                       {"skip_cert_check", true},
-                                                       {"sni", std::move(sniDoc)},
-                                                       {"next", tcpNext}});
+            tlsPlugin.param = nlohmann::json::to_cbor(std::move(tlsParamDoc));
             return PluginDecodeResult::Success;
         }
         catch (...)
