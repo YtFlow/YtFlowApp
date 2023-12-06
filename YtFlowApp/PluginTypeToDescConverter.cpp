@@ -32,6 +32,8 @@ namespace winrt::YtFlowApp::implementation
                                          L"the corresponding handler or fallback handler if there is no match.")},
         {L"rule-dispatcher", box_value(L"Match the connection against rules defined in a resource, and use the handler "
                                        L"of a corresponding action or fallback if there is no match.")},
+        {L"list-dispatcher", box_value(L"Match the connection against a list of matchers defined in a resource, and "
+                                       L"use the handler of the action or fallback handler if there is no match.")},
         {L"forward",
          box_value(L"Establish a new connection for each incoming connection, and forward data between them.")},
         {L"dyn-outbound", box_value(L"Select an outbound proxy from the database at runtime.")},

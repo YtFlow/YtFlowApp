@@ -192,6 +192,7 @@
                     <x:String>http-obfs-server</x:String>
                     <x:String>http-proxy-client</x:String>
                     <x:String>ip-stack</x:String>
+                    <x:String>list-dispatcher</x:String>
                     <x:String>netif</x:String>
                     <x:String>null</x:String>
                     <x:String>redirect</x:String>
