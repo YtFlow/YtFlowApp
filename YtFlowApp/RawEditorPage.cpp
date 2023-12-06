@@ -11,6 +11,7 @@ using namespace winrt;
 using namespace Windows::UI::Text;
 using namespace Windows::UI::Xaml;
 using namespace Media;
+using Windows::Foundation::Uri;
 
 namespace winrt::YtFlowApp::implementation
 {
@@ -18,7 +19,7 @@ namespace winrt::YtFlowApp::implementation
     constexpr const uint8_t PARAM_EDIT_TEXT_STORED = 0b10;
     RawEditorPage::RawEditorPage()
     {
-        InitializeComponent();
+        // InitializeComponent();
     }
 
     EditPluginModel RawEditorPage::Model()
@@ -46,6 +47,8 @@ namespace winrt::YtFlowApp::implementation
         bool isDirty{model.IsDirty()};
         Bindings->Update();
         model.IsDirty(isDirty);
+        PluginTypeText().NavigateUri(
+            Uri{L"https://ytflow.github.io/ytflow-book/plugins/" + model.Plugin().Plugin() + L".html"});
         m_paramEditTextChangedStage = 0;
         ParamEdit().Document().SetText(TextSetOptions::None, editorParam.RawJson());
     }
