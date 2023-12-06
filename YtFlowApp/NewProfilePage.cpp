@@ -536,7 +536,8 @@ namespace winrt::YtFlowApp::implementation
             hstring(L"# See https://ytflow.github.io/ytflow-book/plugins/rule-dispatcher.html\r\n") +
             L"# for quanx-filter-based custom rule syntax.\r\n\r\n" + L"domain, www.example.com, direct\r\n" +
             L"domain-suffix, ip.sb, proxy\r\n" + L"domain-keyword, google-analytics, reject\r\n" +
-            L"ip-cidr, 114.114.114.114/32, direct\r\n" + L"ip6-cidr, 2001:4860:4860::8800/120, proxy\r\n");
+            L"ip-cidr, 114.114.114.114/32, direct, no-resolve\r\n" +
+            L"ip6-cidr, 2001:4860:4860::8800/120, proxy, no-resolve\r\n");
         CustomRuleTextBox().Visibility(Visibility::Visible);
     }
 }
