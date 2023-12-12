@@ -68,12 +68,7 @@ namespace winrt::YtFlowApp::implementation
 
     std::string Sip002Decoder::DecodeName(ParsedUri const &uri)
     {
-        std::string proxyName = UriUnescape(std::string(uri.fragment));
-        if (proxyName.empty())
-        {
-            proxyName = "New Shadowsocks Proxy";
-        }
-        return proxyName;
+        return UriUnescape(std::string(uri.fragment));
     }
     PluginDecodeResult Sip002Decoder::DecodeProtocol(ParsedUri const &uri, ProxyPlugin &plugin,
                                                      std::string_view tcpNext, std::string_view udpNext) const
@@ -281,12 +276,7 @@ namespace winrt::YtFlowApp::implementation
 
     std::string TrojanDecoder::DecodeName(ParsedUri const &uri)
     {
-        std::string proxyName = UriUnescape(std::string(uri.fragment));
-        if (proxyName.empty())
-        {
-            proxyName = "New Trojan Proxy";
-        }
-        return proxyName;
+        return UriUnescape(std::string(uri.fragment));
     }
     PluginDecodeResult TrojanDecoder::DecodeProtocol(ParsedUri const &uri, ProxyPlugin &plugin,
                                                      std::string_view tcpNext, std::string_view) const
@@ -369,12 +359,7 @@ namespace winrt::YtFlowApp::implementation
         {
             return remarks.value().get();
         }
-        std::string proxyName = UriUnescape(std::string(uri.fragment));
-        if (proxyName.empty())
-        {
-            proxyName = "New SOCKS5 Proxy";
-        }
-        return proxyName;
+        return UriUnescape(std::string(uri.fragment));
     }
     PluginDecodeResult Socks5Decoder::DecodeProtocol(ParsedUri const &uri, ProxyPlugin &plugin,
                                                      std::string_view tcpNext, std::string_view udpNext) const
@@ -422,12 +407,7 @@ namespace winrt::YtFlowApp::implementation
     }
     std::string HttpDecoder::DecodeName(ParsedUri const &uri)
     {
-        std::string proxyName = UriUnescape(std::string(uri.fragment));
-        if (proxyName.empty())
-        {
-            proxyName = "New HTTP Proxy";
-        }
-        return proxyName;
+        return UriUnescape(std::string(uri.fragment));
     }
     PluginDecodeResult HttpDecoder::DecodeProtocol(ParsedUri const &uri, ProxyPlugin &plugin, std::string_view tcpNext,
                                                    std::string_view) const

@@ -245,11 +245,16 @@ namespace winrt::YtFlowApp::implementation
             {
                 return std::nullopt;
             }
+            if (name.empty())
+            {
+                name = host + ":" + std::to_string(port);
+            }
             ProxyPlugin redirPlugin{
                 .name = "r",
                 .plugin = std::string(REDIR_PLUGIN_NAME),
-                .param = nlohmann::json::to_cbor(
-                    {{"dest", {{"host", host}, {"port", port}}}, {"tcp_next", tcpOut}, {"udp_next", udpOut}}),
+                .param = nlohmann::json::to_cbor({{"dest", {{"host", std::move(host)}, {"port", port}}},
+                                                  {"tcp_next", tcpOut},
+                                                  {"udp_next", udpOut}}),
             };
             proxy.plugins.emplace_back(std::move(redirPlugin));
             tcpOut = "r.tcp";
