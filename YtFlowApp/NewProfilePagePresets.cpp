@@ -217,15 +217,15 @@ namespace winrt::YtFlowApp::implementation
                {{
                    "choices",
                    {
-                       {{"name", "Off"},
-                        {"description", "UDP packets will not go through any rules or proxies"},
-                        {"tcp_next", "rule-switch.tcp"},
-                        {"udp_next", "resolve-local.udp"}},
                        {{"name", "On"},
                         {"description", "UDP packets will go through the same routing decisions as TCP "
                                         "connections, possibly via a proxy"},
                         {"tcp_next", "rule-switch.tcp"},
                         {"udp_next", "rule-switch.udp"}},
+                       {{"name", "Off"},
+                        {"description", "UDP packets will not go through any rules or proxies"},
+                        {"tcp_next", "rule-switch.tcp"},
+                        {"udp_next", "resolve-local.udp"}},
                    },
                }}}}},
             {
