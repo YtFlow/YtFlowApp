@@ -242,7 +242,7 @@ namespace winrt::YtFlowApp::implementation
                  {"plugin_version", 0},
                  {"param",
                   {{"concurrency_limit", 64},
-                   {"resolver", "fake-ip.resolver"},
+                   {"resolver", "fakeip-filter.resolver"},
                    {"tcp_map_back", {"udp-proxy-switch.tcp"}},
                    {"udp_map_back", {"udp-proxy-switch.udp"}},
                    {"ttl", 60}}}},

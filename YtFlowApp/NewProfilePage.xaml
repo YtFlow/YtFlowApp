@@ -62,7 +62,31 @@
                     <RadioButton Tag="fake">UWP VPN, Fake IP range</RadioButton>
                     <RadioButton Tag="full">UWP VPN, Full IP range</RadioButton>
                 </muxc:RadioButtons>
-                <TextBlock Margin="{StaticResource SubheaderMargin}" Style="{ThemeResource BaseTextBlockStyle}">
+
+                <muxc:Expander
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Stretch"
+                    Padding="0"
+                    Margin="0, 8, 0, 0"
+                >
+                    <muxc:Expander.Header>
+                        <TextBlock Style="{ThemeResource BaseTextBlockStyle}">
+                            Exclude domains from Fake IP
+                        </TextBlock>
+                    </muxc:Expander.Header>
+                    <TextBox
+                        x:Name="FakeIpFilterTextBox"
+                        Height="250"
+                        AcceptsReturn="True"
+                        TextWrapping="Wrap"
+                        IsSpellCheckEnabled="False"
+                        Text=".msftconnecttest.com&#13;.msftncsi.com&#13;.lan&#13;localhost.ptlogin2.qq.com"
+                    ></TextBox>
+                </muxc:Expander>
+
+
+                <!-- Inbound connections from localhost will be blocked by sandbox. No plan for now. -->
+                <!-- TextBlock Margin="{StaticResource SubheaderMargin}" Style="{ThemeResource BaseTextBlockStyle}">
                     Additional Inbound ports
                 </TextBlock>
                 <CheckBox IsEnabled="False">
@@ -70,7 +94,7 @@
                         <TextBlock VerticalAlignment="Center" Margin="0, 0, 10, 0">SOCKS5</TextBlock>
                         <TextBox PlaceholderText="Port" Text="9080" InputScope="Number" MaxLength="5" />
                     </StackPanel>
-                </CheckBox>
+                </CheckBox -->
             </StackPanel>
 
             <StackPanel x:Name="MiddlePanel" Grid.Row="2" Grid.Column="0">
@@ -186,6 +210,7 @@
                             AcceptsReturn="True"
                             Visibility="Collapsed"
                             TextWrapping="Wrap"
+                            IsSpellCheckEnabled="False"
                         ></TextBox>
                         <TextBlock
                             Margin="24, 8, 24, 16"
@@ -287,7 +312,7 @@
                         <Setter Target="MiddlePanel.(Grid.Column)" Value="1" />
                         <Setter Target="MiddlePanel.(Grid.Row)" Value="1" />
                         <Setter Target="MiddlePanel.(Grid.RowSpan)" Value="3" />
-                        <Setter Target="RightPanel.Margin" Value="8, 0, 0, 0" />
+                        <Setter Target="MiddlePanel.Margin" Value="12, 0, 12, 0" />
                         <Setter Target="RightPanel.(Grid.Column)" Value="2" />
                         <Setter Target="RightPanel.(Grid.Row)" Value="1" />
                         <Setter Target="RightPanel.(Grid.RowSpan)" Value="3" />

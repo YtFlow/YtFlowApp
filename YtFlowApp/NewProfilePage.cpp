@@ -30,9 +30,11 @@ namespace winrt::YtFlowApp::implementation
         hstring RuleResolver;
         hstring OutboundType;
         std::string CustomRules;
+        std::string FakeIpFilter;
         std::vector<NewProfileConfigRuleset> Rulesets{};
     };
     void CreatePresetPlugins(uint32_t profileId, NewProfileConfig config);
+    std::vector<std::string_view> SplitLines(std::string_view sv);
 
     NewProfilePage::NewProfilePage()
     {
@@ -90,6 +92,7 @@ namespace winrt::YtFlowApp::implementation
                 .RuleResolver = RuleResolverComboBox().SelectedItem().as<ComboBoxItem>().Tag().as<hstring>(),
                 .OutboundType = m_selectedOutboundType,
                 .CustomRules = to_string(CustomRuleTextBox().Text()),
+                .FakeIpFilter = to_string(FakeIpFilterTextBox().Text()),
                 .Rulesets =
                     std::views::transform(
                         RulesetListView().Items(),
@@ -314,7 +317,6 @@ namespace winrt::YtFlowApp::implementation
     void CreatePresetPlugins(uint32_t profileId, NewProfileConfig config)
     {
         using namespace std::string_literals;
-        using namespace std::string_view_literals;
         try
         {
             auto doc = NewProfilePage::GenPresetDoc();
@@ -407,19 +409,20 @@ namespace winrt::YtFlowApp::implementation
                 {"plugin_version", 0},
                 {"param",
                  {{"resolver", ruleResolver},
-                  {"source",
-                   {{"format", "quanx-filter"},
-                    {"text", std::views::split(std::string_view(config.CustomRules), "\r"sv) |
-                                 std::views::transform([](auto const sr) {
-                                     std::string_view const sv(sr);
-                                     auto const rpos = sv.find_last_not_of('\r');
-                                     return sv.substr(0, rpos == std::string_view::npos ? sv.size() : rpos + 1);
-                                 }) |
-                                 std::ranges::to<std::vector>()}}},
+                  {"source", {{"format", "quanx-filter"}, {"text", SplitLines(config.CustomRules)}}},
                   {"actions", availableActions()},
                   {"rules", {{"proxy", "proxy"}, {"direct", "direct"}, {"reject", "reject"}, {"next", "next"}}},
-                  {"fallback", makeAction(SplitRoutingRuleDecision::Next)}}}};
+                  {"fallback", makeAction(SplitRoutingRuleDecision::Next)}}}},
+                fakeipFilterDoc{
+                    {"desc", "Generate real IP addresses instead of Fake IPs for specified domain names."},
+                    {"plugin", "list-dispatcher"},
+                    {"plugin_version", 0},
+                    {"param",
+                     {{"source", {{"format", "surge-domain-set"}, {"text", SplitLines(config.FakeIpFilter)}}},
+                      {"action", {{"resolver", "phy.resolver"}}},
+                      {"fallback", {{"resolver", "fake-ip.resolver"}}}}}};
             doc["custom-rule-dispatcher"] = std::move(customRuleDoc);
+            doc["fakeip-filter"] = std::move(fakeipFilterDoc);
 
             // Adjust outbound
             if (config.OutboundType == L"ss")
@@ -541,5 +544,16 @@ namespace winrt::YtFlowApp::implementation
             L"ip-cidr, 114.114.114.114/32, direct, no-resolve\r\n" +
             L"ip6-cidr, 2001:4860:4860::8800/120, proxy, no-resolve\r\n");
         CustomRuleTextBox().Visibility(Visibility::Visible);
+    }
+
+    std::vector<std::string_view> SplitLines(std::string_view sv)
+    {
+        using namespace std::string_view_literals;
+        return std::views::split(std::string_view(sv), "\r"sv) | std::views::transform([](auto const sr) {
+                   std::string_view const sv(sr);
+                   auto const rpos = sv.find_last_not_of('\r');
+                   return sv.substr(0, rpos == std::string_view::npos ? sv.size() : rpos + 1);
+               }) |
+               std::ranges::to<std::vector>();
     }
 }
