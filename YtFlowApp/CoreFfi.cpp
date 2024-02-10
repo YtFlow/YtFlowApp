@@ -9,7 +9,7 @@ namespace winrt::YtFlowApp::implementation
     {
         return msg.c_str();
     }
-    FfiException::FfiException(ytflow_core::FfiResult const &r)
+    FfiException::FfiException(ytflow_core::ytflow_result const &r)
     {
         // TODO: all errors
         if (r.data.err[0] == nullptr)
@@ -63,7 +63,7 @@ namespace winrt::YtFlowApp::implementation
 
     FfiDb FfiDb::from_ffi(void *ptr1, uintptr_t)
     {
-        return FfiDb(static_cast<ytflow_core::Database *>(ptr1));
+        return FfiDb(static_cast<ytflow_core::ytflow_database *>(ptr1));
     }
     FfiDb::~FfiDb()
     {
@@ -89,8 +89,7 @@ namespace winrt::YtFlowApp::implementation
     uint32_t FfiConn::CreateProfile(const char *name, const char *locale) &
     {
         std::lock_guard _guard(conn_mu);
-        const auto [ptrRaw, metaRaw] =
-            unwrap_ffi_result<FfiNoop>(ytflow_profile_create(name, locale, conn_ptr));
+        const auto [ptrRaw, metaRaw] = unwrap_ffi_result<FfiNoop>(ytflow_profile_create(name, locale, conn_ptr));
         return (uint32_t)((uintptr_t)ptrRaw & 0xFFFFFFFF);
     }
     void FfiConn::DeleteProfile(uint32_t id) &
@@ -111,8 +110,7 @@ namespace winrt::YtFlowApp::implementation
     std::vector<FfiPlugin> FfiConn::GetPluginsByProfile(uint32_t profileId) &
     {
         std::lock_guard _guard(conn_mu);
-        return unwrap_ffi_buffer<std::vector<FfiPlugin>>(
-            ytflow_plugins_get_by_profile(profileId, conn_ptr));
+        return unwrap_ffi_buffer<std::vector<FfiPlugin>>(ytflow_plugins_get_by_profile(profileId, conn_ptr));
     }
     void FfiConn::SetPluginAsEntry(uint32_t pluginId, uint32_t profileId) &
     {
@@ -141,8 +139,8 @@ namespace winrt::YtFlowApp::implementation
                                uint16_t pluginVersion, uint8_t const *param, size_t paramLen) &
     {
         std::lock_guard _guard(conn_mu);
-        unwrap_ffi_result<FfiNoop>(ytflow_plugin_update(id, profileId, name, desc, plugin, pluginVersion,
-                                                        param, paramLen, conn_ptr));
+        unwrap_ffi_result<FfiNoop>(
+            ytflow_plugin_update(id, profileId, name, desc, plugin, pluginVersion, param, paramLen, conn_ptr));
     }
     std::vector<FfiProxyGroup> FfiConn::GetProxyGroups() &
     {
@@ -167,22 +165,20 @@ namespace winrt::YtFlowApp::implementation
     uint32_t FfiConn::CreateProxyGroup(char const *name, char const *type) &
     {
         std::lock_guard _guard(conn_mu);
-        const auto [ptrRaw, metaRaw] =
-            unwrap_ffi_result<FfiNoop>(ytflow_proxy_group_create(name, type, conn_ptr));
+        const auto [ptrRaw, metaRaw] = unwrap_ffi_result<FfiNoop>(ytflow_proxy_group_create(name, type, conn_ptr));
         return (uint32_t)((uintptr_t)ptrRaw & 0xFFFFFFFF);
     }
     uint32_t FfiConn::CreateProxySubscriptionGroup(char const *name, char const *format, char const *url) &
     {
         std::lock_guard _guard(conn_mu);
-        const auto [ptrRaw, metaRaw] = unwrap_ffi_result<FfiNoop>(
-            ytflow_proxy_group_create_subscription(name, format, url, conn_ptr));
+        const auto [ptrRaw, metaRaw] =
+            unwrap_ffi_result<FfiNoop>(ytflow_proxy_group_create_subscription(name, format, url, conn_ptr));
         return (uint32_t)((uintptr_t)ptrRaw & 0xFFFFFFFF);
     }
     std::vector<FfiProxy> FfiConn::GetProxiesByProxyGroup(uint32_t proxyGroupId) &
     {
         std::lock_guard _guard(conn_mu);
-        return unwrap_ffi_buffer<std::vector<FfiProxy>>(
-            ytflow_proxy_get_by_proxy_group(proxyGroupId, conn_ptr));
+        return unwrap_ffi_buffer<std::vector<FfiProxy>>(ytflow_proxy_get_by_proxy_group(proxyGroupId, conn_ptr));
     }
     FfiProxyGroupSubscription FfiConn::GetProxySubscriptionByProxyGroup(uint32_t proxyGroupId) &
     {
@@ -224,8 +220,7 @@ namespace winrt::YtFlowApp::implementation
                               uint16_t proxyVersion) &
     {
         std::lock_guard _guard(conn_mu);
-        unwrap_ffi_result<FfiNoop>(
-            ytflow_proxy_update(proxyId, name, proxy, proxyLen, proxyVersion, conn_ptr));
+        unwrap_ffi_result<FfiNoop>(ytflow_proxy_update(proxyId, name, proxy, proxyLen, proxyVersion, conn_ptr));
     }
     void FfiConn::DeleteProxy(uint32_t proxyId) &
     {
@@ -235,8 +230,7 @@ namespace winrt::YtFlowApp::implementation
     void FfiConn::ReorderProxy(uint32_t proxyGroupId, int32_t rangeStartOrder, int32_t rangeEndOrder, int32_t moves) &
     {
         std::lock_guard _guard(conn_mu);
-        unwrap_ffi_result<FfiNoop>(
-            ytflow_proxy_reorder(proxyGroupId, rangeStartOrder, rangeEndOrder, moves, conn_ptr));
+        unwrap_ffi_result<FfiNoop>(ytflow_proxy_reorder(proxyGroupId, rangeStartOrder, rangeEndOrder, moves, conn_ptr));
     }
     void FfiConn::BatchUpdateProxyInGroup(uint32_t proxyGroupId, uint8_t const *newProxyBuf, size_t newProxyBufLen) &
     {
@@ -258,8 +252,8 @@ namespace winrt::YtFlowApp::implementation
                                             char const *url) &
     {
         std::lock_guard _guard(conn_mu);
-        const auto [ptrRaw, metaRaw] = unwrap_ffi_result<FfiNoop>(
-            ytflow_resource_create_with_url(key, type, local_file, url, conn_ptr));
+        const auto [ptrRaw, metaRaw] =
+            unwrap_ffi_result<FfiNoop>(ytflow_resource_create_with_url(key, type, local_file, url, conn_ptr));
         return (uint32_t)((uintptr_t)ptrRaw & 0xFFFFFFFF);
     }
     uint32_t FfiConn::CreateResourceWithGitHubRelease(char const *key, char const *type, char const *local_file,
@@ -267,16 +261,14 @@ namespace winrt::YtFlowApp::implementation
                                                       char const *asset_name) &
     {
         std::lock_guard _guard(conn_mu);
-        const auto [ptrRaw, metaRaw] =
-            unwrap_ffi_result<FfiNoop>(ytflow_resource_create_with_github_release(
-                key, type, local_file, github_username, github_repo, asset_name, conn_ptr));
+        const auto [ptrRaw, metaRaw] = unwrap_ffi_result<FfiNoop>(ytflow_resource_create_with_github_release(
+            key, type, local_file, github_username, github_repo, asset_name, conn_ptr));
         return (uint32_t)((uintptr_t)ptrRaw & 0xFFFFFFFF);
     }
     FfiResourceUrl FfiConn::GetResourceUrlByResourceId(uint32_t resourceId) &
     {
         std::lock_guard _guard(conn_mu);
-        return unwrap_ffi_buffer<FfiResourceUrl>(
-            ytflow_resource_url_query_by_resource_id(resourceId, conn_ptr));
+        return unwrap_ffi_buffer<FfiResourceUrl>(ytflow_resource_url_query_by_resource_id(resourceId, conn_ptr));
     }
     void FfiConn::UpdateResourceUrlRetrievedByResourceId(uint32_t resourceId, char const *etag,
                                                          char const *lastModified) &
@@ -295,13 +287,13 @@ namespace winrt::YtFlowApp::implementation
                                                                    char const *releaseTitle) &
     {
         std::lock_guard _guard(conn_mu);
-        unwrap_ffi_result<FfiNoop>(ytflow_resource_github_release_update_retrieved_by_resource_id(
-            resourceId, gitTag, releaseTitle, conn_ptr));
+        unwrap_ffi_result<FfiNoop>(
+            ytflow_resource_github_release_update_retrieved_by_resource_id(resourceId, gitTag, releaseTitle, conn_ptr));
     }
 
     FfiConn FfiConn::from_ffi(void *ptr1, uintptr_t)
     {
-        return FfiConn(static_cast<ytflow_core::Connection *>(ptr1));
+        return FfiConn(static_cast<ytflow_core::ytflow_connection *>(ptr1));
     }
     FfiConn::~FfiConn()
     {

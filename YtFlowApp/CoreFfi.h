@@ -15,10 +15,10 @@ namespace winrt::YtFlowApp::implementation
     {
         std::string msg;
 
-        FfiException(ytflow_core::FfiResult const &r);
+        FfiException(ytflow_core::ytflow_result const &r);
         const char *what() const throw() override;
     };
-    template <typename R> auto unwrap_ffi_result(ytflow_core::FfiResult r) -> decltype(R::from_ffi(nullptr, NULL))
+    template <typename R> auto unwrap_ffi_result(ytflow_core::ytflow_result r) -> decltype(R::from_ffi(nullptr, NULL))
     {
         if (r.code == 0)
         {
@@ -31,7 +31,7 @@ namespace winrt::YtFlowApp::implementation
             throw ex;
         }
     }
-    template <typename R> R unwrap_ffi_buffer(ytflow_core::FfiResult r)
+    template <typename R> R unwrap_ffi_buffer(ytflow_core::ytflow_result r)
     {
         const auto [ptrRaw, metaRaw] = unwrap_ffi_result<FfiNoop>(r);
         auto ptr = (const uint8_t *)ptrRaw;
@@ -209,7 +209,7 @@ namespace winrt::YtFlowApp::implementation
 
     struct FfiConn final
     {
-        FfiConn(ytflow_core::Connection *conn) noexcept : conn_ptr(conn)
+        FfiConn(ytflow_core::ytflow_connection *conn) noexcept : conn_ptr(conn)
         {
         }
         FfiConn(FfiConn &&) noexcept;
@@ -264,12 +264,12 @@ namespace winrt::YtFlowApp::implementation
 
       private:
         std::mutex conn_mu{};
-        ytflow_core::Connection *conn_ptr{nullptr};
+        ytflow_core::ytflow_connection *conn_ptr{nullptr};
     };
     struct FfiDb final
     {
         FfiDb() = default;
-        FfiDb(ytflow_core::Database *db) noexcept : db_ptr(db)
+        FfiDb(ytflow_core::ytflow_database *db) noexcept : db_ptr(db)
         {
         }
         FfiDb(FfiDb &&) noexcept;
@@ -285,7 +285,7 @@ namespace winrt::YtFlowApp::implementation
         ~FfiDb();
 
       private:
-        ytflow_core::Database *db_ptr{nullptr};
+        ytflow_core::ytflow_database *db_ptr{nullptr};
     };
     inline FfiDb FfiDbInstance;
     std::string GetYtFlowCoreVersion();
