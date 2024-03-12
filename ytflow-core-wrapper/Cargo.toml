@@ -1,0 +1,44 @@
+[package]
+name = "ytflow-core-wrapper"
+version = "0.0.0"
+authors = ["bdbai <bdbaiapp@163.com>"]
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+crate-type = ["staticlib"]
+
+[dependencies]
+ytflow = { path = "../YtFlowCore/ytflow", features = ["plugins"] }
+ytflow-app-util = { path = "../YtFlowCore/ytflow-app-util", features = ["ffi"] }
+flume = { version = "0.11", default-features = false, features = [] }
+futures = { version = "0.3", default-features = false }
+
+# Pin tokio version to use patched mio v0.7.
+tokio = { version = "=1.16", features = [
+    "rt",
+    "rt-multi-thread",
+    "sync",
+    "fs",
+    "net",
+    "io-util",
+    "time",
+    "macros",
+] }
+
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.52", features = [
+    "implement",
+    "Foundation",
+    "Foundation_Collections",
+    "Networking",
+    "Networking_Vpn",
+    "Networking_Sockets",
+    "Storage",
+    "Storage_Streams",
+    "Win32_Foundation",
+    "Win32_System_WinRT",
+    "Win32_System_WinRT_Storage",
+] }
+windows-implement = "0.52"

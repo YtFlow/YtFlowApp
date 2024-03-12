@@ -1,0 +1,12 @@
+[workspace]
+members = ["ytflow-core-wrapper"]
+resolver = "2"
+
+[patch.crates-io]
+mio = { git = "https://github.com/YtFlow/mio-noafd", branch = "noafd-v0.7-nobind" }
+libsqlite3-sys = { git = "https://github.com/YtFlow/rusqlite" }
+
+[profile.release]
+debug = true
+lto = true
+codegen-units = 1
