@@ -8,7 +8,7 @@ namespace winrt::YtFlowApp::implementation
     struct ProxyModel : ProxyModelT<ProxyModel>
     {
         ProxyModel() = default;
-        ProxyModel(FfiProxy const &proxy)
+        ProxyModel(FfiDataProxy const &proxy)
             : m_id(proxy.id), m_name(to_hstring(proxy.name)), m_proxy(proxy.proxy), m_proxyVersion(proxy.proxy_version)
         {
         }

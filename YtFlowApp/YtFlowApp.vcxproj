@@ -132,7 +132,6 @@
     <ClInclude Include="BoolTemplateSelector.h" />
     <ClInclude Include="BoolToFontWeightConverter.h" />
     <ClInclude Include="CoreFfi.h" />
-    <ClInclude Include="CoreProxyImpl.h" />
     <ClInclude Include="CoreRpc.h" />
     <ClInclude Include="CoreSubscription.h" />
     <ClInclude Include="cppcoro\async_mutex.hpp" />

@@ -19,7 +19,7 @@ variables:
   appxPackageDir: '$(build.artifactStagingDirectory)\AppxPackages\\'
   keyFile: 'YtFlowApp_TemporaryKey.pfx'
   NUGET_PACKAGES: $(Pipeline.Workspace)/.nuget/packages
-  vcpkgGitCommitId: 75059166857a374297e5edd6e1e7a60912907a46
+  vcpkgGitCommitId: 8d3649ba34aab36914ddd897958599aa0a91b08e
   cleanBuild: false
 
 steps:
@@ -45,24 +45,24 @@ steps:
 - task: Cache@2
   condition: eq(variables.cleanBuild, 'false')
   inputs:
-    key: 'target | "$(Agent.OS)" | YtFlowCore/rust-toolchain.toml | YtFlowCore/Cargo.lock'
+    key: 'target | "$(Agent.OS)" | rust-toolchain.toml | Cargo.lock'
     restoreKeys: |
-      target | "$(Agent.OS)" | YtFlowCore/rust-toolchain.toml
+      target | "$(Agent.OS)" | rust-toolchain.toml
       target
-    path: YtFlowCore/target
-  displayName: Cache YtFlowCore target directory
+    path: target
+  displayName: Cache target directory
 
 - task: Cache@2
   condition: eq(variables.cleanBuild, 'false')
   inputs:
-    key: 'rustup | "$(Agent.OS)" | YtFlowCore/rust-toolchain.toml'
+    key: 'rustup | "$(Agent.OS)" | rust-toolchain.toml'
     path: "$(UserProfile)/.rustup"
   displayName: Cache rustup toolchains
 
 - task: Cache@2
   condition: eq(variables.cleanBuild, 'false')
   inputs:
-    key: 'cargo | "$(Agent.OS)" | YtFlowCore/Cargo.lock'
+    key: 'cargo | "$(Agent.OS)" | Cargo.lock'
     restoreKeys: |
       cargo | "$(Agent.OS)"
       cargo
@@ -85,14 +85,13 @@ steps:
 
 - task: CmdLine@2
   inputs:
-    workingDirectory: YtFlowCore
     script: |
-      cargo build -p ytflow-uwp-plugin -Z build-std=std,panic_abort --target x86_64-uwp-windows-msvc --release
-      cargo build -p ytflow-uwp-plugin -Z build-std=std,panic_abort --target thumbv7a-uwp-windows-msvc --release
+      cargo build --config .cargo/publish.config.toml --target x86_64-uwp-windows-msvc --release
+      cargo build --config .cargo/publish.config.toml --target thumbv7a-uwp-windows-msvc --release
   env:
     X86_64_UWP_WINDOWS_MSVC_OPENSSL_DIR: "$(runVcpkg.RUNVCPKG_VCPKG_ROOT_OUT)\\installed\\x64-uwp"
     THUMBV7A_UWP_WINDOWS_MSVC_OPENSSL_DIR: "$(runVcpkg.RUNVCPKG_VCPKG_ROOT_OUT)\\installed\\arm-uwp"
-  displayName: Build YtFlowCore for UWP
+  displayName: Build core wrapper for UWP
 
 - task: DownloadSecureFile@1
   name: secureKeyFile

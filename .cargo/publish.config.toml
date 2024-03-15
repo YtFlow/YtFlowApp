@@ -13,4 +13,4 @@ rustflags = ["-C", "target-feature=+sse,+sse2,+sse3,+ssse3"]
 rustflags = ["-C", "target-feature=+neon,+aes,+sha2,+crc"]
 
 [unstable]
-bindeps = true
+build-std = ["std", "panic_abort"]

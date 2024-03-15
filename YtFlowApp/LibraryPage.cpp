@@ -225,9 +225,11 @@ namespace winrt::YtFlowApp::implementation
         return client;
     }
     IAsyncAction LibraryPage::DownloadSubscriptionProxies(Windows::Web::Http::HttpClient client, Uri uri,
-                                                          char const *format,
+                                                          char const *formatInput,
                                                           std::shared_ptr<SubscriptionDownloadDecodeResult> result)
     {
+        auto format = formatInput;
+
         auto const res = (co_await client.GetAsync(uri)).EnsureSuccessStatusCode();
         auto const userinfoHeader = res.Headers().TryLookup(L"subscription-userinfo");
         DecodedSubscriptionUserInfo userinfo{};
@@ -273,7 +275,7 @@ namespace winrt::YtFlowApp::implementation
 
                     co_await resume_background();
                     auto conn = FfiDbInstance.Connect();
-                    auto const newGroupId = conn.CreateProxySubscriptionGroup(to_string(uri.Domain()).c_str(),
+                    auto const newGroupId = conn.CreateProxySubscriptionGroup(to_string(uri.Host()).c_str(),
                                                                               res->format, to_string(url).c_str());
                     conn.BatchUpdateProxyInGroup(newGroupId, res->proxies.data(), res->proxies.size());
                     conn.UpdateProxySubscriptionRetrievedByProxyGroup(newGroupId, res->userinfo.upload_bytes_used,
@@ -346,8 +348,7 @@ namespace winrt::YtFlowApp::implementation
                     auto const groupId = model->Id();
                     auto const subscription = conn.GetProxySubscriptionByProxyGroup(groupId);
                     co_await DownloadSubscriptionProxies(client, Uri{to_hstring(subscription.url)},
-                                                         ConvertSubscriptionFormatToStatic(subscription.format.data()),
-                                                         res);
+                                                         subscription.format.data(), res);
                     conn.BatchUpdateProxyInGroup(groupId, res->proxies.data(), res->proxies.size());
                     conn.UpdateProxySubscriptionRetrievedByProxyGroup(groupId, res->userinfo.upload_bytes_used,
                                                                       res->userinfo.download_bytes_used,
@@ -562,7 +563,7 @@ namespace winrt::YtFlowApp::implementation
                     continue;
                 }
                 std::string trimmedLink(line, lpos, rpos - lpos + 1);
-                auto proxy = ConvertShareLinkToProxy(trimmedLink);
+                auto proxy = ConvertShareLinkToDataProxy(trimmedLink);
                 if (!proxy.has_value())
                 {
                     unrecognized++;
@@ -576,10 +577,10 @@ namespace winrt::YtFlowApp::implementation
             }
 
             auto ffiProxies = conn.GetProxiesByProxyGroup(groupId);
-            std::map<uint32_t, FfiProxy> ffiProxySet;
+            std::map<uint32_t, FfiDataProxy> ffiProxySet;
             std::ranges::transform(ffiProxies, std::inserter(ffiProxySet, ffiProxySet.end()), [](auto &&ffiProxy) {
                 auto const id = ffiProxy.id;
-                return std::make_pair(id, std::forward<FfiProxy>(ffiProxy));
+                return std::make_pair(id, std::forward<FfiDataProxy>(ffiProxy));
             });
             auto newProxyModels =
                 std::views::transform(newProxyIds, [&](auto id) { return make<ProxyModel>(ffiProxySet[id]); });
@@ -617,7 +618,7 @@ namespace winrt::YtFlowApp::implementation
                 auto const proxy = model->Proxy();
                 std::span<uint8_t const> const proxyView(proxy.begin(), proxy.size());
                 // TODO: count unrecognized
-                return ConvertProxyToShareLink(to_string(model->Name()), proxyView);
+                return ConvertDataProxyToShareLink(to_string(model->Name()), proxyView);
             }) |
             std::views::filter([](auto const &link) { return link.has_value(); }) |
             std::views::transform([](auto &&link) { return std::forward<std::optional<std::string>>(link).value(); });

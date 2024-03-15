@@ -40,6 +40,9 @@ namespace winrt::YtFlowApp::implementation
         unwrap_ffi_result<FfiNoop>(ytflow_core::ytflow_buffer_free(ptrRaw, metaRaw));
         return json;
     }
+    std::vector<uint8_t> unwrap_ffi_byte_buffer(ytflow_core::ytflow_result r);
+    std::string unwrap_ffi_string(ytflow_core::ytflow_result r);
+
     struct FfiProfile
     {
         uint32_t id{};
@@ -122,7 +125,7 @@ namespace winrt::YtFlowApp::implementation
             r.retrieved_at = {retrievedAtDoc.get<std::string>()};
         }
     }
-    struct FfiProxy
+    struct FfiDataProxy
     {
         uint32_t id{};
         std::string name;
@@ -130,7 +133,7 @@ namespace winrt::YtFlowApp::implementation
         std::vector<uint8_t> proxy;
         uint16_t proxy_version{0};
     };
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(FfiProxy, id, name, order_num, proxy, proxy_version)
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(FfiDataProxy, id, name, order_num, proxy, proxy_version)
     struct FfiResource
     {
         uint32_t id{};
@@ -235,7 +238,7 @@ namespace winrt::YtFlowApp::implementation
         void DeleteProxyGroup(uint32_t id) &;
         uint32_t CreateProxyGroup(char const *name, char const *type) &;
         uint32_t CreateProxySubscriptionGroup(char const *name, char const *format, char const *url) &;
-        std::vector<FfiProxy> GetProxiesByProxyGroup(uint32_t proxyGroupId) &;
+        std::vector<FfiDataProxy> GetProxiesByProxyGroup(uint32_t proxyGroupId) &;
         FfiProxyGroupSubscription GetProxySubscriptionByProxyGroup(uint32_t proxyGroupId) &;
         void UpdateProxySubscriptionRetrievedByProxyGroup(uint32_t proxyGroupId, std::optional<uint64_t> uploadBytes,
                                                           std::optional<uint64_t> downloadBytes,

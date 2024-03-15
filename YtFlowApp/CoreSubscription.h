@@ -4,8 +4,6 @@
 
 namespace winrt::YtFlowApp::implementation
 {
-    constexpr static char SIP008_LITERAL[7] = "sip008";
-    constexpr static char SURGE_PROXY_LIST_LITERAL[17] = "surge-proxy-list";
     struct DecodedSubscriptionUserInfo
     {
         std::optional<uint64_t> upload_bytes_used;
@@ -14,7 +12,12 @@ namespace winrt::YtFlowApp::implementation
         std::optional<std::string> expires_at;
     };
 
-    char const *ConvertSubscriptionFormatToStatic(char const *input);
-    DecodedSubscriptionUserInfo DecodeSubscriptionUserInfoFromResponseHeaderValue(std::string_view resValue);
+    void DecodeSubscriptionUserInfoFromCbor(nlohmann::json const &json, DecodedSubscriptionUserInfo &p);
+    inline void from_json(nlohmann::json const &json, DecodedSubscriptionUserInfo &p)
+    {
+        DecodeSubscriptionUserInfoFromCbor(json, p);
+    }
+
+    DecodedSubscriptionUserInfo DecodeSubscriptionUserInfoFromResponseHeaderValue(std::string const &resValue);
     std::optional<std::vector<uint8_t>> DecodeSubscriptionProxies(std::string_view data, char const *&decodedFormat);
 }

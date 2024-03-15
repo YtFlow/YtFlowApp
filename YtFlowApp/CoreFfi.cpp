@@ -4,30 +4,37 @@
 
 namespace winrt::YtFlowApp::implementation
 {
-    std::map<uint32_t, std::string_view> errorFmtStrings = {{1, ""}};
     const char *FfiException::what() const throw()
     {
         return msg.c_str();
     }
     FfiException::FfiException(ytflow_core::ytflow_result const &r)
     {
+        if (r.data.err[0] != nullptr)
+        {
+            msg = std::string(r.data.err[0]);
+            return;
+        }
         // TODO: all errors
-        if (r.data.err[0] == nullptr)
-        {
-            msg = std::format("Unknown error {}", r.code);
-        }
-        else if (r.data.err[1] == nullptr)
-        {
-            msg = std::format("Unknown error {}({})", r.code, r.data.err[0]);
-        }
-        else if (r.data.err[2] == nullptr)
-        {
-            msg = std::format("Unknown error {}({}, {})", r.code, r.data.err[0], r.data.err[1]);
-        }
-        else
-        {
-            msg = std::format("Unknown error {}({}, {}, {})", r.code, r.data.err[0], r.data.err[1], r.data.err[2]);
-        }
+    }
+
+    std::vector<uint8_t> unwrap_ffi_byte_buffer(ytflow_core::ytflow_result r)
+    {
+        auto const [ptrRaw, metaRaw] = unwrap_ffi_result<FfiNoop>(r);
+        auto ptr = (uint8_t const *)ptrRaw;
+        auto meta = (size_t)metaRaw;
+        std::vector<uint8_t> result(ptr, ptr + meta);
+        unwrap_ffi_result<FfiNoop>(ytflow_core::ytflow_buffer_free(ptrRaw, metaRaw));
+        return result;
+    }
+    std::string unwrap_ffi_string(ytflow_core::ytflow_result r)
+    {
+        auto const [ptrRaw, metaRaw] = unwrap_ffi_result<FfiNoop>(r);
+        auto ptr = (char const *)ptrRaw;
+        auto meta = (size_t)metaRaw;
+        std::string result(ptr, meta);
+        unwrap_ffi_result<FfiNoop>(ytflow_core::ytflow_buffer_free(ptrRaw, metaRaw));
+        return result;
     }
 
     FfiPluginVerifyResult FfiPlugin::verify(char const *plugin, uint16_t plugin_version, uint8_t const *param,
@@ -175,10 +182,10 @@ namespace winrt::YtFlowApp::implementation
             unwrap_ffi_result<FfiNoop>(ytflow_proxy_group_create_subscription(name, format, url, conn_ptr));
         return (uint32_t)((uintptr_t)ptrRaw & 0xFFFFFFFF);
     }
-    std::vector<FfiProxy> FfiConn::GetProxiesByProxyGroup(uint32_t proxyGroupId) &
+    std::vector<FfiDataProxy> FfiConn::GetProxiesByProxyGroup(uint32_t proxyGroupId) &
     {
         std::lock_guard _guard(conn_mu);
-        return unwrap_ffi_buffer<std::vector<FfiProxy>>(ytflow_proxy_get_by_proxy_group(proxyGroupId, conn_ptr));
+        return unwrap_ffi_buffer<std::vector<FfiDataProxy>>(ytflow_proxy_get_by_proxy_group(proxyGroupId, conn_ptr));
     }
     FfiProxyGroupSubscription FfiConn::GetProxySubscriptionByProxyGroup(uint32_t proxyGroupId) &
     {

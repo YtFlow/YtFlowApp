@@ -223,9 +223,6 @@
     <ClInclude Include="DynOutboundProxyModel.h">
       <Filter>Models</Filter>
     </ClInclude>
-    <ClInclude Include="CoreProxyImpl.h">
-      <Filter>CoreInterop</Filter>
-    </ClInclude>
     <ClInclude Include="CoreSubscription.h">
       <Filter>CoreInterop</Filter>
     </ClInclude>
