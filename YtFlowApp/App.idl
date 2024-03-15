@@ -317,6 +317,14 @@ namespace YtFlowApp
             get;
             set;
         };
+        String Summary
+        {
+            get;
+        };
+        String Tooltip
+        {
+            get;
+        };
     }
     runtimeclass ProxyGroupModel : Windows.UI.Xaml.Data.INotifyPropertyChanged
     {

@@ -37,10 +37,11 @@ YtFlow is a network debug tool running on Universal Windows Platform that forwar
 - SOCKS5
 - HTTP Proxy
 - Trojan
-- VMess (v2rayN flavor) (import only)
+- VMess (v2rayN flavor)
 
 ### Subscriptions
 
+- Base64-encoded share links
 - SIP008
 - Surge proxy list
 

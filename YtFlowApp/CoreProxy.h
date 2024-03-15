@@ -35,11 +35,11 @@ namespace winrt::YtFlowApp::implementation
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(FfiProxyProtocolSocks5, username, password);
     struct FfiProxyProtocolVMess
     {
-        std::string uuid;
+        nlohmann::json::binary_t user_id;
         uint16_t alter_id;
         std::string security;
     };
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(FfiProxyProtocolVMess, uuid, alter_id, security);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(FfiProxyProtocolVMess, user_id, alter_id, security);
 
     struct FfiProxyDest
     {
@@ -74,8 +74,8 @@ namespace winrt::YtFlowApp::implementation
             r.host = {hostDoc.get<std::string>()};
         }
 
-        r.path = json.at("path").get<std::string>();
-        r.headers = json.at("headers").get<std::map<std::string, std::string>>();
+        json.at("path").get_to(r.path);
+        json.at("headers").get_to(r.headers);
     }
     inline void to_json(nlohmann::json &json, FfiProxyObfsWebSocket const &r)
     {
@@ -91,13 +91,18 @@ namespace winrt::YtFlowApp::implementation
     struct FfiProxyTls
     {
         std::vector<std::string> alpn;
-        std::string sni;
+        std::optional<std::string> sni;
         std::optional<bool> skip_cert_check;
     };
     inline void from_json(nlohmann::json const &json, FfiProxyTls &r)
     {
         r.alpn = json.at("alpn").get<std::vector<std::string>>();
-        r.sni = json.at("sni").get<std::string>();
+        if (nlohmann::json const sniDoc = json.value("sni", nlohmann::json());
+
+            sniDoc != nullptr)
+        {
+            r.sni = std::make_optional(sniDoc.get<std::string>());
+        }
         if (nlohmann::json const skipCertCheckDoc = json.value("skip_cert_check", nlohmann::json());
 
             skipCertCheckDoc != nullptr)
@@ -108,7 +113,10 @@ namespace winrt::YtFlowApp::implementation
     inline void to_json(nlohmann::json &json, FfiProxyTls const &r)
     {
         json["alpn"] = r.alpn;
-        json["sni"] = r.sni;
+        if (r.sni.has_value())
+        {
+            json["sni"] = r.sni.value();
+        }
         if (r.skip_cert_check.has_value())
         {
             json["skip_cert_check"] = r.skip_cert_check.value();
