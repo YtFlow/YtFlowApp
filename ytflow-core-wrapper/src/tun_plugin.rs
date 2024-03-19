@@ -1,5 +1,5 @@
 use std::mem::transmute;
-use std::sync::{Arc, OnceLock};
+use std::sync::Arc;
 
 use ytflow::flow::*;
 
@@ -21,6 +21,7 @@ pub(super) struct VpnTun {
     channel: VpnChannel,
     rx: Receiver<Buffer>,
     tx_ctx: Arc<SenderContext>,
+    work_tx: std::sync::mpsc::Sender<(Arc<SenderContext>, VpnPacketBuffer)>,
 }
 
 impl SenderContext {
@@ -50,6 +51,34 @@ impl VpnTun {
         rx_buf_rx: Receiver<Buffer>,
         dummy_socket: std::net::UdpSocket,
     ) -> Self {
+        let (work_tx, work_rx) = std::sync::mpsc::channel();
+        std::thread::spawn(move || {
+            let mut tasks: Vec<(Arc<SenderContext>, VpnPacketBuffer)> = vec![];
+            loop {
+                tasks.clear();
+                if let Ok(task) = work_rx.recv() {
+                    tasks.push(task);
+                    while let Ok(task) = work_rx.try_recv() {
+                        tasks.push(task);
+                        if tasks.len() > 8 {
+                            break;
+                        }
+                    }
+                } else {
+                    return;
+                }
+
+                let mut last_tx_ctx = None;
+                for (tx_ctx, packet) in tasks.drain(..) {
+                    // tx_ctx.flush_send_buffer(packet);
+                    tx_ctx.send_buffer(packet);
+                    last_tx_ctx = Some(tx_ctx);
+                }
+                if let Some(tx_ctx) = last_tx_ctx {
+                    tx_ctx.flush();
+                }
+            }
+        });
         Self {
             channel,
             rx: rx_buf_rx,
@@ -57,46 +86,14 @@ impl VpnTun {
                 tx: tx_buf_tx,
                 dummy_socket,
             }),
+            work_tx,
         }
     }
     fn send_buffer_direct(&self, vpn_buffer: VpnPacketBuffer) {
         self.tx_ctx.flush_send_buffer(vpn_buffer);
     }
     fn send_buffer_worker(&self, vpn_buffer: VpnPacketBuffer) {
-        static WORK_TX: OnceLock<std::sync::mpsc::Sender<(Arc<SenderContext>, VpnPacketBuffer)>> =
-            OnceLock::new();
-        let work_tx = WORK_TX.get_or_init(|| {
-            let (tx, rx) = std::sync::mpsc::channel();
-            std::thread::spawn(move || {
-                let mut tasks: Vec<(Arc<SenderContext>, VpnPacketBuffer)> = vec![];
-                loop {
-                    tasks.clear();
-                    if let Ok(task) = rx.recv() {
-                        tasks.push(task);
-                        while let Ok(task) = rx.try_recv() {
-                            tasks.push(task);
-                            if tasks.len() > 8 {
-                                break;
-                            }
-                        }
-                    } else {
-                        return;
-                    }
-
-                    let mut last_tx_ctx = None;
-                    for (tx_ctx, packet) in tasks.drain(..) {
-                        // tx_ctx.flush_send_buffer(packet);
-                        tx_ctx.send_buffer(packet);
-                        last_tx_ctx = Some(tx_ctx);
-                    }
-                    if let Some(tx_ctx) = last_tx_ctx {
-                        tx_ctx.flush();
-                    }
-                }
-            });
-            tx
-        });
-        work_tx.send((self.tx_ctx.clone(), vpn_buffer)).ok();
+        self.work_tx.send((self.tx_ctx.clone(), vpn_buffer)).ok();
     }
 }
 

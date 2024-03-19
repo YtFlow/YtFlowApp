@@ -1,4 +1,4 @@
-use std::cell::{RefCell, UnsafeCell};
+use std::cell::RefCell;
 use std::ffi::OsString;
 use std::mem::ManuallyDrop;
 use std::net::{Ipv4Addr, SocketAddr, SocketAddrV4, UdpSocket};
@@ -6,7 +6,7 @@ use std::os::windows::ffi::OsStringExt;
 use std::rc::Rc;
 use std::slice::from_raw_parts_mut;
 use std::string::ToString;
-use std::sync::{Arc, OnceLock};
+use std::sync::{Arc, Mutex, OnceLock};
 
 use crate::error::ConnectError;
 use crate::storage_resource_loader::StorageResourceLoader;
@@ -187,20 +187,23 @@ enum VpnPlugInInner {
 }
 
 impl VpnPlugInInner {
-    fn request_stop(&mut self) {
+    fn request_stop(&mut self) -> Option<Runtime> {
         let this = std::mem::take(self);
-        *self = match this {
-            Self::Running {
-                tx_buf_rx,
-                runtime: _, // Drop the runtime.
-            } => Self::Stopping { tx_buf_rx },
-            _ => this,
+        match this {
+            Self::Running { tx_buf_rx, runtime } => {
+                *self = Self::Stopping { tx_buf_rx };
+                Some(runtime)
+            }
+            this => {
+                *self = this;
+                None
+            }
         }
     }
 }
 
 #[implement(windows::Networking::Vpn::IVpnPlugIn)]
-pub struct VpnPlugIn(UnsafeCell<VpnPlugInInner>);
+pub struct VpnPlugIn(Mutex<VpnPlugInInner>);
 
 #[allow(non_snake_case)]
 impl VpnPlugIn {
@@ -210,8 +213,7 @@ impl VpnPlugIn {
     }
 
     fn connect_core(&self, channel: &VpnChannel) -> std::result::Result<(), ConnectError> {
-        let inner = unsafe { &mut *self.0.get() };
-        *inner = Default::default();
+        *self.0.lock().unwrap() = Default::default();
 
         let transport = DatagramSocket::new()?;
         channel.AssociateTransport(&transport, None)?;
@@ -376,7 +378,7 @@ impl VpnPlugIn {
                 let (tx_buf_rx, rx_buf_tx, vpn_tun_factory) = vpn_items;
                 match connect_with_factory(&transport, &vpn_tun_factory, channel) {
                     Ok(()) => {
-                        *inner = VpnPlugInInner::Running {
+                        *self.0.lock().unwrap() = VpnPlugInInner::Running {
                             tx_buf_rx,
                             runtime: Runtime {
                                 rx_buf_tx: ManuallyDrop::new(rx_buf_tx),
@@ -421,9 +423,10 @@ impl IVpnPlugIn_Impl for VpnPlugIn {
         // Don't .Stop() the channel because there may be some inflight tx buffers remaining,
         // which will block the VPN background task, leading to the whole process being killed.
         // .Stop() until all buffers are drained in Decapsulate.
-        unsafe {
-            (*self.0.get()).request_stop();
-        }
+
+        // TODO: keep track of inflight tx buffers
+        let rt = self.0.lock().unwrap().request_stop();
+        drop(rt);
         Ok(())
     }
     fn GetKeepAlivePayload(
@@ -441,8 +444,8 @@ impl IVpnPlugIn_Impl for VpnPlugIn {
         _encapulatedPackets: Option<&VpnPacketBufferList>,
     ) -> Result<()> {
         let packets = packets.unwrap();
-        let rx_buf_tx = if let VpnPlugInInner::Running { runtime, .. } = unsafe { &*self.0.get() } {
-            &runtime.rx_buf_tx
+        let rx_buf_tx = if let VpnPlugInInner::Running { runtime, .. } = &*self.0.lock().unwrap() {
+            Sender::clone(&runtime.rx_buf_tx)
         } else {
             return Ok(());
         };
@@ -471,13 +474,11 @@ impl IVpnPlugIn_Impl for VpnPlugIn {
         decapsulatedPackets: Option<&VpnPacketBufferList>,
         _controlPacketsToSend: Option<&VpnPacketBufferList>,
     ) -> Result<()> {
-        let inner = unsafe { &mut *self.0.get() };
-
         let decapsulatedPackets = decapsulatedPackets.unwrap();
-        let tx_buf_rx = match inner {
+        let tx_buf_rx = match &*self.0.lock().unwrap() {
             VpnPlugInInner::NotRunning => return Ok(()),
-            VpnPlugInInner::Running { tx_buf_rx, .. } => tx_buf_rx,
-            VpnPlugInInner::Stopping { tx_buf_rx } => tx_buf_rx,
+            VpnPlugInInner::Running { tx_buf_rx, .. } => tx_buf_rx.clone(),
+            VpnPlugInInner::Stopping { tx_buf_rx } => tx_buf_rx.clone(),
         };
         let mut idle_loop_count = 0;
         loop {
@@ -487,7 +488,7 @@ impl IVpnPlugIn_Impl for VpnPlugIn {
                     decapsulatedPackets.Append(&buf)?;
                 }
                 Err(TryRecvError::Disconnected) => {
-                    *inner = VpnPlugInInner::NotRunning;
+                    *self.0.lock().unwrap() = VpnPlugInInner::NotRunning;
                     let _ = channel.unwrap().Stop();
                     return Ok(());
                 }
