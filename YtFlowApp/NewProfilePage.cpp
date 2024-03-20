@@ -81,9 +81,6 @@ namespace winrt::YtFlowApp::implementation
                 co_return;
             }
 
-            auto selectedSplitRoutingType =
-                SplitRoutingModeButtons().SelectedItem().as<RadioButton>().Tag().as<hstring>();
-
             SaveButton().IsEnabled(false);
             const auto lifetime{get_strong()};
             bool nameDuplicated{false};
