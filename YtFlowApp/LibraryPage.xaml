@@ -221,18 +221,16 @@
             <CommandBar Grid.Row="0" DefaultLabelPosition="Right" IsSticky="True" VerticalContentAlignment="Center">
                 <CommandBar.PrimaryCommands>
                     <AppBarButton
+                        Label="Edit"
+                        contract7Present:Icon="Edit"
+                        Click="ProxyGroupEditProxyButton_Click"
+                    />
+                    <AppBarButton
                         x:Name="ProxyGroupDeleteProxyButton"
                         Label="Delete"
                         contract7Present:Icon="Delete"
                         IsEnabled="False"
                         Click="ProxyGroupDeleteProxyButton_Click"
-                    />
-                    <AppBarButton
-                        x:Name="ProxyGroupShareProxyButton"
-                        Label="Share"
-                        contract7Present:Icon="Share"
-                        IsEnabled="False"
-                        Click="ProxyGroupShareProxyButton_Click"
                     />
                     <AppBarSeparator />
                     <AppBarButton
@@ -242,6 +240,21 @@
                         Click="ProxyGroupAddProxyButton_Click"
                     />
                 </CommandBar.PrimaryCommands>
+                <CommandBar.SecondaryCommands>
+                    <AppBarButton
+                        x:Name="ProxyGroupShareProxyButton"
+                        Label="Share"
+                        contract7Present:Icon="Share"
+                        IsEnabled="False"
+                        Click="ProxyGroupShareProxyButton_Click"
+                    />
+                    <!-- AppBarButton
+                        Label="Unlock"
+                        contract7Present:Icon="Share"
+                        IsEnabled="{x:Bind Model.CurrentProxyGroupModel.IsSubscription, Mode=OneWay, FallbackValue=false}"
+                        Click="ProxyGroupShareProxyButton_Click"
+                    / -->
+                </CommandBar.SecondaryCommands>
                 <CommandBar.Content>
                     <TextBlock
                         Style="{ThemeResource SubtitleTextBlockStyle}"

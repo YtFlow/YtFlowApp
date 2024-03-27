@@ -69,11 +69,11 @@ namespace winrt::YtFlowApp::implementation
 
         hstring ret;
         auto pushLeg = [&](FfiProxyLeg const &leg) {
-            ret = ret +
+            ret = std::move(ret) +
                   std::visit(overloaded{
                                  [](FfiProxyProtocolShadowsocks const &) { return L"Shadowsocks("; },
                                  [](FfiProxyProtocolTrojan const &) { return L"Trojan("; },
-                                 [](FfiProxyProtocolSocks5 const &) { return L"Socks5("; },
+                                 [](FfiProxyProtocolSocks5 const &) { return L"SOCKS5("; },
                                  [](FfiProxyProtocolHttp const &) { return L"HTTP("; },
                                  [](FfiProxyProtocolVMess const &) { return L"VMess("; },
                              },
@@ -81,22 +81,22 @@ namespace winrt::YtFlowApp::implementation
                   to_hstring(leg.dest.host) + L":" + to_hstring(leg.dest.port) + L")";
             if (leg.obfs.has_value())
             {
-                ret = ret + std::visit(overloaded{
-                                           [](FfiProxyObfsHttpObfs const &) { return L", simple-obfs"; },
-                                           [](FfiProxyObfsTlsObfs const &) { return L", simple-obfs"; },
-                                           [](FfiProxyObfsWebSocket const &) { return L", WebSocket"; },
-                                       },
-                                       leg.obfs.value());
+                ret = std::move(ret) + std::visit(overloaded{
+                                                      [](FfiProxyObfsHttpObfs const &) { return L", simple-obfs"; },
+                                                      [](FfiProxyObfsTlsObfs const &) { return L", simple-obfs"; },
+                                                      [](FfiProxyObfsWebSocket const &) { return L", WebSocket"; },
+                                                  },
+                                                  leg.obfs.value());
             }
             if (leg.tls.has_value())
             {
-                ret = ret + L", TLS";
+                ret = std::move(ret) + L", TLS";
             }
         };
         pushLeg(legs.front());
         for (auto const &leg : std::span(legs.begin() + 1, legs.end()))
         {
-            ret = ret + L" -> ";
+            ret = std::move(ret) + L" -> ";
             pushLeg(leg);
         }
         return ret;

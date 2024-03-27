@@ -36,7 +36,7 @@ namespace winrt::YtFlowApp::implementation
     struct FfiProxyProtocolVMess
     {
         nlohmann::json::binary_t user_id;
-        uint16_t alter_id;
+        uint16_t alter_id{};
         std::string security;
     };
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(FfiProxyProtocolVMess, user_id, alter_id, security);
@@ -44,7 +44,7 @@ namespace winrt::YtFlowApp::implementation
     struct FfiProxyDest
     {
         std::string host;
-        uint16_t port;
+        uint16_t port{};
     };
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(FfiProxyDest, host, port);
 

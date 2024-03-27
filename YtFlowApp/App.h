@@ -4,8 +4,10 @@
 #include "BoolTemplateSelector.h"
 #include "BoolToFontWeightConverter.h"
 #include "EditPluginTreeViewItemTemplateSelector.h"
+#include "IdentityConverter.h"
 #include "PluginTypeToDescConverter.h"
 #include "ProfileModel.h"
+#include "ProxyLegModel.h"
 #include "SplitRoutingModeToDescConverter.h"
 
 namespace winrt::YtFlowApp::implementation

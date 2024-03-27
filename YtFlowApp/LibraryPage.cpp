@@ -14,6 +14,8 @@
 #include "ProxyModel.h"
 #include "UI.h"
 
+#include "EditProxyPageParam.h"
+
 using namespace std::string_view_literals;
 using namespace winrt;
 using namespace Windows::UI::Xaml;
@@ -29,6 +31,11 @@ namespace winrt::YtFlowApp::implementation
         // See https://github.com/microsoft/cppwinrt/tree/master/nuget#initializecomponent
 
         LoadModel();
+    }
+
+    Windows::UI::Xaml::DependencyProperty LibraryPage::IsProxyGroupProxySingleSelectedProperty()
+    {
+        return m_isProxyGroupProxySingleSelectedProperty;
     }
 
     fire_and_forget LibraryPage::LoadModel()
@@ -444,6 +451,7 @@ namespace winrt::YtFlowApp::implementation
         {
             ProxyGroupDeleteProxyButton().IsEnabled(currentProxyGroup.IsManualGroup() && !isEmpty);
         }
+        SetValue(m_isProxyGroupProxySingleSelectedProperty, box_value(IsProxyGroupProxySingleSelected()));
     }
 
     fire_and_forget LibraryPage::ProxyGroupDeleteProxyButton_Click(IInspectable const &, RoutedEventArgs const &)
@@ -638,5 +646,26 @@ namespace winrt::YtFlowApp::implementation
         }
         ProxyGroupProxyExportText().Text(std::move(text));
         auto const _ = ProxyGroupProxyExportDialog().ShowAsync();
+    }
+
+    void LibraryPage::ProxyGroupEditProxyButton_Click(IInspectable const &, RoutedEventArgs const &)
+    {
+        if (!IsProxyGroupProxySingleSelected())
+        {
+            return;
+        }
+        auto const proxy = ProxyGroupProxyList().SelectedItem().as<ProxyModel>();
+        auto const isSubscription = m_model->CurrentProxyGroupModel().as<ProxyGroupModel>()->IsSubscription();
+        Frame().Navigate(xaml_typename<YtFlowApp::EditProxyPage>(), make<EditProxyPageParam>(isSubscription, proxy));
+    }
+    bool LibraryPage::IsProxyGroupProxySingleSelected()
+    {
+        auto const selected = ProxyGroupProxyList().SelectedItems();
+        if (selected.Size() != 1)
+        {
+            return false;
+        }
+        auto const proxy = selected.GetAt(0).try_as<ProxyModel>();
+        return proxy != nullptr;
     }
 }

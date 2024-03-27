@@ -52,6 +52,9 @@
     <Page Include="ResourceManageControl.xaml">
       <Filter>Controls</Filter>
     </Page>
+    <Page Include="EditProxyPage.xaml">
+      <Filter>Pages</Filter>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Midl Include="App.idl" />
@@ -154,6 +157,15 @@
     <ClCompile Include="NewProfilePagePresets.cpp">
       <Filter>Pages</Filter>
     </ClCompile>
+    <ClCompile Include="ProxyLegModel.cpp">
+      <Filter>Models</Filter>
+    </ClCompile>
+    <ClCompile Include="EditProxyPageParam.cpp">
+      <Filter>Pages</Filter>
+    </ClCompile>
+    <ClCompile Include="IdentityConverter.cpp">
+      <Filter>Converter</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -237,6 +249,15 @@
     </ClInclude>
     <ClInclude Include="ResourceModel.h">
       <Filter>Models</Filter>
+    </ClInclude>
+    <ClInclude Include="ProxyLegModel.h">
+      <Filter>Models</Filter>
+    </ClInclude>
+    <ClInclude Include="EditProxyPageParam.h">
+      <Filter>Pages</Filter>
+    </ClInclude>
+    <ClInclude Include="IdentityConverter.h">
+      <Filter>Converter</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

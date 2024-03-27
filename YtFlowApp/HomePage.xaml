@@ -84,6 +84,12 @@
                     Margin="0, 20, 0, 0"
                     Orientation="Vertical"
                 >
+                    <StackPanel.ChildrenTransitions>
+                        <TransitionCollection>
+                            <RepositionThemeTransition IsStaggeringEnabled="False" />
+                            <EntranceThemeTransition />
+                        </TransitionCollection>
+                    </StackPanel.ChildrenTransitions>
                 </StackPanel>
                 <StackPanel x:Name="ConnectedViewSidePanel" Grid.Row="1" Grid.Column="0" Margin="0, 20, 0, 0" />
             </Grid>

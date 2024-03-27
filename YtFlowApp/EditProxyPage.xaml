@@ -1,0 +1,659 @@
+﻿<Page
+    x:Class="YtFlowApp.EditProxyPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:YtFlowApp"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    xmlns:contract7Present="http://schemas.microsoft.com/winfx/2006/xaml/presentation?IsApiContractPresent(Windows.Foundation.UniversalApiContract,7)"
+    mc:Ignorable="d"
+    NavigationCacheMode="Enabled">
+
+    <Page.Resources>
+        <ResourceDictionary>
+            <local:IdentityConverter x:Key="IdentityConverter" />
+            <Style x:Key="ProxyLegPanelExpanderStyle" TargetType="muxc:Expander">
+                <Setter Property="Margin" Value="0, 0, 0, 8" />
+                <Setter Property="IsExpanded" Value="True" />
+                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            </Style>
+            <Style x:Key="ProxyLegPanelTitleStyle" TargetType="TextBlock">
+                <Setter Property="FontWeight" Value="SemiBold" />
+            </Style>
+            <Style
+                x:Key="ProxyLegInfoColumnName"
+                TargetType="TextBlock"
+                BasedOn="{StaticResource PluginWidgetInfoColumnName}"
+            >
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="Margin" Value="0, 8, 0, 8" />
+            </Style>
+            <DataTemplate x:Key="BoldTextHeaderTemplate">
+                <TextBlock Text="{Binding}" FontWeight="SemiBold" />
+            </DataTemplate>
+            <DataTemplate x:DataType="local:ProxyLegModel" x:Key="ProxyLegPanelTemplate">
+                <StackPanel Margin="40">
+                    <StackPanel.ChildrenTransitions>
+                        <TransitionCollection>
+                            <RepositionThemeTransition />
+                        </TransitionCollection>
+                    </StackPanel.ChildrenTransitions>
+                    <muxc:Expander Style="{StaticResource ProxyLegPanelExpanderStyle}">
+                        <muxc:Expander.Header>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="0" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <TextBlock
+                                    Grid.Row="0"
+                                    Grid.Column="1"
+                                    Style="{StaticResource ProxyLegPanelTitleStyle}"
+                                >
+                                    Protocol
+                                </TextBlock>
+                                <TextBlock
+                                    Grid.Row="0"
+                                    Grid.Column="2"
+                                    Text="{x:Bind ProtocolType, Mode=OneWay}"
+                                />
+                            </Grid>
+                        </muxc:Expander.Header>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1*" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="2*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock
+                                Grid.Row="0"
+                                Grid.Column="0"
+                                Style="{StaticResource ProxyLegInfoColumnName}"
+                            >
+                                Type
+                            </TextBlock>
+                            <ComboBox
+                                Grid.Row="0"
+                                Grid.Column="2"
+                                SelectedItem="{x:Bind ProtocolType, Mode=TwoWay, Converter={StaticResource IdentityConverter}}"
+                                IsEnabled="{x:Bind IsWritable}"
+                            >
+                                <x:String>Shadowsocks</x:String>
+                                <x:String>Trojan</x:String>
+                                <x:String>HTTP</x:String>
+                                <x:String>SOCKS5</x:String>
+                                <x:String>VMess</x:String>
+                            </ComboBox>
+
+                            <TextBlock
+                                Grid.Row="1"
+                                Grid.Column="0"
+                                Text="Method"
+                                Style="{StaticResource ProxyLegInfoColumnName}"
+                                Visibility="{x:Bind local:EditProxyPage.IsShadowsocks(ProtocolType), Mode=OneWay}"
+                            />
+                            <ComboBox
+                                Grid.Row="1"
+                                Grid.Column="2"
+                                Visibility="{x:Bind local:EditProxyPage.IsShadowsocks(ProtocolType), Mode=OneWay}"
+                                SelectedItem="{x:Bind ShadowsocksEncryptionMethod, Mode=TwoWay, Converter={StaticResource IdentityConverter}}"
+                                IsEnabled="{x:Bind IsWritable}"
+                            >
+                                <x:String>none</x:String>
+                                <x:String>rc4</x:String>
+                                <x:String>rc4-md5</x:String>
+                                <x:String>aes-128-cfb</x:String>
+                                <x:String>aes-192-cfb</x:String>
+                                <x:String>aes-256-cfb</x:String>
+                                <x:String>aes-128-ctr</x:String>
+                                <x:String>aes-192-ctr</x:String>
+                                <x:String>aes-256-ctr</x:String>
+                                <x:String>camellia-128-cfb</x:String>
+                                <x:String>camellia-192-cfb</x:String>
+                                <x:String>camellia-256-cfb</x:String>
+                                <x:String>aes-128-gcm</x:String>
+                                <x:String>aes-256-gcm</x:String>
+                                <x:String>chacha20-ietf</x:String>
+                                <x:String>chacha20-ietf-poly1305</x:String>
+                                <x:String>xchacha20-ietf-poly1305</x:String>
+                            </ComboBox>
+                            <TextBlock
+                                Grid.Row="2"
+                                Grid.Column="0"
+                                Text="Password"
+                                Style="{StaticResource ProxyLegInfoColumnName}"
+                                Visibility="{x:Bind local:EditProxyPage.IsShadowsocks(ProtocolType), Mode=OneWay}"
+                            />
+                            <TextBox
+                                Grid.Row="2"
+                                Grid.Column="2"
+                                Text="{x:Bind Password, Mode=TwoWay}"
+                                IsReadOnly="{x:Bind IsReadonly}"
+                                MinWidth="100"
+                                Visibility="{x:Bind local:EditProxyPage.IsShadowsocks(ProtocolType), Mode=OneWay}"
+                            />
+                            <TextBlock
+                                Grid.Row="1"
+                                Grid.Column="0"
+                                Text="Password"
+                                Style="{StaticResource ProxyLegInfoColumnName}"
+                                Visibility="{x:Bind local:EditProxyPage.IsTrojan(ProtocolType), Mode=OneWay}"
+                            />
+                            <TextBox
+                                Grid.Row="1"
+                                Grid.Column="2"
+                                Text="{x:Bind Password, Mode=TwoWay}"
+                                IsReadOnly="{x:Bind IsReadonly}"
+                                MinWidth="100"
+                                Visibility="{x:Bind local:EditProxyPage.IsTrojan(ProtocolType), Mode=OneWay}"
+                            />
+                            <TextBlock
+                                Grid.Row="1"
+                                Grid.Column="0"
+                                Text="Username"
+                                Style="{StaticResource ProxyLegInfoColumnName}"
+                                Visibility="{x:Bind local:EditProxyPage.IsHttp(ProtocolType), Mode=OneWay}"
+                            />
+                            <TextBox
+                                Grid.Row="1"
+                                Grid.Column="2"
+                                Text="{x:Bind Username, Mode=TwoWay}"
+                                IsReadOnly="{x:Bind IsReadonly}"
+                                MinWidth="100"
+                                Visibility="{x:Bind local:EditProxyPage.IsHttp(ProtocolType), Mode=OneWay}"
+                            />
+                            <TextBlock
+                                Grid.Row="2"
+                                Grid.Column="0"
+                                Text="Password"
+                                Style="{StaticResource ProxyLegInfoColumnName}"
+                                Visibility="{x:Bind local:EditProxyPage.IsHttp(ProtocolType), Mode=OneWay}"
+                            />
+                            <TextBox
+                                Grid.Row="2"
+                                Grid.Column="2"
+                                Text="{x:Bind Password, Mode=TwoWay}"
+                                IsReadOnly="{x:Bind IsReadonly}"
+                                MinWidth="100"
+                                Visibility="{x:Bind local:EditProxyPage.IsHttp(ProtocolType), Mode=OneWay}"
+                            />
+                            <TextBlock
+                                Grid.Row="1"
+                                Grid.Column="0"
+                                Text="Username"
+                                Style="{StaticResource ProxyLegInfoColumnName}"
+                                Visibility="{x:Bind local:EditProxyPage.IsSocks5(ProtocolType), Mode=OneWay}"
+                            />
+                            <TextBox
+                                Grid.Row="1"
+                                Grid.Column="2"
+                                Text="{x:Bind Username, Mode=TwoWay}"
+                                IsReadOnly="{x:Bind IsReadonly}"
+                                MinWidth="100"
+                                Visibility="{x:Bind local:EditProxyPage.IsSocks5(ProtocolType), Mode=OneWay}"
+                            />
+                            <TextBlock
+                                Grid.Row="2"
+                                Grid.Column="0"
+                                Text="Password"
+                                Style="{StaticResource ProxyLegInfoColumnName}"
+                                Visibility="{x:Bind local:EditProxyPage.IsSocks5(ProtocolType), Mode=OneWay}"
+                            />
+                            <TextBox
+                                Grid.Row="2"
+                                Grid.Column="2"
+                                Text="{x:Bind Password, Mode=TwoWay}"
+                                IsReadOnly="{x:Bind IsReadonly}"
+                                MinWidth="100"
+                                Visibility="{x:Bind local:EditProxyPage.IsSocks5(ProtocolType), Mode=OneWay}"
+                            />
+                            <TextBlock
+                                Grid.Row="1"
+                                Grid.Column="0"
+                                Text="User ID"
+                                Style="{StaticResource ProxyLegInfoColumnName}"
+                                Visibility="{x:Bind local:EditProxyPage.IsVMess(ProtocolType), Mode=OneWay}"
+                            />
+                            <TextBox
+                                Grid.Row="1"
+                                Grid.Column="2"
+                                Text="{x:Bind Password, Mode=TwoWay}"
+                                IsReadOnly="{x:Bind IsReadonly}"
+                                MinWidth="100"
+                                Visibility="{x:Bind local:EditProxyPage.IsVMess(ProtocolType), Mode=OneWay}"
+                            />
+                            <TextBlock
+                                Grid.Row="2"
+                                Grid.Column="0"
+                                Text="Encryption"
+                                Style="{StaticResource ProxyLegInfoColumnName}"
+                                Visibility="{x:Bind local:EditProxyPage.IsVMess(ProtocolType), Mode=OneWay}"
+                            />
+                            <ComboBox
+                                Grid.Row="2"
+                                Grid.Column="2"
+                                Visibility="{x:Bind local:EditProxyPage.IsVMess(ProtocolType), Mode=OneWay}"
+                                SelectedItem="{x:Bind VMessEncryptionMethod, Mode=TwoWay, Converter={StaticResource IdentityConverter}}"
+                                IsEnabled="{x:Bind IsWritable}"
+                            >
+                                <x:String>none</x:String>
+                                <x:String>auto</x:String>
+                                <x:String>aes-128-cfb</x:String>
+                                <x:String>aes-128-gcm</x:String>
+                                <x:String>chacha20-poly1305</x:String>
+                            </ComboBox>
+
+                        </Grid>
+                    </muxc:Expander>
+                    <muxc:Expander Style="{StaticResource ProxyLegPanelExpanderStyle}">
+                        <muxc:Expander.Header>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="0" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <TextBlock
+                                    Grid.Row="0"
+                                    Grid.Column="1"
+                                    Style="{StaticResource ProxyLegPanelTitleStyle}">
+                                    Server
+                                </TextBlock>
+                                <TextBlock Grid.Row="0" Grid.Column="2" TextWrapping="Wrap" IsTextSelectionEnabled="True" Text="{x:Bind Dest, Mode=OneWay}" />
+                            </Grid>
+                        </muxc:Expander.Header>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="100" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <TextBox
+                                Grid.Row="0"
+                                Grid.Column="0"
+                                Margin="0, 0, 10, 0"
+                                Header="Host"
+                                HeaderTemplate="{StaticResource BoldTextHeaderTemplate}"
+                                Text="{x:Bind Host, Mode=TwoWay}"
+                                IsReadOnly="{x:Bind IsReadonly, Mode=OneWay}"
+                                InputScope="AlphanumericHalfWidth"
+                                MaxLength="255"
+                            />
+                            <muxc:NumberBox
+                                Grid.Row="0"
+                                Grid.Column="1"
+                                Header="Port"
+                                HeaderTemplate="{StaticResource BoldTextHeaderTemplate}"
+                                Value="{x:Bind Port, Mode=TwoWay}"
+                                IsEnabled="{x:Bind IsWritable, Mode=OneWay}"
+                                AcceptsExpression="False"
+                                Maximum="65535"
+                                Minimum="1"
+                                ValidationMode="InvalidInputOverwritten"
+                            />
+                        </Grid>
+                    </muxc:Expander>
+                    <muxc:Expander Style="{StaticResource ProxyLegPanelExpanderStyle}">
+                        <muxc:Expander.Header>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="0" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <TextBlock
+                                    Grid.Row="0"
+                                    Grid.Column="1"
+                                    Style="{StaticResource ProxyLegPanelTitleStyle}"
+                                >
+                                    Additional Transport Layer
+                                </TextBlock>
+                                <TextBlock
+                                    Grid.Row="0"
+                                    Grid.Column="2"
+                                    Text="{x:Bind ObfsType, Mode=OneWay}"
+                                />
+                            </Grid>
+                        </muxc:Expander.Header>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1*" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="2*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <TextBlock
+                                Grid.Row="0"
+                                Grid.Column="0"
+                                Style="{StaticResource ProxyLegInfoColumnName}"
+                            >
+                                Type
+                            </TextBlock>
+                            <ComboBox
+                                Grid.Row="0"
+                                Grid.Column="2"
+                                SelectedValue="{x:Bind ObfsType, Mode=TwoWay, Converter={StaticResource IdentityConverter}}"
+                                IsEnabled="{x:Bind IsWritable}"
+                            >
+                                <x:String>none</x:String>
+                                <x:String>simple-obfs (HTTP)</x:String>
+                                <x:String>simple-obfs (TLS)</x:String>
+                                <x:String>WebSocket</x:String>
+                            </ComboBox>
+                            <TextBlock
+                                Grid.Row="1"
+                                Grid.Column="0"
+                                Text="Host"
+                                Style="{StaticResource ProxyLegInfoColumnName}"
+                                Visibility="{x:Bind local:EditProxyPage.IsHttpObfs(ObfsType), Mode=OneWay}"
+                            />
+                            <TextBox
+                                Grid.Row="1"
+                                Grid.Column="2"
+                                Text="{x:Bind ObfsHost, Mode=TwoWay}"
+                                IsReadOnly="{x:Bind IsReadonly}"
+                                MinWidth="100"
+                                Visibility="{x:Bind local:EditProxyPage.IsHttpObfs(ObfsType), Mode=OneWay}"
+                            />
+                            <TextBlock
+                                Grid.Row="2"
+                                Grid.Column="0"
+                                Text="Path"
+                                Style="{StaticResource ProxyLegInfoColumnName}"
+                                Visibility="{x:Bind local:EditProxyPage.IsHttpObfs(ObfsType), Mode=OneWay}"
+                            />
+                            <TextBox
+                                Grid.Row="2"
+                                Grid.Column="2"
+                                Text="{x:Bind ObfsPath, Mode=TwoWay}"
+                                PlaceholderText="Example: /"
+                                IsReadOnly="{x:Bind IsReadonly}"
+                                MinWidth="100"
+                                Visibility="{x:Bind local:EditProxyPage.IsHttpObfs(ObfsType), Mode=OneWay}"
+                            />
+                            <TextBlock
+                                Grid.Row="1"
+                                Grid.Column="0"
+                                Text="Host"
+                                Style="{StaticResource ProxyLegInfoColumnName}"
+                                Visibility="{x:Bind local:EditProxyPage.IsTlsObfs(ObfsType), Mode=OneWay}"
+                            />
+                            <TextBox
+                                Grid.Row="1"
+                                Grid.Column="2"
+                                Text="{x:Bind ObfsHost, Mode=TwoWay}"
+                                IsReadOnly="{x:Bind IsReadonly}"
+                                MinWidth="100"
+                                Visibility="{x:Bind local:EditProxyPage.IsTlsObfs(ObfsType), Mode=OneWay}"
+                            />
+                            <TextBlock
+                                Grid.Row="1"
+                                Grid.Column="0"
+                                Text="Host"
+                                Style="{StaticResource ProxyLegInfoColumnName}"
+                                Visibility="{x:Bind local:EditProxyPage.IsWebSocket(ObfsType), Mode=OneWay}"
+                            />
+                            <TextBox
+                                Grid.Row="1"
+                                Grid.Column="2"
+                                Text="{x:Bind ObfsHost, Mode=TwoWay}"
+                                PlaceholderText="Default to server host name"
+                                IsReadOnly="{x:Bind IsReadonly}"
+                                MinWidth="100"
+                                Visibility="{x:Bind local:EditProxyPage.IsWebSocket(ObfsType), Mode=OneWay}"
+                            />
+                            <TextBlock
+                                Grid.Row="2"
+                                Grid.Column="0"
+                                Text="Path"
+                                Style="{StaticResource ProxyLegInfoColumnName}"
+                                Visibility="{x:Bind local:EditProxyPage.IsWebSocket(ObfsType), Mode=OneWay}"
+                            />
+                            <TextBox
+                                Grid.Row="2"
+                                Grid.Column="2"
+                                Text="{x:Bind ObfsPath, Mode=TwoWay}"
+                                PlaceholderText="Example: /"
+                                IsReadOnly="{x:Bind IsReadonly}"
+                                MinWidth="100"
+                                Visibility="{x:Bind local:EditProxyPage.IsWebSocket(ObfsType), Mode=OneWay}"
+                            />
+                            <TextBlock
+                                Grid.Row="3"
+                                Grid.Column="0"
+                                Text="Headers"
+                                Style="{StaticResource ProxyLegInfoColumnName}"
+                                Visibility="{x:Bind local:EditProxyPage.IsWebSocket(ObfsType), Mode=OneWay}"
+                            />
+                            <TextBox
+                                Grid.Row="3"
+                                Grid.Column="2"
+                                MinHeight="80"
+                                Text="{x:Bind ObfsHeaders, Mode=TwoWay}"
+                                PlaceholderText="Example: User-Agent: Mozilla/5.0"
+                                AcceptsReturn="True"
+                                TextWrapping="Wrap"
+                                IsReadOnly="{x:Bind IsReadonly}"
+                                HorizontalAlignment="Stretch"
+                                Visibility="{x:Bind local:EditProxyPage.IsWebSocket(ObfsType), Mode=OneWay}"
+                            />
+                        </Grid>
+                    </muxc:Expander>
+                    <muxc:Expander Style="{StaticResource ProxyLegPanelExpanderStyle}">
+                        <muxc:Expander.Header>
+                            <TextBlock Style="{StaticResource ProxyLegPanelTitleStyle}">
+                                TLS
+                            </TextBlock>
+                        </muxc:Expander.Header>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1*" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="2*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <CheckBox
+                                Grid.Row="0"
+                                Grid.Column="2"
+                                IsChecked="{x:Bind EnableTls, Mode=TwoWay}"
+                                IsEnabled="{x:Bind IsWritable}"
+                            >
+                                Enable TLS
+                            </CheckBox>
+                            <TextBlock
+                                Grid.Row="1"
+                                Grid.Column="0"
+                                Text="Server name"
+                                Style="{StaticResource ProxyLegInfoColumnName}"
+                            />
+                            <AutoSuggestBox
+                                Grid.Row="1"
+                                Grid.Column="2"
+                                Text="{x:Bind Sni, Mode=TwoWay}"
+                                PlaceholderText="&#x22;auto&#x22; or hardcoded server name"
+                                IsEnabled="{x:Bind local:EditProxyPage.TlsParamsAllowed(EnableTls, IsReadonly), Mode=OneWay}"
+                                MinWidth="100"
+                            />
+                            <TextBlock
+                                Grid.Row="2"
+                                Grid.Column="0"
+                                Text="ALPN"
+                                Style="{StaticResource ProxyLegInfoColumnName}"
+                            />
+                            <AutoSuggestBox
+                                Grid.Row="2"
+                                Grid.Column="2"
+                                Text="{x:Bind Alpn, Mode=TwoWay}"
+                                IsEnabled="{x:Bind local:EditProxyPage.TlsParamsAllowed(EnableTls, IsReadonly), Mode=OneWay}"
+                                MinWidth="100"
+                            />
+                            <CheckBox
+                                Grid.Row="3"
+                                Grid.Column="2"
+                                IsThreeState="True"
+                                IsChecked="{x:Bind SkipCertCheck, Mode=TwoWay}"
+                                IsEnabled="{x:Bind local:EditProxyPage.TlsParamsAllowed(EnableTls, IsReadonly), Mode=OneWay}"
+                            >
+                                Skip certificate check (insecure)
+                            </CheckBox>
+                        </Grid>
+                    </muxc:Expander>
+                </StackPanel>
+            </DataTemplate>
+        </ResourceDictionary>
+    </Page.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition x:Name="MasterCol" Width="*" />
+            <ColumnDefinition x:Name="DetailCol" Width="0" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Column="0" Grid.Row="0" Margin="16, 0, 0, 12">
+            <TextBlock Margin="4, 0, 0, 10" FontWeight="Bold">Editing Proxy</TextBlock>
+            <TextBox
+                x:Name="ProxyNameBox"
+                Margin="0, 0, 10, 0"
+                Text="{x:Bind ProxyName, Mode=TwoWay}"
+                IsReadOnly="{x:Bind IsReadonly, Mode=OneWay}"
+            />
+            <CheckBox
+                IsChecked="{x:Bind IsUdpSupported, Mode=TwoWay, FallbackValue=False}"
+                IsEnabled="{x:Bind IsWritable, Mode=OneWay}"
+            >
+                UDP supported
+            </CheckBox>
+        </StackPanel>
+
+        <ListView
+            x:Name="LegList"
+            Grid.Row="1"
+            Grid.Column="0"
+            SelectionMode="Single"
+            CanReorderItems="{x:Bind IsWritable}"
+            CanDragItems="True"
+            AllowDrop="True"
+            ItemsSource="{x:Bind ProxyLegs, Mode=OneWay}"
+        >
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                </Style>
+            </ListView.ItemContainerStyle>
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="local:ProxyLegModel">
+                    <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
+                        <StackPanel.ContextFlyout>
+                            <MenuFlyout>
+                                <MenuFlyoutItem Icon="Delete" Text="Delete" IsEnabled="{x:Bind IsWritable}" />
+                            </MenuFlyout>
+                        </StackPanel.ContextFlyout>
+                        <TextBlock Text="{x:Bind Dest, Mode=OneWay}" TextWrapping="Wrap" />
+                        <TextBlock
+                            Text="{x:Bind Summary, Mode=OneWay}"
+                            Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
+                        />
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+        <CommandBar Grid.Column="0" Grid.Row="2" DefaultLabelPosition="Right">
+            <AppBarButton Label="Chain" Icon="Add" IsEnabled="{x:Bind IsWritable}">
+                <AppBarButton.Flyout>
+                    <MenuFlyout>
+                        <MenuFlyoutItem Text="Chain Before">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xE77E;" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutItem Text="Chain After">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xE7F2;" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                    </MenuFlyout>
+                </AppBarButton.Flyout>
+            </AppBarButton>
+            <AppBarButton Label="Save" Icon="Save" IsEnabled="{x:Bind IsDirty, Mode=OneWay}" />
+        </CommandBar>
+
+        <ScrollViewer
+            Grid.Column="1"
+            Grid.Row="0"
+            Grid.RowSpan="3"
+            Background="{ThemeResource LayerFillColorDefaultBrush}"
+            contract7Present:CornerRadius="{StaticResource AppContentControlCornerRadius}"
+        >
+            <ContentControl
+                Content="{x:Bind LegList.SelectedItem, Mode=OneWay}"
+                HorizontalContentAlignment="Stretch"
+                ContentTemplate="{StaticResource ProxyLegPanelTemplate}"
+            />
+        </ScrollViewer>
+
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="AdaptiveWidthVisualStateGroup" CurrentStateChanged="AdaptiveWidth_StateChanged">
+                <VisualState x:Name="MediumWidthState">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="{StaticResource MediumAdaptiveWidth}" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="MasterCol.Width" Value="300" />
+                        <Setter Target="DetailCol.Width" Value="*" />
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="MasterState">
+                    <VisualState.Setters>
+                        <Setter Target="MasterCol.Width" Value="*" />
+                        <Setter Target="DetailCol.Width" Value="0" />
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="DetailState">
+                    <VisualState.Setters>
+                        <Setter Target="MasterCol.Width" Value="0" />
+                        <Setter Target="DetailCol.Width" Value="*" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+    </Grid>
+</Page>

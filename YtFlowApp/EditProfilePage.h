@@ -24,8 +24,7 @@ namespace winrt::YtFlowApp::implementation
         fire_and_forget OnNavigatingFrom(Windows::UI::Xaml::Navigation::NavigatingCancelEventArgs const &args);
         void OnNavigatedFrom(Windows::UI::Xaml::Navigation::NavigationEventArgs const &args);
         void CheckRenamingPlugin(EditPluginModel *editPluginModel) const &;
-        com_ptr<EditPluginModel> CreateEditPluginModel(FfiPlugin const &plugin,
-                                                       bool isEntry);
+        com_ptr<EditPluginModel> CreateEditPluginModel(FfiPlugin const &plugin, bool isEntry);
 
         void AdaptiveWidth_StateChanged(Windows::Foundation::IInspectable const &sender,
                                         Windows::UI::Xaml::VisualStateChangedEventArgs const &e);

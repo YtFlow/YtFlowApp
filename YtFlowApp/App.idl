@@ -51,6 +51,63 @@ namespace YtFlowApp
         };
     }
 
+    [default_interface] runtimeclass EditProxyPageParam : Windows.UI.Xaml.Data.INotifyPropertyChanged
+    {
+        EditProxyPageParam();
+    };
+
+    [default_interface] runtimeclass EditProxyPage : Windows.UI.Xaml.Controls.Page
+    {
+        EditProxyPage();
+
+        static Windows.UI.Xaml.DependencyProperty IsDirtyProperty
+        {
+            get;
+        };
+
+        String ProxyName
+        {
+            get;
+            set;
+        };
+        Windows.Foundation.Collections.IObservableVector<ProxyLegModel> ProxyLegs
+        {
+            get;
+        };
+        Boolean IsUdpSupported
+        {
+            get;
+            set;
+        };
+        Boolean IsReadonly
+        {
+            get;
+        };
+        Boolean IsWritable
+        {
+            get;
+        };
+        Boolean IsDirty
+        {
+            get;
+            set;
+        };
+        Windows.UI.Xaml.Controls.ListView LegList
+        {
+            get;
+        };
+
+        static Windows.UI.Xaml.Visibility IsShadowsocks(String protocolType);
+        static Windows.UI.Xaml.Visibility IsTrojan(String protocolType);
+        static Windows.UI.Xaml.Visibility IsHttp(String protocolType);
+        static Windows.UI.Xaml.Visibility IsSocks5(String protocolType);
+        static Windows.UI.Xaml.Visibility IsVMess(String protocolType);
+        static Windows.UI.Xaml.Visibility IsHttpObfs(String obfsType);
+        static Windows.UI.Xaml.Visibility IsTlsObfs(String obfsType);
+        static Windows.UI.Xaml.Visibility IsWebSocket(String obfsType);
+        static Boolean TlsParamsAllowed(Boolean enableTls, Boolean isReadonly);
+    }
+
     [default_interface] runtimeclass EditProfilePage : Windows.UI.Xaml.Controls.Page
     {
         EditProfilePage();
@@ -77,6 +134,11 @@ namespace YtFlowApp
             get;
         };
         Windows.UI.Xaml.Controls.GridView ProxyGroupGridView
+        {
+            get;
+        };
+
+        Boolean IsProxyGroupProxySingleSelected
         {
             get;
         };
@@ -423,6 +485,108 @@ namespace YtFlowApp
             set;
         };
     }
+    runtimeclass ProxyLegModel : Windows.UI.Xaml.Data.INotifyPropertyChanged
+    {
+        ProxyLegModel();
+
+        Boolean IsReadonly
+        {
+            get;
+        };
+        Boolean IsWritable
+        {
+            get;
+        };
+        String ProtocolType
+        {
+            get;
+            set;
+        };
+        String ShadowsocksEncryptionMethod
+        {
+            get;
+            set;
+        };
+        String VMessEncryptionMethod
+        {
+            get;
+            set;
+        };
+        UInt16 AlterId
+        {
+            get;
+            set;
+        };
+        String Username
+        {
+            get;
+            set;
+        };
+        String Password
+        {
+            get;
+            set;
+        };
+        String Host
+        {
+            get;
+            set;
+        };
+        UInt16 Port
+        {
+            get;
+            set;
+        };
+        String ObfsType
+        {
+            get;
+            set;
+        };
+        String ObfsHost
+        {
+            get;
+            set;
+        };
+        String ObfsPath
+        {
+            get;
+            set;
+        };
+        String ObfsHeaders
+        {
+            get;
+            set;
+        };
+        Boolean EnableTls
+        {
+            get;
+            set;
+        };
+        String Sni
+        {
+            get;
+            set;
+        };
+        String Alpn
+        {
+            get;
+            set;
+        };
+        Windows.Foundation.IReference<Boolean> SkipCertCheck
+        {
+            get;
+            set;
+        };
+
+        String Dest
+        {
+            get;
+        };
+        String Summary
+        {
+            get;
+        };
+    }
     runtimeclass DynOutboundProxyModel : Windows.UI.Xaml.Data.INotifyPropertyChanged
     {
         DynOutboundProxyModel();
@@ -503,5 +667,9 @@ namespace YtFlowApp
     [default_interface] runtimeclass SplitRoutingModeToDescConverter : Windows.UI.Xaml.Data.IValueConverter
     {
         SplitRoutingModeToDescConverter();
+    }
+    [default_interface] runtimeclass IdentityConverter : Windows.UI.Xaml.Data.IValueConverter
+    {
+        IdentityConverter();
     }
 }

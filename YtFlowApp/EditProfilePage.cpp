@@ -24,7 +24,6 @@ namespace winrt::YtFlowApp::implementation
     {
         try
         {
-            InitializeComponent();
             VisualStateManager::GoToState(*this, L"MasterState", false);
 
             auto const weak{get_weak()};
@@ -112,8 +111,7 @@ namespace winrt::YtFlowApp::implementation
         }
         editPluginModel->HasNamingConflict(false);
     }
-    com_ptr<EditPluginModel> EditProfilePage::CreateEditPluginModel(FfiPlugin const &p,
-                                                                    bool isEntry)
+    com_ptr<EditPluginModel> EditProfilePage::CreateEditPluginModel(FfiPlugin const &p, bool isEntry)
     {
         auto const pluginModel{winrt::make_self<PluginModel>(p, m_profile->Id())};
         auto const editPluginModel{winrt::make_self<EditPluginModel>(pluginModel, isEntry)};
@@ -147,8 +145,7 @@ namespace winrt::YtFlowApp::implementation
         });
         return editPluginModel;
     }
-    fire_and_forget EditProfilePage::OnNavigatingFrom(
-        NavigatingCancelEventArgs const &args)
+    fire_and_forget EditProfilePage::OnNavigatingFrom(NavigatingCancelEventArgs const &args)
     {
         try
         {
@@ -182,7 +179,7 @@ namespace winrt::YtFlowApp::implementation
             }
 
             UnsavedPluginDialogText().Text(std::move(unsavedPluginNames));
-            args.Cancel(true);
+            navArgs.Cancel(true);
             if (co_await QuitWithUnsavedDialog().ShowAsync() != ContentDialogResult::Primary)
             {
                 co_return;
@@ -280,8 +277,7 @@ namespace winrt::YtFlowApp::implementation
             co_await resume_background();
 
             auto conn{FfiDbInstance.Connect()};
-            conn.UpdateProfile(profile->Id(), to_string(newProfileName).data(),
-                               to_string(profile->Locale()).data());
+            conn.UpdateProfile(profile->Id(), to_string(newProfileName).data(), to_string(profile->Locale()).data());
 
             co_await resume_foreground(lifetime->Dispatcher());
             profile->Name(newProfileName);
@@ -689,8 +685,7 @@ namespace winrt::YtFlowApp::implementation
             auto const pluginName{NewPluginNameText().Text()};
             FfiPlugin ffiPlugin;
             ffiPlugin.name = to_string(pluginName);
-            ffiPlugin.desc =
-                to_string(PluginTypeToDescConverter::DescMap.find(pluginType)->second.as<hstring>());
+            ffiPlugin.desc = to_string(PluginTypeToDescConverter::DescMap.find(pluginType)->second.as<hstring>());
             ffiPlugin.plugin = to_string(pluginType);
             ffiPlugin.plugin_version = 0;
             ffiPlugin.param = std::vector<uint8_t>{0xf6}; // TODO: param?

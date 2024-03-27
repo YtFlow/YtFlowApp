@@ -146,6 +146,11 @@
       <DependentUpon>EditProfilePage.xaml</DependentUpon>
       <SubType>Code</SubType>
     </ClInclude>
+    <ClInclude Include="EditProxyPage.h">
+      <DependentUpon>EditProxyPage.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </ClInclude>
+    <ClInclude Include="EditProxyPageParam.h" />
     <ClInclude Include="FirstTimePage.h">
       <DependentUpon>FirstTimePage.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -162,6 +167,7 @@
       <DependentUpon>HomeProfileControl.xaml</DependentUpon>
       <SubType>Code</SubType>
     </ClInclude>
+    <ClInclude Include="IdentityConverter.h" />
     <ClInclude Include="LibraryPage.h">
       <DependentUpon>LibraryPage.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -188,6 +194,7 @@
     <ClInclude Include="PluginModel.h" />
     <ClInclude Include="PluginTypeToDescConverter.h" />
     <ClInclude Include="ProxyGroupModel.h" />
+    <ClInclude Include="ProxyLegModel.h" />
     <ClInclude Include="ProxyModel.h" />
     <ClInclude Include="RawEditorPage.h">
       <DependentUpon>RawEditorPage.xaml</DependentUpon>
@@ -229,6 +236,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="EditProfilePage.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="EditProxyPage.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Include="FirstTimePage.xaml">
@@ -355,6 +365,11 @@
       <DependentUpon>EditProfilePage.xaml</DependentUpon>
       <SubType>Code</SubType>
     </ClCompile>
+    <ClCompile Include="EditProxyPage.cpp">
+      <DependentUpon>EditProxyPage.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </ClCompile>
+    <ClCompile Include="EditProxyPageParam.cpp" />
     <ClCompile Include="FirstTimePage.cpp">
       <DependentUpon>FirstTimePage.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -374,6 +389,7 @@
       <DependentUpon>HomeProfileControl.xaml</DependentUpon>
       <SubType>Code</SubType>
     </ClCompile>
+    <ClCompile Include="IdentityConverter.cpp" />
     <ClCompile Include="LibraryPage.cpp">
       <DependentUpon>LibraryPage.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -405,6 +421,7 @@
     </ClCompile>
     <ClCompile Include="$(GeneratedFilesDir)module.g.cpp" />
     <ClCompile Include="ProxyGroupModel.cpp" />
+    <ClCompile Include="ProxyLegModel.cpp" />
     <ClCompile Include="ProxyModel.cpp" />
     <ClCompile Include="RawEditorPage.cpp">
       <DependentUpon>RawEditorPage.xaml</DependentUpon>

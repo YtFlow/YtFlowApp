@@ -11,7 +11,7 @@ namespace winrt::YtFlowApp::implementation
     {
         return *m_plugin;
     }
-    bool EditPluginModel::IsEntry()
+    bool EditPluginModel::IsEntry() const
     {
         return m_isEntry;
     }
@@ -21,11 +21,11 @@ namespace winrt::YtFlowApp::implementation
         m_propertyChanged(*this, Windows::UI::Xaml::Data::PropertyChangedEventArgs{L"IsEntry"});
         m_propertyChanged(*this, Windows::UI::Xaml::Data::PropertyChangedEventArgs{L"IsNotEntry"});
     }
-    bool EditPluginModel::IsNotEntry()
+    bool EditPluginModel::IsNotEntry() const
     {
         return !m_isEntry;
     }
-    bool EditPluginModel::IsDirty()
+    bool EditPluginModel::IsDirty() const
     {
         return m_isDirty;
     }
@@ -34,7 +34,7 @@ namespace winrt::YtFlowApp::implementation
         m_isDirty = value;
         m_propertyChanged(*this, Windows::UI::Xaml::Data::PropertyChangedEventArgs{L"IsDirty"});
     }
-    bool EditPluginModel::HasNamingConflict()
+    bool EditPluginModel::HasNamingConflict() const
     {
         return m_hasNamingConflict;
     }

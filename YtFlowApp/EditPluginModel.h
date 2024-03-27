@@ -15,12 +15,12 @@ namespace winrt::YtFlowApp::implementation
         }
 
         YtFlowApp::PluginModel Plugin();
-        bool IsEntry();
+        bool IsEntry() const;
         void IsEntry(bool value);
-        bool IsNotEntry();
-        bool IsDirty();
+        bool IsNotEntry() const;
+        bool IsDirty() const;
         void IsDirty(bool value);
-        bool HasNamingConflict();
+        bool HasNamingConflict() const;
         void HasNamingConflict(bool value);
         IPluginEditorParam EditorParam();
         void EditorParam(IPluginEditorParam const &value);

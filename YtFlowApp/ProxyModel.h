@@ -26,6 +26,7 @@ namespace winrt::YtFlowApp::implementation
         hstring Tooltip() const;
         event_token PropertyChanged(Windows::UI::Xaml::Data::PropertyChangedEventHandler const &handler);
         void PropertyChanged(event_token const &token) noexcept;
+        std::optional<FfiProxy> &Analyze(char const *name = nullptr) const;
 
       private:
         uint32_t m_id;
@@ -34,7 +35,5 @@ namespace winrt::YtFlowApp::implementation
         uint16_t m_proxyVersion;
         mutable std::optional<FfiProxy> m_analyzedProxy;
         event<Windows::UI::Xaml::Data::PropertyChangedEventHandler> m_propertyChanged;
-
-        std::optional<FfiProxy> &Analyze(char const *name = nullptr) const;
     };
 }
