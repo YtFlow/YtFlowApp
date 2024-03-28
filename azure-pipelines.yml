@@ -12,6 +12,8 @@ trigger:
 pool:
   vmImage: 'windows-2022'
 
+timeoutInMinutes: 120
+
 variables:
   solution: 'YtFlowApp.sln'
   buildPlatform: 'x64|ARM'
