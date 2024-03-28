@@ -21,7 +21,6 @@ jobs:
       buildPlatform: "x64|ARM"
       buildConfiguration: "Release"
       appxPackageDir: '$(build.artifactStagingDirectory)\AppxPackages\\'
-      keyFile: "YtFlowApp_TemporaryKey.pfx"
       NUGET_PACKAGES: $(Pipeline.Workspace)/.nuget/packages
       vcpkgGitCommitId: 8d3649ba34aab36914ddd897958599aa0a91b08e
       cleanBuild: false
@@ -100,7 +99,7 @@ jobs:
       - task: DownloadSecureFile@1
         name: secureKeyFile
         inputs:
-          secureFile: "$(keyFile)"
+          secureFile: "YtFlowApp_TemporaryKey.pfx"
           retryCount: "2"
 
       - task: CmdLine@2
