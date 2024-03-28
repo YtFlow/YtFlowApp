@@ -10,7 +10,7 @@ trigger:
   - main
 
 jobs:
-  - job: build x64
+  - job: build_x64
     pool:
       vmImage: "windows-2022"
 
