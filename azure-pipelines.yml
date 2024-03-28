@@ -5,117 +5,119 @@
 # https://aka.ms/yaml
 
 trigger:
-- next
-- next-ci
-- main
+  - next
+  - next-ci
+  - main
 
-pool:
-  vmImage: 'windows-2022'
+jobs:
+  - job: build x64
+    pool:
+      vmImage: "windows-2022"
 
-timeoutInMinutes: 120
+    timeoutInMinutes: 120
 
-variables:
-  solution: 'YtFlowApp.sln'
-  buildPlatform: 'x64|ARM'
-  buildConfiguration: 'Release'
-  appxPackageDir: '$(build.artifactStagingDirectory)\AppxPackages\\'
-  keyFile: 'YtFlowApp_TemporaryKey.pfx'
-  NUGET_PACKAGES: $(Pipeline.Workspace)/.nuget/packages
-  vcpkgGitCommitId: 8d3649ba34aab36914ddd897958599aa0a91b08e
-  cleanBuild: false
+    variables:
+      solution: "YtFlowApp.sln"
+      buildPlatform: "x64|ARM"
+      buildConfiguration: "Release"
+      appxPackageDir: '$(build.artifactStagingDirectory)\AppxPackages\\'
+      keyFile: "YtFlowApp_TemporaryKey.pfx"
+      NUGET_PACKAGES: $(Pipeline.Workspace)/.nuget/packages
+      vcpkgGitCommitId: 8d3649ba34aab36914ddd897958599aa0a91b08e
+      cleanBuild: false
 
-steps:
-- checkout: self
-  submodules: recursive
+    steps:
+      - checkout: self
+        submodules: recursive
 
-- task: NuGetToolInstaller@1
+      - task: NuGetToolInstaller@1
 
-- task: Cache@2
-  condition: eq(variables.cleanBuild, 'false')
-  inputs:
-    key: 'nuget | "$(Agent.OS)" | **/*.vcxproj'
-    restoreKeys: |
-      nuget | "$(Agent.OS)"
-      nuget
-    path: $(NUGET_PACKAGES)
-  displayName: Cache NuGet packages
+      - task: Cache@2
+        condition: eq(variables.cleanBuild, 'false')
+        inputs:
+          key: 'nuget | "$(Agent.OS)" | **/*.vcxproj'
+          restoreKeys: |
+            nuget | "$(Agent.OS)"
+            nuget
+          path: $(NUGET_PACKAGES)
+        displayName: Cache NuGet packages
 
-- task: NuGetCommand@2
-  inputs:
-    restoreSolution: '$(solution)'
+      - task: NuGetCommand@2
+        inputs:
+          restoreSolution: "$(solution)"
 
-- task: Cache@2
-  condition: eq(variables.cleanBuild, 'false')
-  inputs:
-    key: 'target | "$(Agent.OS)" | rust-toolchain.toml | Cargo.lock'
-    restoreKeys: |
-      target | "$(Agent.OS)" | rust-toolchain.toml
-      target
-    path: target
-  displayName: Cache target directory
+      - task: Cache@2
+        condition: eq(variables.cleanBuild, 'false')
+        inputs:
+          key: 'target | "$(Agent.OS)" | rust-toolchain.toml | Cargo.lock'
+          restoreKeys: |
+            target | "$(Agent.OS)" | rust-toolchain.toml
+            target
+          path: target
+        displayName: Cache target directory
 
-- task: Cache@2
-  condition: eq(variables.cleanBuild, 'false')
-  inputs:
-    key: 'rustup | "$(Agent.OS)" | rust-toolchain.toml'
-    path: "$(UserProfile)/.rustup"
-  displayName: Cache rustup toolchains
+      - task: Cache@2
+        condition: eq(variables.cleanBuild, 'false')
+        inputs:
+          key: 'rustup | "$(Agent.OS)" | rust-toolchain.toml'
+          path: "$(UserProfile)/.rustup"
+        displayName: Cache rustup toolchains
 
-- task: Cache@2
-  condition: eq(variables.cleanBuild, 'false')
-  inputs:
-    key: 'cargo | "$(Agent.OS)" | Cargo.lock'
-    restoreKeys: |
-      cargo | "$(Agent.OS)"
-      cargo
-    path: "$(UserProfile)/.cargo"
-  displayName: Cache Cargo packages
+      - task: Cache@2
+        condition: eq(variables.cleanBuild, 'false')
+        inputs:
+          key: 'cargo | "$(Agent.OS)" | Cargo.lock'
+          restoreKeys: |
+            cargo | "$(Agent.OS)"
+            cargo
+          path: "$(UserProfile)/.cargo"
+        displayName: Cache Cargo packages
 
-- task: Cache@2
-  condition: eq(variables.cleanBuild, 'false')
-  inputs:
-    key: 'vcpkg | "$(Agent.OS)" | "$(vcpkgGitCommitId)"'
-    path: "$(Build.BinariesDirectory)/vcpkg"
-  displayName: Cache vcpkg for YtFlowCore
+      - task: Cache@2
+        condition: eq(variables.cleanBuild, 'false')
+        inputs:
+          key: 'vcpkg | "$(Agent.OS)" | "$(vcpkgGitCommitId)"'
+          path: "$(Build.BinariesDirectory)/vcpkg"
+        displayName: Cache vcpkg for YtFlowCore
 
-- task: run-vcpkg@0
-  name: runVcpkg
-  displayName: 'Run vcpkg for YtFlowCore'
-  inputs:
-    vcpkgArguments: 'openssl:x64-uwp openssl:arm-uwp'
-    vcpkgGitCommitId: $(vcpkgGitCommitId)
+      - task: run-vcpkg@0
+        name: runVcpkg
+        displayName: "Run vcpkg for YtFlowCore"
+        inputs:
+          vcpkgArguments: "openssl:x64-uwp openssl:arm-uwp"
+          vcpkgGitCommitId: $(vcpkgGitCommitId)
 
-- task: CmdLine@2
-  inputs:
-    script: |
-      cargo build --config .cargo/publish.config.toml --target x86_64-uwp-windows-msvc --release
-      cargo build --config .cargo/publish.config.toml --target thumbv7a-uwp-windows-msvc --release
-  env:
-    X86_64_UWP_WINDOWS_MSVC_OPENSSL_DIR: "$(runVcpkg.RUNVCPKG_VCPKG_ROOT_OUT)\\installed\\x64-uwp"
-    THUMBV7A_UWP_WINDOWS_MSVC_OPENSSL_DIR: "$(runVcpkg.RUNVCPKG_VCPKG_ROOT_OUT)\\installed\\arm-uwp"
-  displayName: Build core wrapper for UWP
+      - task: CmdLine@2
+        inputs:
+          script: |
+            cargo build --config .cargo/publish.config.toml --target x86_64-uwp-windows-msvc --release
+            cargo build --config .cargo/publish.config.toml --target thumbv7a-uwp-windows-msvc --release
+        env:
+          X86_64_UWP_WINDOWS_MSVC_OPENSSL_DIR: "$(runVcpkg.RUNVCPKG_VCPKG_ROOT_OUT)\\installed\\x64-uwp"
+          THUMBV7A_UWP_WINDOWS_MSVC_OPENSSL_DIR: "$(runVcpkg.RUNVCPKG_VCPKG_ROOT_OUT)\\installed\\arm-uwp"
+        displayName: Build core wrapper for UWP
 
-- task: DownloadSecureFile@1
-  name: secureKeyFile
-  inputs:
-    secureFile: '$(keyFile)'
-    retryCount: '2'
+      - task: DownloadSecureFile@1
+        name: secureKeyFile
+        inputs:
+          secureFile: "$(keyFile)"
+          retryCount: "2"
 
-- task: CmdLine@2
-  inputs:
-    script: '.\vcpkg\bootstrap-vcpkg.bat'
-  displayName: Bootstrap vcpkg
+      - task: CmdLine@2
+        inputs:
+          script: '.\vcpkg\bootstrap-vcpkg.bat'
+        displayName: Bootstrap vcpkg
 
-- task: VSBuild@1
-  displayName: Build App Bundle
-  inputs:
-    platform: 'x64'
-    solution: '$(solution)'
-    configuration: '$(buildConfiguration)'
-    msbuildArgs: '/p:AppxBundlePlatforms="$(buildPlatform)" /p:AppxPackageDir="$(appxPackageDir)" /p:AppxBundle=Always /p:PackageCertificateKeyFile="$(secureKeyFile.secureFilePath)" /p:PackageCertificateThumbprint="" /p:UapAppxPackageBuildMode=SideloadOnly /p:PlatformToolset=v143 /p:PreferredToolArchitecture=x64'
+      - task: VSBuild@1
+        displayName: Build App Bundle
+        inputs:
+          platform: "x64"
+          solution: "$(solution)"
+          configuration: "$(buildConfiguration)"
+          msbuildArgs: '/p:AppxBundlePlatforms="$(buildPlatform)" /p:AppxPackageDir="$(appxPackageDir)" /p:AppxBundle=Always /p:PackageCertificateKeyFile="$(secureKeyFile.secureFilePath)" /p:PackageCertificateThumbprint="" /p:UapAppxPackageBuildMode=SideloadOnly /p:PlatformToolset=v143 /p:PreferredToolArchitecture=x64'
 
-- task: PublishPipelineArtifact@1
-  inputs:
-    targetPath: '$(build.artifactStagingDirectory)\AppxPackages\'
-    artifact: 'AppxPackages'
-    publishLocation: 'pipeline'
+      - task: PublishPipelineArtifact@1
+        inputs:
+          targetPath: '$(build.artifactStagingDirectory)\AppxPackages\'
+          artifact: "AppxPackages"
+          publishLocation: "pipeline"
