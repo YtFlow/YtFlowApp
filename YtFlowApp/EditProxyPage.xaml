@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    xmlns:contract5Present="http://schemas.microsoft.com/winfx/2006/xaml/presentation?IsApiContractPresent(Windows.Foundation.UniversalApiContract, 5)"
     xmlns:contract7Present="http://schemas.microsoft.com/winfx/2006/xaml/presentation?IsApiContractPresent(Windows.Foundation.UniversalApiContract,7)"
     mc:Ignorable="d"
     NavigationCacheMode="Enabled">
@@ -28,7 +29,22 @@
                 BasedOn="{StaticResource PluginWidgetInfoColumnName}"
             >
                 <Setter Property="VerticalAlignment" Value="Center" />
-                <Setter Property="Margin" Value="0, 8, 0, 8" />
+                <Setter Property="Margin" Value="0, 0, 0, 4" />
+            </Style>
+            <Style
+                x:Key="ProxyLegInfoColumnTextBoxContent"
+                TargetType="TextBox"
+                BasedOn="{StaticResource DefaultTextBoxStyle}"
+            >
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="Margin" Value="0, 0, 0, 4" />
+            </Style>
+            <Style
+                x:Key="ProxyLegInfoColumnComboBoxContent"
+                TargetType="ComboBox"
+                BasedOn="{StaticResource DefaultComboBoxStyle}"
+            >
+                <Setter Property="Margin" Value="0, 0, 0, 4" />
             </Style>
             <DataTemplate x:Key="BoldTextHeaderTemplate">
                 <TextBlock Text="{Binding}" FontWeight="SemiBold" />
@@ -91,6 +107,7 @@
                                 Grid.Column="2"
                                 SelectedItem="{x:Bind ProtocolType, Mode=TwoWay, Converter={StaticResource IdentityConverter}}"
                                 IsEnabled="{x:Bind IsWritable}"
+                                Style="{StaticResource ProxyLegInfoColumnComboBoxContent}"
                             >
                                 <x:String>Shadowsocks</x:String>
                                 <x:String>Trojan</x:String>
@@ -112,6 +129,7 @@
                                 Visibility="{x:Bind local:EditProxyPage.IsShadowsocks(ProtocolType), Mode=OneWay}"
                                 SelectedItem="{x:Bind ShadowsocksEncryptionMethod, Mode=TwoWay, Converter={StaticResource IdentityConverter}}"
                                 IsEnabled="{x:Bind IsWritable}"
+                                Style="{StaticResource ProxyLegInfoColumnComboBoxContent}"
                             >
                                 <x:String>none</x:String>
                                 <x:String>rc4</x:String>
@@ -141,7 +159,8 @@
                             <TextBox
                                 Grid.Row="2"
                                 Grid.Column="2"
-                                Text="{x:Bind Password, Mode=TwoWay}"
+                                Text="{x:Bind Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                Style="{StaticResource ProxyLegInfoColumnTextBoxContent}"
                                 IsReadOnly="{x:Bind IsReadonly}"
                                 MinWidth="100"
                                 Visibility="{x:Bind local:EditProxyPage.IsShadowsocks(ProtocolType), Mode=OneWay}"
@@ -156,8 +175,9 @@
                             <TextBox
                                 Grid.Row="1"
                                 Grid.Column="2"
-                                Text="{x:Bind Password, Mode=TwoWay}"
+                                Text="{x:Bind Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                 IsReadOnly="{x:Bind IsReadonly}"
+                                Style="{StaticResource ProxyLegInfoColumnTextBoxContent}"
                                 MinWidth="100"
                                 Visibility="{x:Bind local:EditProxyPage.IsTrojan(ProtocolType), Mode=OneWay}"
                             />
@@ -171,8 +191,9 @@
                             <TextBox
                                 Grid.Row="1"
                                 Grid.Column="2"
-                                Text="{x:Bind Username, Mode=TwoWay}"
+                                Text="{x:Bind Username, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                 IsReadOnly="{x:Bind IsReadonly}"
+                                Style="{StaticResource ProxyLegInfoColumnTextBoxContent}"
                                 MinWidth="100"
                                 Visibility="{x:Bind local:EditProxyPage.IsHttp(ProtocolType), Mode=OneWay}"
                             />
@@ -186,8 +207,9 @@
                             <TextBox
                                 Grid.Row="2"
                                 Grid.Column="2"
-                                Text="{x:Bind Password, Mode=TwoWay}"
+                                Text="{x:Bind Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                 IsReadOnly="{x:Bind IsReadonly}"
+                                Style="{StaticResource ProxyLegInfoColumnTextBoxContent}"
                                 MinWidth="100"
                                 Visibility="{x:Bind local:EditProxyPage.IsHttp(ProtocolType), Mode=OneWay}"
                             />
@@ -201,8 +223,9 @@
                             <TextBox
                                 Grid.Row="1"
                                 Grid.Column="2"
-                                Text="{x:Bind Username, Mode=TwoWay}"
+                                Text="{x:Bind Username, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                 IsReadOnly="{x:Bind IsReadonly}"
+                                Style="{StaticResource ProxyLegInfoColumnTextBoxContent}"
                                 MinWidth="100"
                                 Visibility="{x:Bind local:EditProxyPage.IsSocks5(ProtocolType), Mode=OneWay}"
                             />
@@ -216,8 +239,9 @@
                             <TextBox
                                 Grid.Row="2"
                                 Grid.Column="2"
-                                Text="{x:Bind Password, Mode=TwoWay}"
+                                Text="{x:Bind Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                 IsReadOnly="{x:Bind IsReadonly}"
+                                Style="{StaticResource ProxyLegInfoColumnTextBoxContent}"
                                 MinWidth="100"
                                 Visibility="{x:Bind local:EditProxyPage.IsSocks5(ProtocolType), Mode=OneWay}"
                             />
@@ -231,8 +255,9 @@
                             <TextBox
                                 Grid.Row="1"
                                 Grid.Column="2"
-                                Text="{x:Bind Password, Mode=TwoWay}"
+                                Text="{x:Bind Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                 IsReadOnly="{x:Bind IsReadonly}"
+                                Style="{StaticResource ProxyLegInfoColumnTextBoxContent}"
                                 MinWidth="100"
                                 Visibility="{x:Bind local:EditProxyPage.IsVMess(ProtocolType), Mode=OneWay}"
                             />
@@ -249,6 +274,7 @@
                                 Visibility="{x:Bind local:EditProxyPage.IsVMess(ProtocolType), Mode=OneWay}"
                                 SelectedItem="{x:Bind VMessEncryptionMethod, Mode=TwoWay, Converter={StaticResource IdentityConverter}}"
                                 IsEnabled="{x:Bind IsWritable}"
+                                Style="{StaticResource ProxyLegInfoColumnComboBoxContent}"
                             >
                                 <x:String>none</x:String>
                                 <x:String>auto</x:String>
@@ -293,7 +319,7 @@
                                 Margin="0, 0, 10, 0"
                                 Header="Host"
                                 HeaderTemplate="{StaticResource BoldTextHeaderTemplate}"
-                                Text="{x:Bind Host, Mode=TwoWay}"
+                                Text="{x:Bind Host, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                 IsReadOnly="{x:Bind IsReadonly, Mode=OneWay}"
                                 InputScope="AlphanumericHalfWidth"
                                 MaxLength="255"
@@ -303,7 +329,7 @@
                                 Grid.Column="1"
                                 Header="Port"
                                 HeaderTemplate="{StaticResource BoldTextHeaderTemplate}"
-                                Value="{x:Bind Port, Mode=TwoWay}"
+                                Value="{x:Bind Port, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                 IsEnabled="{x:Bind IsWritable, Mode=OneWay}"
                                 AcceptsExpression="False"
                                 Maximum="65535"
@@ -362,6 +388,7 @@
                                 Grid.Column="2"
                                 SelectedValue="{x:Bind ObfsType, Mode=TwoWay, Converter={StaticResource IdentityConverter}}"
                                 IsEnabled="{x:Bind IsWritable}"
+                                Style="{StaticResource ProxyLegInfoColumnComboBoxContent}"
                             >
                                 <x:String>none</x:String>
                                 <x:String>simple-obfs (HTTP)</x:String>
@@ -378,8 +405,9 @@
                             <TextBox
                                 Grid.Row="1"
                                 Grid.Column="2"
-                                Text="{x:Bind ObfsHost, Mode=TwoWay}"
+                                Text="{x:Bind ObfsHost, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                 IsReadOnly="{x:Bind IsReadonly}"
+                                Style="{StaticResource ProxyLegInfoColumnTextBoxContent}"
                                 MinWidth="100"
                                 Visibility="{x:Bind local:EditProxyPage.IsHttpObfs(ObfsType), Mode=OneWay}"
                             />
@@ -393,9 +421,10 @@
                             <TextBox
                                 Grid.Row="2"
                                 Grid.Column="2"
-                                Text="{x:Bind ObfsPath, Mode=TwoWay}"
+                                Text="{x:Bind ObfsPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                 PlaceholderText="Example: /"
                                 IsReadOnly="{x:Bind IsReadonly}"
+                                Style="{StaticResource ProxyLegInfoColumnTextBoxContent}"
                                 MinWidth="100"
                                 Visibility="{x:Bind local:EditProxyPage.IsHttpObfs(ObfsType), Mode=OneWay}"
                             />
@@ -409,8 +438,9 @@
                             <TextBox
                                 Grid.Row="1"
                                 Grid.Column="2"
-                                Text="{x:Bind ObfsHost, Mode=TwoWay}"
+                                Text="{x:Bind ObfsHost, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                 IsReadOnly="{x:Bind IsReadonly}"
+                                Style="{StaticResource ProxyLegInfoColumnTextBoxContent}"
                                 MinWidth="100"
                                 Visibility="{x:Bind local:EditProxyPage.IsTlsObfs(ObfsType), Mode=OneWay}"
                             />
@@ -424,9 +454,10 @@
                             <TextBox
                                 Grid.Row="1"
                                 Grid.Column="2"
-                                Text="{x:Bind ObfsHost, Mode=TwoWay}"
+                                Text="{x:Bind ObfsHost, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                 PlaceholderText="Default to server host name"
                                 IsReadOnly="{x:Bind IsReadonly}"
+                                Style="{StaticResource ProxyLegInfoColumnTextBoxContent}"
                                 MinWidth="100"
                                 Visibility="{x:Bind local:EditProxyPage.IsWebSocket(ObfsType), Mode=OneWay}"
                             />
@@ -440,9 +471,10 @@
                             <TextBox
                                 Grid.Row="2"
                                 Grid.Column="2"
-                                Text="{x:Bind ObfsPath, Mode=TwoWay}"
+                                Text="{x:Bind ObfsPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                 PlaceholderText="Example: /"
                                 IsReadOnly="{x:Bind IsReadonly}"
+                                Style="{StaticResource ProxyLegInfoColumnTextBoxContent}"
                                 MinWidth="100"
                                 Visibility="{x:Bind local:EditProxyPage.IsWebSocket(ObfsType), Mode=OneWay}"
                             />
@@ -451,17 +483,19 @@
                                 Grid.Column="0"
                                 Text="Headers"
                                 Style="{StaticResource ProxyLegInfoColumnName}"
+                                VerticalAlignment="Top"
                                 Visibility="{x:Bind local:EditProxyPage.IsWebSocket(ObfsType), Mode=OneWay}"
                             />
                             <TextBox
                                 Grid.Row="3"
                                 Grid.Column="2"
                                 MinHeight="80"
-                                Text="{x:Bind ObfsHeaders, Mode=TwoWay}"
+                                Text="{x:Bind ObfsHeaders, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                 PlaceholderText="Example: User-Agent: Mozilla/5.0"
                                 AcceptsReturn="True"
                                 TextWrapping="Wrap"
                                 IsReadOnly="{x:Bind IsReadonly}"
+                                Style="{StaticResource ProxyLegInfoColumnTextBoxContent}"
                                 HorizontalAlignment="Stretch"
                                 Visibility="{x:Bind local:EditProxyPage.IsWebSocket(ObfsType), Mode=OneWay}"
                             />
@@ -502,9 +536,11 @@
                             <AutoSuggestBox
                                 Grid.Row="1"
                                 Grid.Column="2"
-                                Text="{x:Bind Sni, Mode=TwoWay}"
+                                Text="{x:Bind Sni, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                TextChanged="SniAutoSuggestBox_TextChanged"
                                 PlaceholderText="&#x22;auto&#x22; or hardcoded server name"
                                 IsEnabled="{x:Bind local:EditProxyPage.TlsParamsAllowed(EnableTls, IsReadonly), Mode=OneWay}"
+                                Margin="0, 0, 0, 4"
                                 MinWidth="100"
                             />
                             <TextBlock
@@ -516,7 +552,9 @@
                             <AutoSuggestBox
                                 Grid.Row="2"
                                 Grid.Column="2"
-                                Text="{x:Bind Alpn, Mode=TwoWay}"
+                                Text="{x:Bind Alpn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                TextChanged="AlpnAutoSuggestBox_TextChanged"
+                                PlaceholderText="Comma separated; Leave empty for auto detection"
                                 IsEnabled="{x:Bind local:EditProxyPage.TlsParamsAllowed(EnableTls, IsReadonly), Mode=OneWay}"
                                 MinWidth="100"
                             />
@@ -552,7 +590,7 @@
             <TextBox
                 x:Name="ProxyNameBox"
                 Margin="0, 0, 10, 0"
-                Text="{x:Bind ProxyName, Mode=TwoWay}"
+                Text="{x:Bind ProxyName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 IsReadOnly="{x:Bind IsReadonly, Mode=OneWay}"
             />
             <CheckBox
@@ -572,18 +610,19 @@
             CanDragItems="True"
             AllowDrop="True"
             ItemsSource="{x:Bind ProxyLegs, Mode=OneWay}"
+            ItemClick="LegList_ItemClick"
         >
-            <ListView.ItemContainerStyle>
-                <Style TargetType="ListViewItem">
-                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                </Style>
-            </ListView.ItemContainerStyle>
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="local:ProxyLegModel">
-                    <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
+                    <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" Margin="0, 4, 0, 4">
                         <StackPanel.ContextFlyout>
                             <MenuFlyout>
-                                <MenuFlyoutItem Icon="Delete" Text="Delete" IsEnabled="{x:Bind IsWritable}" />
+                                <MenuFlyoutItem
+                                    Icon="Delete"
+                                    Text="Delete"
+                                    IsEnabled="{x:Bind IsWritable}"
+                                    Click="LegItemDelete_Click"
+                                />
                             </MenuFlyout>
                         </StackPanel.ContextFlyout>
                         <TextBlock Text="{x:Bind Dest, Mode=OneWay}" TextWrapping="Wrap" />
@@ -600,12 +639,12 @@
             <AppBarButton Label="Chain" Icon="Add" IsEnabled="{x:Bind IsWritable}">
                 <AppBarButton.Flyout>
                     <MenuFlyout>
-                        <MenuFlyoutItem Text="Chain Before">
+                        <MenuFlyoutItem Text="Chain Before" Click="ChainBeforeButton_Click">
                             <MenuFlyoutItem.Icon>
                                 <FontIcon Glyph="&#xE77E;" />
                             </MenuFlyoutItem.Icon>
                         </MenuFlyoutItem>
-                        <MenuFlyoutItem Text="Chain After">
+                        <MenuFlyoutItem Text="Chain After" Click="ChainAfterButton_Click">
                             <MenuFlyoutItem.Icon>
                                 <FontIcon Glyph="&#xE7F2;" />
                             </MenuFlyoutItem.Icon>
@@ -613,7 +652,11 @@
                     </MenuFlyout>
                 </AppBarButton.Flyout>
             </AppBarButton>
-            <AppBarButton Label="Save" Icon="Save" IsEnabled="{x:Bind IsDirty, Mode=OneWay}" />
+            <AppBarButton Label="Save" Icon="Save" IsEnabled="{x:Bind IsDirty, Mode=OneWay}" Click="SaveButton_Click">
+                <contract5Present:AppBarButton.KeyboardAccelerators>
+                    <contract5Present:KeyboardAccelerator Modifiers="Control" Key="S" ScopeOwner="{x:Bind}" />
+                </contract5Present:AppBarButton.KeyboardAccelerators>
+            </AppBarButton>
         </CommandBar>
 
         <ScrollViewer
@@ -630,6 +673,18 @@
             />
         </ScrollViewer>
 
+        <ContentDialog
+            x:Name="QuitWithUnsavedDialog"
+            Grid.ColumnSpan="2"
+            Grid.RowSpan="3"
+            CloseButtonText="Cancel"
+            PrimaryButtonText="Discard"
+            DefaultButton="Primary"
+            Title="Unsaved Changes"
+        >
+            Discard unsaved changes?
+        </ContentDialog>
+
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="AdaptiveWidthVisualStateGroup" CurrentStateChanged="AdaptiveWidth_StateChanged">
                 <VisualState x:Name="MediumWidthState">
@@ -639,18 +694,21 @@
                     <VisualState.Setters>
                         <Setter Target="MasterCol.Width" Value="300" />
                         <Setter Target="DetailCol.Width" Value="*" />
+                        <Setter Target="LegList.IsItemClickEnabled" Value="False" />
                     </VisualState.Setters>
                 </VisualState>
                 <VisualState x:Name="MasterState">
                     <VisualState.Setters>
                         <Setter Target="MasterCol.Width" Value="*" />
                         <Setter Target="DetailCol.Width" Value="0" />
+                        <Setter Target="LegList.IsItemClickEnabled" Value="True" />
                     </VisualState.Setters>
                 </VisualState>
                 <VisualState x:Name="DetailState">
                     <VisualState.Setters>
                         <Setter Target="MasterCol.Width" Value="0" />
                         <Setter Target="DetailCol.Width" Value="*" />
+                        <Setter Target="LegList.IsItemClickEnabled" Value="True" />
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>

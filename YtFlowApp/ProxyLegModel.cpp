@@ -2,6 +2,8 @@
 #include "ProxyLegModel.h"
 #include "ProxyLegModel.g.cpp"
 
+#include "StringUtil.h"
+
 namespace winrt::YtFlowApp::implementation
 {
     template <class... Ts> struct overloaded : Ts...
@@ -367,4 +369,129 @@ namespace winrt::YtFlowApp::implementation
         }
         return ret;
     }
+
+    nlohmann::json::binary_t to_utf8string(hstring const &hstr)
+    {
+        std::string const s = to_string(hstr);
+        std::vector<uint8_t> ret(reinterpret_cast<uint8_t const *>(s.data()),
+                                 reinterpret_cast<uint8_t const *>(s.data() + s.size()));
+        return nlohmann::json::binary_t(std::move(ret));
+    }
+
+    FfiProxyLeg ProxyLegModel::Encode() const
+    {
+        std::variant<FfiProxyProtocolShadowsocks, FfiProxyProtocolTrojan, FfiProxyProtocolHttp, FfiProxyProtocolSocks5,
+                     FfiProxyProtocolVMess>
+            protocol;
+        if (m_protocolType == L"Shadowsocks")
+        {
+            protocol = FfiProxyProtocolShadowsocks{.cipher = to_string(m_shadowsocksEncryptionMethod),
+                                                   .password = to_utf8string(m_password)};
+        }
+        else if (m_protocolType == L"Trojan")
+        {
+            protocol = FfiProxyProtocolTrojan{.password = to_utf8string(m_password)};
+        }
+        else if (m_protocolType == L"HTTP")
+        {
+            protocol =
+                FfiProxyProtocolHttp{.username = to_utf8string(m_username), .password = to_utf8string(m_password)};
+        }
+        else if (m_protocolType == L"SOCKS5")
+        {
+            protocol =
+                FfiProxyProtocolSocks5{.username = to_utf8string(m_username), .password = to_utf8string(m_password)};
+        }
+        else if (m_protocolType == L"VMess")
+        {
+            GUID userGuid{};
+            hstring const guidStr = hstring(L"{" + m_password + L"}");
+            assert(SUCCEEDED(CLSIDFromString(guidStr.c_str(), &userGuid)));
+            if constexpr (std::endian::native == std::endian::little)
+            {
+                userGuid.Data1 = std::byteswap(userGuid.Data1);
+                userGuid.Data2 = std::byteswap(userGuid.Data2);
+                userGuid.Data3 = std::byteswap(userGuid.Data3);
+            }
+            std::vector<uint8_t> userIdBuf(sizeof(GUID), 0);
+            std::memmove(userIdBuf.data(), &userGuid, sizeof(GUID));
+            protocol = FfiProxyProtocolVMess{
+                .user_id = nlohmann::json::binary_t(std::move(userIdBuf)),
+                .alter_id = m_alterId,
+                .security = to_string(m_vmessEncryptionMethod),
+            };
+        }
+
+        std::optional<std::variant<FfiProxyObfsHttpObfs, FfiProxyObfsTlsObfs, FfiProxyObfsWebSocket>> obfs;
+        if (m_obfsType == L"simple-obfs (HTTP)")
+        {
+            obfs = FfiProxyObfsHttpObfs{.host = to_string(m_obfsHost), .path = to_string(m_obfsPath)};
+        }
+        else if (m_obfsType == L"simple-obfs (TLS)")
+        {
+            obfs = FfiProxyObfsTlsObfs{.host = to_string(m_obfsHost)};
+        }
+        else if (m_obfsType == L"WebSocket")
+        {
+            using std::ranges::to;
+            using std::ranges::views::filter;
+            using std::ranges::views::split;
+            using std::ranges::views::transform;
+            using namespace std::string_view_literals;
+
+            auto const rawObfsHeaders = to_string(m_obfsHeaders);
+            std::map<std::string, std::string> headers =
+                split(rawObfsHeaders, "\r"sv) |
+                transform([](auto const &line) { return std::string_view(line.begin(), line.end()); }) |
+                transform([](std::string_view line) { return std::make_pair(line, line.find(':')); }) |
+                filter([](auto const &pair) { return pair.second != std::string::npos; }) |
+                transform([](auto const &pair) {
+                    auto const &[line, colonPos] = pair;
+                    auto key = static_cast<std::string>(TrimSpaces(line.substr(0, colonPos)));
+                    auto value = static_cast<std::string>(TrimSpaces(line.substr(colonPos + 1)));
+                    return std::make_pair(std::move(key), std::move(value));
+                }) |
+                to<std::map<std::string, std::string>>();
+
+            obfs = FfiProxyObfsWebSocket{
+                .host = to_string(m_obfsHost), .path = to_string(m_obfsPath), .headers = std::move(headers)};
+        }
+
+        std::optional<FfiProxyTls> tls(std::nullopt);
+        if (m_enableTls)
+        {
+            std::optional<std::string> sni(std::nullopt);
+            if (m_sni != L"auto")
+            {
+                sni = to_string(m_sni);
+            }
+
+            using std::ranges::to;
+            using std::ranges::views::filter;
+            using std::ranges::views::split;
+            using std::ranges::views::transform;
+            using namespace std::string_view_literals;
+
+            auto const rawAlpn = to_string(m_alpn);
+            std::vector<std::string> alpn;
+            if (rawAlpn != "auto")
+            {
+                alpn = split(rawAlpn, ","sv) |
+                       transform([](auto const &alpn) { return std::string_view(alpn.begin(), alpn.end()); }) |
+                       transform([](std::string_view alpn) { return TrimSpaces(alpn); }) |
+                       filter([](std::string_view alpn) { return !alpn.empty(); }) | to<std::vector<std::string>>();
+            }
+
+            tls = FfiProxyTls{
+                .alpn = std::move(alpn),
+                .sni = std::move(sni),
+                .skip_cert_check = m_skipCertCheck.try_as<bool>(),
+            };
+        }
+
+        return {.protocol = std::move(protocol),
+                .dest = {.host = to_string(m_host), .port = m_port},
+                .obfs = std::move(obfs),
+                .tls = std::move(tls)};
+    };
 }

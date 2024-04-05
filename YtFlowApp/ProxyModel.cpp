@@ -140,4 +140,10 @@ namespace winrt::YtFlowApp::implementation
 
         return m_analyzedProxy;
     }
+
+    void ProxyModel::Update() const
+    {
+        auto conn{FfiDbInstance.Connect()};
+        conn.UpdateProxy(m_id, to_string(m_name).data(), m_proxy.data(), m_proxy.size(), m_proxyVersion);
+    }
 }

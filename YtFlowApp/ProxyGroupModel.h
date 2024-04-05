@@ -33,8 +33,8 @@ namespace winrt::YtFlowApp::implementation
         hstring SubscriptionBytesTotal() const;
         hstring SubscriptionRetrievedAt() const;
         hstring SubscriptionExpireAt() const;
-        IObservableVector<ProxyModel> Proxies() const;
-        void Proxies(IObservableVector<ProxyModel> const &value);
+        IObservableVector<YtFlowApp::ProxyModel> Proxies() const;
+        void Proxies(IObservableVector<YtFlowApp::ProxyModel> const &value);
         event_token PropertyChanged(Windows::UI::Xaml::Data::PropertyChangedEventHandler const &handler);
         void PropertyChanged(event_token const &token) noexcept;
 
@@ -50,7 +50,7 @@ namespace winrt::YtFlowApp::implementation
             m_subscriptionBytesTotal, m_subscriptionRetrievedAt, m_subscriptionExpireAt;
         double m_subscriptionPercentUsed{};
         bool m_subscriptionHasDataUsage{false};
-        IObservableVector<ProxyModel> m_proxies{nullptr};
+        IObservableVector<YtFlowApp::ProxyModel> m_proxies{nullptr};
         event<Windows::UI::Xaml::Data::PropertyChangedEventHandler> m_propertyChanged;
     };
 }

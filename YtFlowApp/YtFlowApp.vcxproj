@@ -213,6 +213,7 @@
       <DependentUpon>SplitRoutingRulesetControl.xaml</DependentUpon>
       <SubType>Code</SubType>
     </ClInclude>
+    <ClInclude Include="StringUtil.h" />
     <ClInclude Include="SwitchChoiceItem.h" />
     <ClInclude Include="SwitchHomeWidget.h">
       <DependentUpon>SwitchHomeWidget.xaml</DependentUpon>
@@ -440,6 +441,7 @@
       <DependentUpon>SplitRoutingRulesetControl.xaml</DependentUpon>
       <SubType>Code</SubType>
     </ClCompile>
+    <ClCompile Include="StringUtil.cpp" />
     <ClCompile Include="SwitchChoiceItem.cpp" />
     <ClCompile Include="SwitchHomeWidget.cpp">
       <DependentUpon>SwitchHomeWidget.xaml</DependentUpon>

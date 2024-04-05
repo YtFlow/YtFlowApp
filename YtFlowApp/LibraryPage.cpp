@@ -10,11 +10,11 @@
 #include "CoreFfi.h"
 #include "CoreProxy.h"
 #include "CoreSubscription.h"
+#include "EditProxyPageParam.h"
 #include "ProxyGroupModel.h"
 #include "ProxyModel.h"
+#include "StringUtil.h"
 #include "UI.h"
-
-#include "EditProxyPageParam.h"
 
 using namespace std::string_view_literals;
 using namespace winrt;
@@ -584,14 +584,11 @@ namespace winrt::YtFlowApp::implementation
             for (auto const wline : std::ranges::views::split(input, L"\r"sv))
             {
                 auto const line(to_string(std::wstring_view(wline.begin(), wline.end())));
-                constexpr char const *SPACES = " \r\n\t\v\f";
-                auto const lpos = line.find_first_not_of(SPACES);
-                auto const rpos = line.find_last_not_of(SPACES);
-                if (lpos == std::string::npos || rpos == std::string::npos)
+                std::string const trimmedLink(TrimSpaces(line));
+                if (trimmedLink.empty())
                 {
                     continue;
                 }
-                std::string trimmedLink(line, lpos, rpos - lpos + 1);
                 auto proxy = ConvertShareLinkToDataProxy(trimmedLink);
                 if (!proxy.has_value())
                 {

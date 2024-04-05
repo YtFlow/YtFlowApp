@@ -166,6 +166,9 @@
     <ClCompile Include="IdentityConverter.cpp">
       <Filter>Converter</Filter>
     </ClCompile>
+    <ClCompile Include="StringUtil.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -258,6 +261,9 @@
     </ClInclude>
     <ClInclude Include="IdentityConverter.h">
       <Filter>Converter</Filter>
+    </ClInclude>
+    <ClInclude Include="StringUtil.h">
+      <Filter>Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

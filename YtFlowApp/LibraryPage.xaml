@@ -341,8 +341,17 @@
                                 <ColumnDefinition Width="2*" />
                             </Grid.ColumnDefinitions>
 
-                            <TextBlock Grid.Column="0" Text="{x:Bind Name}" ToolTipService.ToolTip="{x:Bind Tooltip}" />
-                            <TextBlock Grid.Column="1" Text="{x:Bind Summary}" Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}" ToolTipService.ToolTip="{x:Bind Summary}" />
+                            <TextBlock
+                                Grid.Column="0"
+                                Text="{x:Bind Name, Mode=OneWay}"
+                                ToolTipService.ToolTip="{x:Bind Tooltip, Mode=OneWay}"
+                            />
+                            <TextBlock
+                                Grid.Column="1"
+                                Text="{x:Bind Summary, Mode=OneWay}"
+                                Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
+                                ToolTipService.ToolTip="{x:Bind Summary, Mode=OneWay}"
+                            />
                         </Grid>
                     </DataTemplate>
                 </ListView.ItemTemplate>

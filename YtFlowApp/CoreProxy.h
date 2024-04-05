@@ -44,7 +44,7 @@ namespace winrt::YtFlowApp::implementation
     struct FfiProxyDest
     {
         std::string host;
-        uint16_t port{};
+        uint16_t port = 1;
     };
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(FfiProxyDest, host, port);
 

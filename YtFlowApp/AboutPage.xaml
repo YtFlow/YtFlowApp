@@ -22,7 +22,7 @@
         </Style>
     </Page.Resources>
 
-    <ScrollViewer x:Name="MainScrollViewer" Margin="16, 0, 16, 0">
+    <ScrollViewer x:Name="MainScrollViewer" Padding="16, 0, 16, 0">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -118,7 +118,7 @@
                         <Setter Target="MainPanel.(Grid.ColumnSpan)" Value="1" />
                         <Setter Target="MainPanel.(Grid.Row)" Value="1" />
                         <Setter Target="MainPanel.Margin" Value="0, 0, 16, 0" />
-                        <Setter Target="MainScrollViewer.Margin" Value="40, 0, 40, 0" />
+                        <Setter Target="MainScrollViewer.Padding" Value="40, 0, 40, 0" />
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>

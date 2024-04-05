@@ -28,6 +28,8 @@ namespace winrt::YtFlowApp::implementation
         void PropertyChanged(event_token const &token) noexcept;
         std::optional<FfiProxy> &Analyze(char const *name = nullptr) const;
 
+        void Update() const;
+
       private:
         uint32_t m_id;
         hstring m_name;

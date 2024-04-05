@@ -48,23 +48,24 @@ namespace winrt::YtFlowApp::implementation
         void PropertyChanged(winrt::event_token const &token) noexcept;
         hstring Dest();
         hstring Summary() const;
+        FfiProxyLeg Encode() const;
 
       private:
         bool m_isReadonly{};
-        hstring m_protocolType;
+        hstring m_protocolType = L"SOCKS5";
         hstring m_shadowsocksEncryptionMethod = L"none";
         hstring m_vmessEncryptionMethod = L"none";
         uint16_t m_alterId{};
         hstring m_username;
         hstring m_password;
-        hstring m_host;
-        uint16_t m_port{};
-        hstring m_obfsType;
+        hstring m_host = L"localhost";
+        uint16_t m_port = 1;
+        hstring m_obfsType = L"none";
         hstring m_obfsHost;
-        hstring m_obfsPath;
+        hstring m_obfsPath = L"/";
         hstring m_obfsHeaders;
         bool m_enableTls{};
-        hstring m_sni;
+        hstring m_sni = L"auto";
         hstring m_alpn;
         winrt::Windows::Foundation::IReference<bool> m_skipCertCheck;
         event<Windows::UI::Xaml::Data::PropertyChangedEventHandler> m_propertyChanged;

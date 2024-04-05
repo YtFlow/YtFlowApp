@@ -24,8 +24,6 @@ namespace winrt::YtFlowApp::implementation
     {
         try
         {
-            VisualStateManager::GoToState(*this, L"MasterState", false);
-
             auto const weak{get_weak()};
             m_depChangeSubject$.get_observable().debounce(3s, ObserveOnDispatcher()).subscribe([=](bool) {
                 try
@@ -61,6 +59,7 @@ namespace winrt::YtFlowApp::implementation
         try
         {
             const auto lifetime{get_strong()};
+            VisualStateManager::GoToState(*this, L"MasterState", false);
             m_profile = args.Parameter().as<ProfileModel>();
             ProfileNameBox().Text(m_profile->Name());
             EditorFrame().Content(nullptr);
