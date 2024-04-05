@@ -55,9 +55,20 @@ namespace winrt::YtFlowApp::implementation
                            GUID userGuid{};
                            assert(v.user_id.size() == sizeof(GUID));
                            std::memmove(&userGuid, v.user_id.data(), sizeof(GUID));
-                           std::array<OLECHAR, 37> userIdBuf{};
+                           if constexpr (std::endian::native == std::endian::little)
+                           {
+                               userGuid.Data1 = std::byteswap(userGuid.Data1);
+                               userGuid.Data2 = std::byteswap(userGuid.Data2);
+                               userGuid.Data3 = std::byteswap(userGuid.Data3);
+                           }
+                           std::array<OLECHAR, 40> userIdBuf{};
                            assert(StringFromGUID2(userGuid, userIdBuf.data(), static_cast<int>(userIdBuf.size())) > 0);
-                           m_password = hstring(userIdBuf.data());
+                           std::wstring_view userIdSv(userIdBuf.data());
+                           if (userIdSv.starts_with(L'{') && userIdSv.ends_with(L'}'))
+                           {
+                               userIdSv = userIdSv.substr(1, userIdSv.size() - 2);
+                           }
+                           m_password = hstring(userIdSv);
                        },
                    },
                    leg.protocol);
