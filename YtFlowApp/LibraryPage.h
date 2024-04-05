@@ -21,7 +21,13 @@ namespace winrt::YtFlowApp::implementation
     {
         LibraryPage();
 
-        static Windows::UI::Xaml::DependencyProperty IsProxyGroupProxySingleSelectedProperty();
+        static Windows::UI::Xaml::DependencyProperty ProxyGroupProxySelectedCountProperty();
+        static Windows::UI::Xaml::DependencyProperty IsProxyGroupLockedProperty();
+        static bool IsProxyGroupProxyShareEnabled(uint32_t proxySelectedCount) noexcept;
+        static bool IsProxyGroupProxyEditEnabled(uint32_t proxySelectedCount) noexcept;
+        static bool IsProxyGroupProxyAddEnabled(bool isSubscription, bool isProxyGroupLocked) noexcept;
+        static bool IsProxyGroupProxyDeleteEnabled(bool isSubscription, bool isProxyGroupLocked,
+                                                   uint32_t proxySelectedCount);
 
         YtFlowApp::AssetModel Model() const;
         fire_and_forget LoadModel();
@@ -46,20 +52,26 @@ namespace winrt::YtFlowApp::implementation
                                                           Windows::UI::Xaml::RoutedEventArgs const &e);
         fire_and_forget ProxyGroupAddProxyButton_Click(Windows::Foundation::IInspectable const &sender,
                                                        Windows::UI::Xaml::RoutedEventArgs const &e);
+        fire_and_forget ProxyGroupUnlockProxyButton_Click(Windows::Foundation::IInspectable const &sender,
+                                                          Windows::UI::Xaml::RoutedEventArgs const &e);
         void ProxyGroupShareProxyButton_Click(Windows::Foundation::IInspectable const &sender,
                                               Windows::UI::Xaml::RoutedEventArgs const &e);
         void ProxyGroupEditProxyButton_Click(Windows::Foundation::IInspectable const &sender,
                                              Windows::UI::Xaml::RoutedEventArgs const &e);
-        bool IsProxyGroupProxySingleSelected();
+        uint32_t ProxyGroupProxySelectedCount();
+        bool IsProxyGroupLocked() const;
 
       private:
         static Windows::Web::Http::HttpClient GetHttpClientForSubscription();
         static Windows::Foundation::IAsyncAction DownloadSubscriptionProxies(
             Windows::Web::Http::HttpClient client, Windows::Foundation::Uri uri, char const *format,
             std::shared_ptr<SubscriptionDownloadDecodeResult> result);
-        inline static Windows::UI::Xaml::DependencyProperty m_isProxyGroupProxySingleSelectedProperty =
-            Windows::UI::Xaml::DependencyProperty::Register(L"IsProxyGroupProxySingleSelected",
-                                                            winrt::xaml_typename<bool>(),
+        inline static Windows::UI::Xaml::DependencyProperty m_proxyGroupProxySelectedCountProperty =
+            Windows::UI::Xaml::DependencyProperty::Register(L"ProxyGroupProxySelectedCount",
+                                                            winrt::xaml_typename<uint32_t>(),
+                                                            winrt::xaml_typename<YtFlowApp::LibraryPage>(), nullptr);
+        inline static Windows::UI::Xaml::DependencyProperty m_isProxyGroupLockedProperty =
+            Windows::UI::Xaml::DependencyProperty::Register(L"IsProxyGroupLocked", winrt::xaml_typename<bool>(),
                                                             winrt::xaml_typename<YtFlowApp::LibraryPage>(), nullptr);
 
         fire_and_forget LoadProxiesForProxyGroup(ProxyGroupModel const &model);

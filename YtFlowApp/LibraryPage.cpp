@@ -33,9 +33,35 @@ namespace winrt::YtFlowApp::implementation
         LoadModel();
     }
 
-    Windows::UI::Xaml::DependencyProperty LibraryPage::IsProxyGroupProxySingleSelectedProperty()
+    Windows::UI::Xaml::DependencyProperty LibraryPage::ProxyGroupProxySelectedCountProperty()
     {
-        return m_isProxyGroupProxySingleSelectedProperty;
+        return m_proxyGroupProxySelectedCountProperty;
+    }
+
+    Windows::UI::Xaml::DependencyProperty LibraryPage::IsProxyGroupLockedProperty()
+    {
+        return m_isProxyGroupLockedProperty;
+    }
+
+    bool LibraryPage::IsProxyGroupProxyShareEnabled(uint32_t proxySelectedCount) noexcept
+    {
+        return proxySelectedCount > 0;
+    }
+
+    bool LibraryPage::IsProxyGroupProxyEditEnabled(uint32_t proxySelectedCount) noexcept
+    {
+        return proxySelectedCount == 1;
+    }
+
+    bool LibraryPage::IsProxyGroupProxyAddEnabled(bool isSubscription, bool isProxyGroupLocked) noexcept
+    {
+        return !(isSubscription && isProxyGroupLocked);
+    }
+
+    bool LibraryPage::IsProxyGroupProxyDeleteEnabled(bool isSubscription, bool isProxyGroupLocked,
+                                                     uint32_t proxySelectedCount)
+    {
+        return !(isSubscription && isProxyGroupLocked) && proxySelectedCount > 0;
     }
 
     fire_and_forget LibraryPage::LoadModel()
@@ -405,6 +431,7 @@ namespace winrt::YtFlowApp::implementation
             return;
         }
         LoadProxiesForProxyGroup(*model);
+        SetValue(m_isProxyGroupLockedProperty, box_value(true));
         m_model->CurrentProxyGroupModel(*model);
         VisualStateManager::GoToState(*this, L"DisplayProxyGroupView", true);
         isDetailedViewShown = true;
@@ -444,14 +471,8 @@ namespace winrt::YtFlowApp::implementation
     void LibraryPage::ProxyGroupProxyList_SelectionChanged(IInspectable const &sender,
                                                            SelectionChangedEventArgs const &)
     {
-        auto const isEmpty = sender.as<ListView>().SelectedItems().Size() == 0;
-        ProxyGroupShareProxyButton().IsEnabled(!isEmpty);
-        auto const currentProxyGroup = m_model->CurrentProxyGroupModel();
-        if (currentProxyGroup != nullptr)
-        {
-            ProxyGroupDeleteProxyButton().IsEnabled(currentProxyGroup.IsManualGroup() && !isEmpty);
-        }
-        SetValue(m_isProxyGroupProxySingleSelectedProperty, box_value(IsProxyGroupProxySingleSelected()));
+        auto const selectedCount = sender.as<ListView>().SelectedItems().Size();
+        SetValue(m_proxyGroupProxySelectedCountProperty, box_value(selectedCount));
     }
 
     fire_and_forget LibraryPage::ProxyGroupDeleteProxyButton_Click(IInspectable const &, RoutedEventArgs const &)
@@ -616,6 +637,23 @@ namespace winrt::YtFlowApp::implementation
         }
     }
 
+    fire_and_forget LibraryPage::ProxyGroupUnlockProxyButton_Click(Windows::Foundation::IInspectable const &sender,
+                                                                   Windows::UI::Xaml::RoutedEventArgs const &e)
+    {
+        auto const lifetime = get_strong();
+        if (std::exchange(isDialogsShown, true))
+        {
+            co_return;
+        }
+        auto const dialogResult = co_await ProxyGroupUnlockDialog().ShowAsync();
+        lifetime->isDialogsShown = false;
+        if (dialogResult != ContentDialogResult::Primary)
+        {
+            co_return;
+        }
+        SetValue(m_isProxyGroupLockedProperty, box_value(false));
+    }
+
     void LibraryPage::ProxyGroupShareProxyButton_Click(IInspectable const &, RoutedEventArgs const &)
     {
         auto linkRange =
@@ -650,22 +688,21 @@ namespace winrt::YtFlowApp::implementation
 
     void LibraryPage::ProxyGroupEditProxyButton_Click(IInspectable const &, RoutedEventArgs const &)
     {
-        if (!IsProxyGroupProxySingleSelected())
+        auto const proxy = ProxyGroupProxyList().SelectedItem().try_as<ProxyModel>();
+        if (!proxy)
         {
             return;
         }
-        auto const proxy = ProxyGroupProxyList().SelectedItem().as<ProxyModel>();
         auto const isSubscription = m_model->CurrentProxyGroupModel().as<ProxyGroupModel>()->IsSubscription();
-        Frame().Navigate(xaml_typename<YtFlowApp::EditProxyPage>(), make<EditProxyPageParam>(isSubscription, proxy));
+        auto const isReadonly = isSubscription && IsProxyGroupLocked();
+        Frame().Navigate(xaml_typename<YtFlowApp::EditProxyPage>(), make<EditProxyPageParam>(isReadonly, proxy));
     }
-    bool LibraryPage::IsProxyGroupProxySingleSelected()
+    uint32_t LibraryPage::ProxyGroupProxySelectedCount()
     {
-        auto const selected = ProxyGroupProxyList().SelectedItems();
-        if (selected.Size() != 1)
-        {
-            return false;
-        }
-        auto const proxy = selected.GetAt(0).try_as<ProxyModel>();
-        return proxy != nullptr;
+        return ProxyGroupProxyList().SelectedItems().Size();
+    }
+    bool LibraryPage::IsProxyGroupLocked() const
+    {
+        return GetValue(m_isProxyGroupLockedProperty).try_as<bool>().value_or(true);
     }
 }

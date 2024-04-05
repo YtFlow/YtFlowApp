@@ -2,7 +2,7 @@
 #include "App.xaml.g.h"
 
 #include "BoolTemplateSelector.h"
-#include "BoolToFontWeightConverter.h"
+#include "BoolToObjectConverter.h"
 #include "EditPluginTreeViewItemTemplateSelector.h"
 #include "IdentityConverter.h"
 #include "PluginTypeToDescConverter.h"

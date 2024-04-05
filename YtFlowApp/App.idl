@@ -112,6 +112,8 @@ namespace YtFlowApp
     {
         EditProfilePage();
 
+        static Windows.UI.Text.FontWeight PluginNameFontWeight(Boolean isDirty);
+
         Windows.UI.Xaml.Controls.ComboBox NewPluginTypeBox;
     }
     [default_interface] runtimeclass RawEditorPage : Windows.UI.Xaml.Controls.Page
@@ -129,6 +131,15 @@ namespace YtFlowApp
     {
         LibraryPage();
 
+        static Windows.UI.Xaml.DependencyProperty ProxyGroupProxySelectedCountProperty
+        {
+            get;
+        };
+        static Windows.UI.Xaml.DependencyProperty IsProxyGroupLockedProperty
+        {
+            get;
+        };
+
         AssetModel Model
         {
             get;
@@ -138,10 +149,20 @@ namespace YtFlowApp
             get;
         };
 
-        Boolean IsProxyGroupProxySingleSelected
+        UInt32 ProxyGroupProxySelectedCount
         {
             get;
         };
+        Boolean IsProxyGroupLocked
+        {
+            get;
+        };
+
+        static Boolean IsProxyGroupProxyShareEnabled(UInt32 proxySelectedCount);
+        static Boolean IsProxyGroupProxyEditEnabled(UInt32 proxySelectedCount);
+        static Boolean IsProxyGroupProxyAddEnabled(Boolean isSubscription, Boolean isProxyGroupLocked);
+        static Boolean IsProxyGroupProxyDeleteEnabled(Boolean isSubscription, Boolean isProxyGroupLocked,
+                                                      UInt32 proxySelectedCount);
     }
     [default_interface] runtimeclass AboutPage : Windows.UI.Xaml.Controls.Page
     {
@@ -660,9 +681,28 @@ namespace YtFlowApp
     {
         PluginTypeToDescConverter();
     }
-    [default_interface] runtimeclass BoolToFontWeightConverter : Windows.UI.Xaml.Data.IValueConverter
+    [default_interface] runtimeclass BoolToObjectConverter : Windows.UI.Xaml.Data.IValueConverter
     {
-        BoolToFontWeightConverter();
+        BoolToObjectConverter();
+
+        static Windows.UI.Xaml.Visibility ToVisibility(Boolean input);
+        static Windows.UI.Xaml.Visibility NullabilityToVisibility(Object input);
+
+        Object TrueObject
+        {
+            get;
+            set;
+        };
+        Object FalseObject
+        {
+            get;
+            set;
+        };
+        Object DefaultObject
+        {
+            get;
+            set;
+        };
     }
     [default_interface] runtimeclass SplitRoutingModeToDescConverter : Windows.UI.Xaml.Data.IValueConverter
     {

@@ -91,7 +91,7 @@
     <ClCompile Include="PluginTypeToDescConverter.cpp">
       <Filter>Converter</Filter>
     </ClCompile>
-    <ClCompile Include="BoolToFontWeightConverter.cpp">
+    <ClCompile Include="BoolToObjectConverter.cpp">
       <Filter>Converter</Filter>
     </ClCompile>
     <ClCompile Include="RawEditorParam.cpp">
@@ -196,7 +196,7 @@
     <ClInclude Include="PluginTypeToDescConverter.h">
       <Filter>Converter</Filter>
     </ClInclude>
-    <ClInclude Include="BoolToFontWeightConverter.h">
+    <ClInclude Include="BoolToObjectConverter.h">
       <Filter>Converter</Filter>
     </ClInclude>
     <ClInclude Include="RawEditorParam.h">

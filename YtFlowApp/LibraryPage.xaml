@@ -221,23 +221,18 @@
             <CommandBar Grid.Row="0" DefaultLabelPosition="Right" IsSticky="True" VerticalContentAlignment="Center">
                 <CommandBar.PrimaryCommands>
                     <AppBarButton
+                        x:Name="ProxyGroupEditProxyButton"
                         Label="Edit"
                         contract7Present:Icon="Edit"
+                        IsEnabled="{x:Bind local:LibraryPage.IsProxyGroupProxyEditEnabled(ProxyGroupProxySelectedCount), Mode=OneWay}"
                         Click="ProxyGroupEditProxyButton_Click"
                     />
                     <AppBarButton
                         x:Name="ProxyGroupDeleteProxyButton"
                         Label="Delete"
                         contract7Present:Icon="Delete"
-                        IsEnabled="False"
+                        IsEnabled="{x:Bind local:LibraryPage.IsProxyGroupProxyDeleteEnabled(Model.CurrentProxyGroupModel.IsSubscription, IsProxyGroupLocked, ProxyGroupProxySelectedCount), Mode=OneWay, FallbackValue=true}"
                         Click="ProxyGroupDeleteProxyButton_Click"
-                    />
-                    <AppBarSeparator />
-                    <AppBarButton
-                        Label="Add"
-                        contract7Present:Icon="Add"
-                        IsEnabled="{x:Bind Model.CurrentProxyGroupModel.IsManualGroup, Mode=OneWay, FallbackValue=true}"
-                        Click="ProxyGroupAddProxyButton_Click"
                     />
                 </CommandBar.PrimaryCommands>
                 <CommandBar.SecondaryCommands>
@@ -245,15 +240,25 @@
                         x:Name="ProxyGroupShareProxyButton"
                         Label="Share"
                         contract7Present:Icon="Share"
-                        IsEnabled="False"
+                        IsEnabled="{x:Bind local:LibraryPage.IsProxyGroupProxyShareEnabled(ProxyGroupProxySelectedCount), Mode=OneWay}"
                         Click="ProxyGroupShareProxyButton_Click"
                     />
-                    <!-- AppBarButton
+                    <AppBarButton
+                        Label="Import"
+                        contract7Present:Icon="Add"
+                        IsEnabled="{x:Bind local:LibraryPage.IsProxyGroupProxyAddEnabled(Model.CurrentProxyGroupModel.IsSubscription, IsProxyGroupLocked), Mode=OneWay, FallbackValue=true}"
+                        Click="ProxyGroupAddProxyButton_Click"
+                    />
+                    <AppBarButton
                         Label="Unlock"
-                        contract7Present:Icon="Share"
-                        IsEnabled="{x:Bind Model.CurrentProxyGroupModel.IsSubscription, Mode=OneWay, FallbackValue=false}"
-                        Click="ProxyGroupShareProxyButton_Click"
-                    / -->
+                        Visibility="{x:Bind local:BoolToObjectConverter.ToVisibility(Model.CurrentProxyGroupModel.IsSubscription), Mode=OneWay}"
+                        IsEnabled="{x:Bind IsProxyGroupLocked, Mode=OneWay}"
+                        Click="ProxyGroupUnlockProxyButton_Click"
+                    >
+                        <contract7Present:AppBarButton.Icon>
+                            <contract7Present:FontIcon Glyph="&#xE785;" />
+                        </contract7Present:AppBarButton.Icon>
+                    </AppBarButton>
                 </CommandBar.SecondaryCommands>
                 <CommandBar.Content>
                     <TextBlock
@@ -359,9 +364,27 @@
                 </contract7Present:ContentDialog.SecondaryButtonCommand>
                 <ContentDialog.Content>
                     <TextBlock TextWrapping="Wrap">
-                            <Run>Do you want to delete</Run>
-                            <Run x:Name="ProxyGroupDeleteProxyPlaceholder" />
-                            <Run>? This operation cannot be undone.</Run>
+                        <Run>Do you want to delete</Run>
+                        <Run x:Name="ProxyGroupDeleteProxyPlaceholder" />
+                        <Run>? This operation cannot be undone.</Run>
+                    </TextBlock>
+                </ContentDialog.Content>
+            </ContentDialog>
+            <ContentDialog
+                Grid.RowSpan="2"
+                x:Name="ProxyGroupUnlockDialog"
+                Title="Unlock Proxy Group"
+                PrimaryButtonText="Unlock"
+                contract7NotPresent:SecondaryButtonText="Cancel"
+                DefaultButton="Primary"
+            >
+                <contract7Present:ContentDialog.SecondaryButtonCommand>
+                    <contract7Present:StandardUICommand Kind="Close"/>
+                </contract7Present:ContentDialog.SecondaryButtonCommand>
+                <ContentDialog.Content>
+                    <TextBlock TextWrapping="Wrap">
+                        By unlocking a subscription group, you can temporarily edit the proxies in the group. However,
+                        the changes will be lost when the group is updated.
                     </TextBlock>
                 </ContentDialog.Content>
             </ContentDialog>

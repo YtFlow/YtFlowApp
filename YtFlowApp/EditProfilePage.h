@@ -20,6 +20,8 @@ namespace winrt::YtFlowApp::implementation
 
         EditProfilePage();
 
+        static Windows::UI::Text::FontWeight PluginNameFontWeight(bool isDirty);
+
         fire_and_forget OnNavigatedTo(Windows::UI::Xaml::Navigation::NavigationEventArgs const &args);
         fire_and_forget OnNavigatingFrom(Windows::UI::Xaml::Navigation::NavigatingCancelEventArgs const &args);
         void OnNavigatedFrom(Windows::UI::Xaml::Navigation::NavigationEventArgs const &args);

@@ -11,7 +11,6 @@
 
     <Page.Resources>
         <local:PluginTypeToDescConverter x:Key="PluginTypeToDesc" />
-        <local:BoolToFontWeightConverter x:Key="BoolToFontWeight" />
 
         <local:EditPluginTreeViewItemTemplateSelector x:Key="TreeItemSelector">
             <local:EditPluginTreeViewItemTemplateSelector.CategoryTemplate>
@@ -61,7 +60,7 @@
                             />
                             <TextBlock
                                 Text="{x:Bind ((local:EditPluginModel)Content).Plugin.Name, Mode=OneWay}"
-                                FontWeight="{x:Bind ((local:EditPluginModel)Content).IsDirty, Mode=OneWay, Converter={StaticResource BoolToFontWeight}}"
+                                FontWeight="{x:Bind local:EditProfilePage.PluginNameFontWeight(((local:EditPluginModel)Content).IsDirty), Mode=OneWay}"
                             />
                         </StackPanel>
                         <TextBlock

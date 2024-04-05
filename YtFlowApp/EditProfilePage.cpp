@@ -47,6 +47,15 @@ namespace winrt::YtFlowApp::implementation
         }
     }
 
+    Windows::UI::Text::FontWeight EditProfilePage::PluginNameFontWeight(bool isDirty)
+    {
+        if (isDirty)
+        {
+            return Windows::UI::Text::FontWeights::SemiBold();
+        }
+        return Windows::UI::Text::FontWeights::Normal();
+    }
+
     fire_and_forget EditProfilePage::OnNavigatedTo(NavigationEventArgs const &args)
     {
         try

@@ -130,7 +130,7 @@
     <ClInclude Include="AssetModel.h" />
     <ClInclude Include="base64.h" />
     <ClInclude Include="BoolTemplateSelector.h" />
-    <ClInclude Include="BoolToFontWeightConverter.h" />
+    <ClInclude Include="BoolToObjectConverter.h" />
     <ClInclude Include="CoreFfi.h" />
     <ClInclude Include="CoreRpc.h" />
     <ClInclude Include="CoreSubscription.h" />
@@ -349,7 +349,7 @@
     <ClCompile Include="AssetModel.cpp" />
     <ClCompile Include="base64.cpp" />
     <ClCompile Include="BoolTemplateSelector.cpp" />
-    <ClCompile Include="BoolToFontWeightConverter.cpp" />
+    <ClCompile Include="BoolToObjectConverter.cpp" />
     <ClCompile Include="CoreFfi.cpp" />
     <ClCompile Include="CoreRpc.cpp" />
     <ClCompile Include="CoreSubscription.cpp" />
