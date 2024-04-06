@@ -32,6 +32,10 @@ namespace winrt::YtFlowApp::implementation
     {
         return com_array(m_proxy);
     }
+    std::vector<uint8_t> ProxyModel::ProxyRaw() const
+    {
+        return m_proxy;
+    }
     void ProxyModel::Proxy(array_view<uint8_t const> value)
     {
         m_proxy = std::vector(value.begin(), value.end());

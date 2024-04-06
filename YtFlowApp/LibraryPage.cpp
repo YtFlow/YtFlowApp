@@ -92,7 +92,15 @@ namespace winrt::YtFlowApp::implementation
             {
                 model->AttachSubscriptionInfo(subscriptionInfo);
             }
-            m_model->ProxyGroups(single_threaded_observable_vector(std::move(proxyGroupModels)));
+            auto observableProxyGroups = single_threaded_observable_vector(std::move(proxyGroupModels));
+            observableProxyGroups.VectorChanged([weak = lifetime->get_weak()](auto const &, auto const &) {
+                if (auto const self = weak.get())
+                {
+                    self->PopulateProxyGroupItemsForMenu();
+                }
+            });
+            m_model->ProxyGroups(std::move(observableProxyGroups));
+            lifetime->PopulateProxyGroupItemsForMenu();
         }
         catch (...)
         {
@@ -234,11 +242,12 @@ namespace winrt::YtFlowApp::implementation
             co_await resume_background();
             auto conn = FfiDbInstance.Connect();
             auto const newGroupId = conn.CreateProxyGroup(newGroupName.c_str(), "manual");
-            auto const newGroupModel = make<ProxyGroupModel>(conn.GetProxyGroupById(newGroupId));
+            auto newGroup = conn.GetProxyGroupById(newGroupId);
             co_await resume_foreground(lifetime->Dispatcher());
 
+            auto newGroupModel = make<ProxyGroupModel>(std::move(newGroup));
             m_model->ProxyGroups().Append(newGroupModel);
-            RenameProxyGroupItem(newGroupModel);
+            RenameProxyGroupItem(std::move(newGroupModel));
         }
         catch (...)
         {
@@ -427,6 +436,26 @@ namespace winrt::YtFlowApp::implementation
         auto const isSubscription = m_model->CurrentProxyGroupModel().as<ProxyGroupModel>()->IsSubscription();
         auto const isReadonly = isSubscription && IsProxyGroupLocked();
         Frame().Navigate(xaml_typename<YtFlowApp::EditProxyPage>(), make<EditProxyPageParam>(isReadonly, proxyModel));
+    }
+
+    void LibraryPage::PopulateProxyGroupItemsForMenu()
+    {
+        ProxyGroupProxyDuplicateFlyout().Items().Clear();
+        auto const proxyGroups = m_model->ProxyGroups();
+        for (auto const proxyGroupModel : proxyGroups)
+        {
+            auto const proxyGroup = get_self<ProxyGroupModel>(proxyGroupModel);
+            if (proxyGroup->IsSubscription())
+            {
+                continue;
+            }
+
+            MenuFlyoutItem const menuItemForDuplicate;
+            menuItemForDuplicate.Text(proxyGroup->Name());
+            menuItemForDuplicate.DataContext(proxyGroupModel);
+            menuItemForDuplicate.Click({get_weak(), &LibraryPage::ProxyGroupItemDuplicate_Click});
+            ProxyGroupProxyDuplicateFlyout().Items().Append(menuItemForDuplicate);
+        }
     }
 
     void LibraryPage::ProxyGroupItem_Click(IInspectable const &sender, RoutedEventArgs const &)
@@ -641,8 +670,8 @@ namespace winrt::YtFlowApp::implementation
         }
     }
 
-    fire_and_forget LibraryPage::ProxyGroupUnlockProxyButton_Click(Windows::Foundation::IInspectable const &sender,
-                                                                   Windows::UI::Xaml::RoutedEventArgs const &e)
+    fire_and_forget LibraryPage::ProxyGroupUnlockButton_Click(Windows::Foundation::IInspectable const &sender,
+                                                              Windows::UI::Xaml::RoutedEventArgs const &e)
     {
         auto const lifetime = get_strong();
         if (std::exchange(isDialogsShown, true))
@@ -698,6 +727,76 @@ namespace winrt::YtFlowApp::implementation
             return;
         }
         EditProxyInCurrentProxyGroup(proxy);
+    }
+    fire_and_forget LibraryPage::ProxyGroupItemDuplicate_Click(Windows::Foundation::IInspectable const &sender,
+                                                               Windows::UI::Xaml::RoutedEventArgs const &)
+    {
+        try
+        {
+            auto const lifetime = get_strong();
+
+            auto const targetGroup = sender.as<FrameworkElement>().DataContext().try_as<ProxyGroupModel>();
+            if (targetGroup == nullptr)
+            {
+                co_return;
+            }
+            auto const targetGroupId = targetGroup->Id();
+            auto const allProxies = ProxyGroupProxyList().Items();
+            using std::ranges::sort;
+            using std::ranges::to;
+            using std::ranges::views::filter;
+            using std::ranges::views::transform;
+            auto items = ProxyGroupProxyList().SelectedItems() | to<std::vector>();
+            sort(items, [&allProxies](auto const &lhs, auto const &rhs) {
+                uint32_t lhsIndex{}, rhsIndex{};
+                allProxies.IndexOf(lhs, lhsIndex);
+                allProxies.IndexOf(rhs, rhsIndex);
+                return lhsIndex < rhsIndex;
+            });
+            auto newProxies =
+                items | transform([](auto const &item) { return item.try_as<ProxyModel>(); }) |
+                filter([](auto const &item) { return static_cast<bool>(item); }) | transform([](auto const &proxy) {
+                    return FfiDataProxy{
+                        .id = INVALID_DB_ID, .name = to_string(proxy->Name()), .proxy = proxy->ProxyRaw()};
+                }) |
+                to<std::vector>();
+
+            co_await resume_background();
+            auto conn = FfiDbInstance.Connect();
+            for (auto &proxy : newProxies)
+            {
+                try
+                {
+                    proxy.id =
+                        conn.CreateProxy(targetGroupId, proxy.name.c_str(), proxy.proxy.data(), proxy.proxy.size(), 0);
+                    // TODO: order_num
+                }
+                catch (...)
+                {
+                    NotifyException(L"Duplicating a proxy");
+                }
+            }
+
+            co_await resume_foreground(lifetime->Dispatcher());
+            size_t newProxyModelSize{};
+            auto const targetGroupProxies = targetGroup->Proxies();
+            for (auto &&newProxyModel : newProxies | filter([](auto const &proxy) {
+                                            return proxy.id != INVALID_DB_ID;
+                                        }) | transform([](auto const &proxy) { return make<ProxyModel>(proxy); }))
+            {
+                if (targetGroupProxies)
+                {
+                    targetGroupProxies.Append(std::move(newProxyModel));
+                }
+                newProxyModelSize++;
+            }
+            NotifyUser(L"Duplicated " + to_hstring(newProxyModelSize) + L" proxies to " + targetGroup->Name(),
+                       L"Duplicate Proxies");
+        }
+        catch (...)
+        {
+            NotifyException(L"Duplicating proxies");
+        }
     }
     uint32_t LibraryPage::ProxyGroupProxySelectedCount()
     {

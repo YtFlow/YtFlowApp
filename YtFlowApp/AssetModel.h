@@ -9,20 +9,20 @@ namespace winrt::YtFlowApp::implementation
     {
         AssetModel() = default;
 
-        IObservableVector<ProxyGroupModel> ProxyGroups();
-        void ProxyGroups(IObservableVector<ProxyGroupModel> const &value);
+        IObservableVector<YtFlowApp::ProxyGroupModel> ProxyGroups();
+        void ProxyGroups(IObservableVector<YtFlowApp::ProxyGroupModel> const &value);
         bool IsProxyGroupsEmpty() const;
-        ProxyGroupModel CurrentProxyGroupModel() const;
-        void CurrentProxyGroupModel(ProxyGroupModel const &value);
+        YtFlowApp::ProxyGroupModel CurrentProxyGroupModel() const;
+        void CurrentProxyGroupModel(YtFlowApp::ProxyGroupModel const &value);
 
         event_token PropertyChanged(Windows::UI::Xaml::Data::PropertyChangedEventHandler const &handler);
         void PropertyChanged(event_token const &token) noexcept;
 
       private:
-        IObservableVector<ProxyGroupModel> m_proxyGroups;
+        IObservableVector<YtFlowApp::ProxyGroupModel> m_proxyGroups;
         event_token m_proxyGroupsChangeHandle;
         event<Windows::UI::Xaml::Data::PropertyChangedEventHandler> m_propertyChanged;
-        ProxyGroupModel m_currentProxyModel{nullptr};
+        YtFlowApp::ProxyGroupModel m_currentProxyModel{nullptr};
     };
 }
 namespace winrt::YtFlowApp::factory_implementation

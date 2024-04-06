@@ -19,6 +19,7 @@ namespace winrt::YtFlowApp::implementation
         hstring Name() const;
         void Name(hstring const &value);
         com_array<uint8_t> Proxy() const;
+        std::vector<uint8_t> ProxyRaw() const;
         void Proxy(array_view<uint8_t const> value);
         uint16_t ProxyVersion() const;
         void ProxyVersion(uint16_t value);
@@ -31,10 +32,10 @@ namespace winrt::YtFlowApp::implementation
         void Update() const;
 
       private:
-        uint32_t m_id;
+        uint32_t m_id{};
         hstring m_name;
         std::vector<uint8_t> m_proxy;
-        uint16_t m_proxyVersion;
+        uint16_t m_proxyVersion{};
         mutable std::optional<FfiProxy> m_analyzedProxy;
         event<Windows::UI::Xaml::Data::PropertyChangedEventHandler> m_propertyChanged;
     };

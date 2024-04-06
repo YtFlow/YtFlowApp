@@ -6,11 +6,11 @@ namespace winrt::YtFlowApp::implementation
 {
     using Windows::UI::Xaml::Data::PropertyChangedEventArgs;
 
-    IObservableVector<ProxyGroupModel> AssetModel::ProxyGroups()
+    IObservableVector<YtFlowApp::ProxyGroupModel> AssetModel::ProxyGroups()
     {
         return m_proxyGroups;
     }
-    void AssetModel::ProxyGroups(IObservableVector<ProxyGroupModel> const &value)
+    void AssetModel::ProxyGroups(IObservableVector<YtFlowApp::ProxyGroupModel> const &value)
     {
         if (m_proxyGroupsChangeHandle)
         {
@@ -40,11 +40,11 @@ namespace winrt::YtFlowApp::implementation
     {
         m_propertyChanged.remove(token);
     }
-    ProxyGroupModel AssetModel::CurrentProxyGroupModel() const
+    YtFlowApp::ProxyGroupModel AssetModel::CurrentProxyGroupModel() const
     {
         return m_currentProxyModel;
     }
-    void AssetModel::CurrentProxyGroupModel(ProxyGroupModel const &value)
+    void AssetModel::CurrentProxyGroupModel(YtFlowApp::ProxyGroupModel const &value)
     {
         m_currentProxyModel = value;
         m_propertyChanged(*this, PropertyChangedEventArgs(L"CurrentProxyGroupModel"));

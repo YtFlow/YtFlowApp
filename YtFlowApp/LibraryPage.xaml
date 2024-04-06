@@ -219,7 +219,19 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <CommandBar Grid.Row="0" DefaultLabelPosition="Right" IsSticky="True" VerticalContentAlignment="Center">
+            <CommandBar
+                Grid.Row="0"
+                DefaultLabelPosition="Right"
+                VerticalContentAlignment="Center"
+            >
+                <CommandBar.Resources>
+                    <MenuFlyout
+                        x:Name="ProxyGroupProxyDuplicateFlyout"
+                        Placement="Left"
+                        contract7Present:ShowMode="TransientWithDismissOnPointerMoveAway"
+                    >
+                    </MenuFlyout>
+                </CommandBar.Resources>
                 <CommandBar.PrimaryCommands>
                     <AppBarButton
                         x:Name="ProxyGroupEditProxyButton"
@@ -260,10 +272,18 @@
                         </contract7Present:AppBarButton.Icon>
                     </AppBarButton>
                     <AppBarButton
+                        Label="Duplicate"
+                        IsEnabled="{x:Bind local:LibraryPage.IsProxyGroupProxyShareEnabled(ProxyGroupProxySelectedCount), Mode=OneWay}"
+                        FlyoutBase.AttachedFlyout="{StaticResource ProxyGroupProxyDuplicateFlyout}"
+                        Flyout="{StaticResource ProxyGroupProxyDuplicateFlyout}"
+                        contract7Present:Icon="Copy"
+                    >
+                    </AppBarButton>
+                    <AppBarButton
                         Label="Unlock"
                         Visibility="{x:Bind local:BoolToObjectConverter.ToVisibility(Model.CurrentProxyGroupModel.IsSubscription), Mode=OneWay}"
                         IsEnabled="{x:Bind IsProxyGroupLocked, Mode=OneWay}"
-                        Click="ProxyGroupUnlockProxyButton_Click"
+                        Click="ProxyGroupUnlockButton_Click"
                     >
                         <contract7Present:AppBarButton.Icon>
                             <contract7Present:FontIcon Glyph="&#xE785;" />
