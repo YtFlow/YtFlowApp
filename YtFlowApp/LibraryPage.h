@@ -9,6 +9,8 @@
 
 namespace winrt::YtFlowApp::implementation
 {
+    struct ProxyModel;
+
     struct SubscriptionDownloadDecodeResult
     {
         std::vector<uint8_t> proxies;
@@ -52,6 +54,8 @@ namespace winrt::YtFlowApp::implementation
                                                           Windows::UI::Xaml::RoutedEventArgs const &e);
         fire_and_forget ProxyGroupAddProxyButton_Click(Windows::Foundation::IInspectable const &sender,
                                                        Windows::UI::Xaml::RoutedEventArgs const &e);
+        fire_and_forget ProxyGroupNewProxyButton_Click(winrt::Windows::Foundation::IInspectable const &sender,
+                                            winrt::Windows::UI::Xaml::RoutedEventArgs const &e);
         fire_and_forget ProxyGroupUnlockProxyButton_Click(Windows::Foundation::IInspectable const &sender,
                                                           Windows::UI::Xaml::RoutedEventArgs const &e);
         void ProxyGroupShareProxyButton_Click(Windows::Foundation::IInspectable const &sender,
@@ -76,6 +80,7 @@ namespace winrt::YtFlowApp::implementation
 
         fire_and_forget LoadProxiesForProxyGroup(ProxyGroupModel const &model);
         fire_and_forget UpdateSubscription(std::optional<uint32_t> id);
+        void EditProxyInCurrentProxyGroup(com_ptr<ProxyModel> proxyModel) const;
 
         com_ptr<AssetModel> m_model = make_self<AssetModel>();
         bool isDialogsShown{false};

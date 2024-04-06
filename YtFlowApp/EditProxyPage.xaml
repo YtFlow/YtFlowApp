@@ -47,9 +47,6 @@
             >
                 <Setter Property="Margin" Value="0, 0, 0, 4" />
             </Style>
-            <DataTemplate x:Key="BoldTextHeaderTemplate">
-                <TextBlock Text="{Binding}" FontWeight="SemiBold" />
-            </DataTemplate>
             <DataTemplate x:DataType="local:ProxyLegModel" x:Key="ProxyLegPanelTemplate">
                 <StackPanel Margin="40">
                     <StackPanel.ChildrenTransitions>

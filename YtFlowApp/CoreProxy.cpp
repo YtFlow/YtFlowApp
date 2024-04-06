@@ -122,7 +122,7 @@ namespace winrt::YtFlowApp::implementation
     {
         return nlohmann::json::from_cbor(cbor).get<FfiProxyNameOnly>().name;
     }
-    std::optional<std::pair<std::string, std::vector<uint8_t>>> ConvertShareLinkToDataProxy(std::string const &link)
+    std::optional<std::pair<std::string, std::vector<uint8_t>>> ConvertShareLinkToDataProxyV1(std::string const &link)
     {
         try
         {
@@ -138,12 +138,13 @@ namespace winrt::YtFlowApp::implementation
         }
     }
 
-    std::optional<std::string> ConvertDataProxyToShareLink(std::string const &name, std::span<uint8_t const> data_proxy)
+    std::optional<std::string> ConvertDataProxyToShareLink(std::string const &name, std::span<uint8_t const> data_proxy,
+                                                           uint16_t version)
     {
         try
         {
             auto const proxy_buf = unwrap_ffi_byte_buffer(
-                ytflow_app_proxy_data_proxy_analyze(name.c_str(), data_proxy.data(), data_proxy.size(), 0));
+                ytflow_app_proxy_data_proxy_analyze(name.c_str(), data_proxy.data(), data_proxy.size(), version));
             auto link = unwrap_ffi_string(ytflow_app_share_link_encode(proxy_buf.data(), proxy_buf.size()));
             return std::make_optional(std::move(link));
         }

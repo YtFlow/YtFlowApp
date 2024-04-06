@@ -422,6 +422,13 @@ namespace winrt::YtFlowApp::implementation
         lifetime->ProxySubscriptionUpdatesRunning$.get_subscriber().on_next(-1);
     }
 
+    void LibraryPage::EditProxyInCurrentProxyGroup(com_ptr<ProxyModel> proxyModel) const
+    {
+        auto const isSubscription = m_model->CurrentProxyGroupModel().as<ProxyGroupModel>()->IsSubscription();
+        auto const isReadonly = isSubscription && IsProxyGroupLocked();
+        Frame().Navigate(xaml_typename<YtFlowApp::EditProxyPage>(), make<EditProxyPageParam>(isReadonly, proxyModel));
+    }
+
     void LibraryPage::ProxyGroupItem_Click(IInspectable const &sender, RoutedEventArgs const &)
     {
         auto const source = sender.as<FrameworkElement>();
@@ -589,7 +596,7 @@ namespace winrt::YtFlowApp::implementation
                 {
                     continue;
                 }
-                auto proxy = ConvertShareLinkToDataProxy(trimmedLink);
+                auto proxy = ConvertShareLinkToDataProxyV1(trimmedLink);
                 if (!proxy.has_value())
                 {
                     unrecognized++;
@@ -661,7 +668,7 @@ namespace winrt::YtFlowApp::implementation
                 auto const proxy = model->Proxy();
                 std::span<uint8_t const> const proxyView(proxy.begin(), proxy.size());
                 // TODO: count unrecognized
-                return ConvertDataProxyToShareLink(to_string(model->Name()), proxyView);
+                return ConvertDataProxyToShareLink(to_string(model->Name()), proxyView, model->ProxyVersion());
             }) |
             std::views::filter([](auto const &link) { return link.has_value(); }) |
             std::views::transform([](auto &&link) { return std::forward<std::optional<std::string>>(link).value(); });
@@ -690,9 +697,7 @@ namespace winrt::YtFlowApp::implementation
         {
             return;
         }
-        auto const isSubscription = m_model->CurrentProxyGroupModel().as<ProxyGroupModel>()->IsSubscription();
-        auto const isReadonly = isSubscription && IsProxyGroupLocked();
-        Frame().Navigate(xaml_typename<YtFlowApp::EditProxyPage>(), make<EditProxyPageParam>(isReadonly, proxy));
+        EditProxyInCurrentProxyGroup(proxy);
     }
     uint32_t LibraryPage::ProxyGroupProxySelectedCount()
     {
@@ -701,5 +706,115 @@ namespace winrt::YtFlowApp::implementation
     bool LibraryPage::IsProxyGroupLocked() const
     {
         return GetValue(m_isProxyGroupLockedProperty).try_as<bool>().value_or(true);
+    }
+
+    fire_and_forget LibraryPage::ProxyGroupNewProxyButton_Click(IInspectable const &, RoutedEventArgs const &)
+    {
+        try
+        {
+            if (isDialogsShown)
+            {
+                co_return;
+            }
+            auto const lifetime = get_strong();
+            auto const proxyGroup = get_self<ProxyGroupModel>(m_model->CurrentProxyGroupModel());
+            if (proxyGroup == nullptr)
+            {
+                co_return;
+            }
+            auto const proxies = proxyGroup->Proxies();
+            auto const existingProxyCount = proxies.Size();
+            auto const proxyGroupId = proxyGroup->Id();
+
+            bool isNameValid = false;
+            hstring newProxyNameHstr;
+            while (!isNameValid)
+            {
+                lifetime->isDialogsShown = true;
+                lifetime->ProxyGroupProxyCreateNameTextBox().Text(hstring(L"New Proxy ") +
+                                                                  to_hstring(existingProxyCount + 1));
+                auto const dialogResult = co_await lifetime->ProxyGroupProxyCreateDialog().ShowAsync();
+                lifetime->isDialogsShown = false;
+                if (dialogResult != ContentDialogResult::Primary)
+                {
+                    co_return;
+                }
+                newProxyNameHstr = lifetime->ProxyGroupProxyCreateNameTextBox().Text();
+                isNameValid = !newProxyNameHstr.empty();
+            }
+            auto const selectedTemplate =
+                lifetime->ProxyGroupProxyCreateTemplateComboBox().SelectedItem().try_as<hstring>().value_or(hstring());
+
+            co_await resume_background();
+            FfiProxy newProxy{};
+            FfiProxyDest dest{.host = "example.com", .port = 1080};
+            if (selectedTemplate == L"SOCKS5")
+            {
+                newProxy.legs = {FfiProxyLeg{.protocol = FfiProxyProtocolSocks5{}, .dest = std::move(dest)}};
+            }
+            else if (selectedTemplate == L"HTTP")
+            {
+                newProxy.legs = {FfiProxyLeg{.protocol = FfiProxyProtocolHttp{}, .dest = std::move(dest)}};
+            }
+            else if (selectedTemplate == L"Shadowsocks")
+            {
+                auto password = nlohmann::json::binary_t({0x70, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64});
+                newProxy.legs = {FfiProxyLeg{
+                    .protocol = FfiProxyProtocolShadowsocks{.cipher = "aes-128-gcm", .password = std::move(password)},
+                    .dest = std::move(dest)}};
+                newProxy.udp_supported = true;
+            }
+            else if (selectedTemplate == L"Trojan-GFW")
+            {
+                auto password = nlohmann::json::binary_t({0x70, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64});
+                newProxy.legs = {FfiProxyLeg{.protocol = FfiProxyProtocolTrojan{.password = std::move(password)},
+                                             .dest = std::move(dest),
+                                             .tls = FfiProxyTls{}}};
+            }
+            else if (selectedTemplate == L"Trojan-Go")
+            {
+                auto password = nlohmann::json::binary_t({0x70, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64});
+                newProxy.legs = {FfiProxyLeg{.protocol = FfiProxyProtocolTrojan{.password = std::move(password)},
+                                             .dest = std::move(dest),
+                                             .obfs = FfiProxyObfsWebSocket{.path = "/"},
+                                             .tls = FfiProxyTls{}}};
+            }
+            else if (selectedTemplate == L"VMess + WebSocket + TLS")
+            {
+                auto password = nlohmann::json::binary_t(
+                    {0xab, 0x94, 0xe0, 0xfc, 0x56, 0x21, 0x8e, 0xeb, 0x08, 0xb4, 0x4c, 0xce, 0xd6, 0xb3, 0xd2, 0x66});
+                newProxy.legs = {FfiProxyLeg{
+                    .protocol =
+                        FfiProxyProtocolVMess{.user_id = std::move(password), .alter_id = 0, .security = "auto"},
+                    .dest = std::move(dest),
+                    .obfs = FfiProxyObfsWebSocket{.path = "/"},
+                    .tls = FfiProxyTls{}}};
+            }
+            else
+            {
+                co_return;
+            }
+            auto const proxyBuf = nlohmann::json::to_cbor(newProxy);
+            auto dataProxyBuf = unwrap_ffi_byte_buffer(
+                ytflow_core::ytflow_app_proxy_data_proxy_compose_v1(proxyBuf.data(), proxyBuf.size()));
+
+            auto conn = FfiDbInstance.Connect();
+            auto newProxyName = to_string(newProxyNameHstr);
+            auto const newProxyId =
+                conn.CreateProxy(proxyGroupId, newProxyName.c_str(), dataProxyBuf.data(), dataProxyBuf.size(), 0);
+
+            co_await resume_foreground(lifetime->Dispatcher());
+            auto newProxyModel = make_self<ProxyModel>(FfiDataProxy{.id = newProxyId,
+                                                                    .name = std::move(newProxyName),
+                                                                    .order_num = 0, // TODO: order_num
+                                                                    .proxy = std::move(dataProxyBuf),
+                                                                    .proxy_version = 0});
+            proxies.Append(*newProxyModel);
+            lifetime->EditProxyInCurrentProxyGroup(std::move(newProxyModel));
+        }
+        catch (...)
+        {
+            NotifyException(L"Creating new proxy");
+        }
     }
 }

@@ -251,6 +251,15 @@
                         Click="ProxyGroupAddProxyButton_Click"
                     />
                     <AppBarButton
+                        Label="Create"
+                        IsEnabled="{x:Bind local:LibraryPage.IsProxyGroupProxyAddEnabled(Model.CurrentProxyGroupModel.IsSubscription, IsProxyGroupLocked), Mode=OneWay, FallbackValue=true}"
+                        Click="ProxyGroupNewProxyButton_Click"
+                    >
+                        <contract7Present:AppBarButton.Icon>
+                            <contract7Present:FontIcon Glyph="&#xECC8;" />
+                        </contract7Present:AppBarButton.Icon>
+                    </AppBarButton>
+                    <AppBarButton
                         Label="Unlock"
                         Visibility="{x:Bind local:BoolToObjectConverter.ToVisibility(Model.CurrentProxyGroupModel.IsSubscription), Mode=OneWay}"
                         IsEnabled="{x:Bind IsProxyGroupLocked, Mode=OneWay}"
@@ -366,7 +375,7 @@
             <ContentDialog
                 Grid.RowSpan="2"
                 x:Name="ProxyGroupProxyDeleteDialog"
-                Title="Delete proxy"
+                Title="Delete Proxy"
                 contract7NotPresent:PrimaryButtonText="Delete"
                 contract7NotPresent:SecondaryButtonText="Close"
                 DefaultButton="Primary"
@@ -406,7 +415,7 @@
             <ContentDialog
                 Grid.RowSpan="2"
                 x:Name="ProxyGroupProxyImportDialog"
-                Title="Import proxy"
+                Title="Import Proxy"
                 PrimaryButtonText="Import"
                 contract7NotPresent:SecondaryButtonText="Close"
                 DefaultButton="Primary"
@@ -430,7 +439,7 @@
             <ContentDialog
                 Grid.RowSpan="2"
                 x:Name="ProxyGroupProxyExportDialog"
-                Title="Export proxy"
+                Title="Export Proxy"
                 contract7NotPresent:SecondaryButtonText="Close"
                 DefaultButton="Secondary"
             >
@@ -447,6 +456,40 @@
                         AcceptsReturn="True"
                     />
                 </ContentDialog.Content>
+            </ContentDialog>
+            <ContentDialog
+                Grid.RowSpan="2"
+                x:Name="ProxyGroupProxyCreateDialog"
+                Title="Create Proxy"
+                PrimaryButtonText="Create"
+                contract7NotPresent:SecondaryButtonText="Close"
+                DefaultButton="Primary"
+            >
+                <contract7Present:ContentDialog.SecondaryButtonCommand>
+                    <contract7Present:StandardUICommand Kind="Close"/>
+                </contract7Present:ContentDialog.SecondaryButtonCommand>
+                <StackPanel Orientation="Vertical" Width="270">
+                    <TextBox
+                        x:Name="ProxyGroupProxyCreateNameTextBox"
+                        Header="Name"
+                        HeaderTemplate="{StaticResource BoldTextHeaderTemplate}"
+                        Margin="0, 0, 0, 12"
+                    />
+                    <ComboBox
+                        x:Name="ProxyGroupProxyCreateTemplateComboBox"
+                        Header="Template"
+                        HeaderTemplate="{StaticResource BoldTextHeaderTemplate}"
+                        SelectedIndex="0"
+                        HorizontalAlignment="Stretch"
+                    >
+                        <x:String>SOCKS5</x:String>
+                        <x:String>HTTP</x:String>
+                        <x:String>Shadowsocks</x:String>
+                        <x:String>Trojan-GFW</x:String>
+                        <x:String>Trojan-Go</x:String>
+                        <x:String>VMess + WebSocket + TLS</x:String>
+                    </ComboBox>
+                </StackPanel>
             </ContentDialog>
         </Grid>
         <VisualStateManager.VisualStateGroups>

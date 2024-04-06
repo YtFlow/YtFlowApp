@@ -33,6 +33,9 @@
                         <Setter Property="Foreground" Value="{ThemeResource SystemControlPageTextBaseMediumBrush}" />
                         <Setter Property="IsTextSelectionEnabled" Value="True" />
                     </Style>
+                    <DataTemplate x:Key="BoldTextHeaderTemplate">
+                        <TextBlock Text="{Binding}" FontWeight="SemiBold" />
+                    </DataTemplate>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>

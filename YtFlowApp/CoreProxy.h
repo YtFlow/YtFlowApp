@@ -152,7 +152,7 @@ namespace winrt::YtFlowApp::implementation
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(FfiProxy, name, legs, udp_supported);
 
     std::string ExtractProxyNameFromCbor(std::span<uint8_t const> cbor);
-    std::optional<std::pair<std::string, std::vector<uint8_t>>> ConvertShareLinkToDataProxy(std::string const &link);
-    std::optional<std::string> ConvertDataProxyToShareLink(std::string const &name,
-                                                           std::span<uint8_t const> data_proxy);
+    std::optional<std::pair<std::string, std::vector<uint8_t>>> ConvertShareLinkToDataProxyV1(std::string const &link);
+    std::optional<std::string> ConvertDataProxyToShareLink(std::string const &name, std::span<uint8_t const> data_proxy,
+                                                           uint16_t version);
 }
