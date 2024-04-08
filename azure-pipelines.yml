@@ -46,7 +46,7 @@ jobs:
           restoreSolution: "$(solution)"
 
       - task: Cache@2
-        condition: eq(variables.cleanBuild, 'false')
+        condition: false
         inputs:
           key: 'target | "$(Agent.OS)" | rust-toolchain.toml | Cargo.lock'
           restoreKeys: |
