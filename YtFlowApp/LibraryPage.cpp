@@ -158,14 +158,14 @@ namespace winrt::YtFlowApp::implementation
                 co_return;
             }
 
-            if (std::exchange(isDialogsShown, true))
+            if (std::exchange(isDialogShown, true))
             {
                 co_return;
             }
             auto const lifetime = get_strong();
             ProxyGroupDeleteDialog().Content(*item);
             auto const dialogResult = co_await ProxyGroupDeleteDialog().ShowAsync();
-            lifetime->isDialogsShown = false;
+            lifetime->isDialogShown = false;
             if (dialogResult != ContentDialogResult::Primary)
             {
                 co_return;
@@ -202,7 +202,7 @@ namespace winrt::YtFlowApp::implementation
     {
         try
         {
-            if (std::exchange(isDialogsShown, true))
+            if (std::exchange(isDialogShown, true))
             {
                 co_return;
             }
@@ -211,7 +211,7 @@ namespace winrt::YtFlowApp::implementation
 
             ProxyGroupRenameDialogText().Text(item->Name());
             auto const dialogResult = co_await ProxyGroupRenameDialog().ShowAsync();
-            lifetime->isDialogsShown = false;
+            lifetime->isDialogShown = false;
             if (dialogResult != ContentDialogResult::Primary)
             {
                 co_return;
@@ -515,7 +515,7 @@ namespace winrt::YtFlowApp::implementation
     {
         try
         {
-            if (std::exchange(isDialogsShown, true))
+            if (std::exchange(isDialogShown, true))
             {
                 co_return;
             }
@@ -545,7 +545,7 @@ namespace winrt::YtFlowApp::implementation
                 break;
             }
             auto const dialogResult = co_await ProxyGroupProxyDeleteDialog().ShowAsync();
-            lifetime->isDialogsShown = false;
+            lifetime->isDialogShown = false;
             if (dialogResult != ContentDialogResult::Primary)
             {
                 co_return;
@@ -592,7 +592,7 @@ namespace winrt::YtFlowApp::implementation
     {
         try
         {
-            if (std::exchange(isDialogsShown, true))
+            if (std::exchange(isDialogShown, true))
             {
                 co_return;
             }
@@ -600,7 +600,7 @@ namespace winrt::YtFlowApp::implementation
 
             ProxyGroupProxyImportText().Text(L"");
             auto const dialogResult = co_await ProxyGroupProxyImportDialog().ShowAsync();
-            lifetime->isDialogsShown = false;
+            lifetime->isDialogShown = false;
             if (dialogResult != ContentDialogResult::Primary)
             {
                 co_return;
@@ -674,12 +674,12 @@ namespace winrt::YtFlowApp::implementation
                                                               Windows::UI::Xaml::RoutedEventArgs const &e)
     {
         auto const lifetime = get_strong();
-        if (std::exchange(isDialogsShown, true))
+        if (std::exchange(isDialogShown, true))
         {
             co_return;
         }
         auto const dialogResult = co_await ProxyGroupUnlockDialog().ShowAsync();
-        lifetime->isDialogsShown = false;
+        lifetime->isDialogShown = false;
         if (dialogResult != ContentDialogResult::Primary)
         {
             co_return;
@@ -811,7 +811,7 @@ namespace winrt::YtFlowApp::implementation
     {
         try
         {
-            if (isDialogsShown)
+            if (isDialogShown)
             {
                 co_return;
             }
@@ -829,11 +829,11 @@ namespace winrt::YtFlowApp::implementation
             hstring newProxyNameHstr;
             while (!isNameValid)
             {
-                lifetime->isDialogsShown = true;
+                lifetime->isDialogShown = true;
                 lifetime->ProxyGroupProxyCreateNameTextBox().Text(hstring(L"New Proxy ") +
                                                                   to_hstring(existingProxyCount + 1));
                 auto const dialogResult = co_await lifetime->ProxyGroupProxyCreateDialog().ShowAsync();
-                lifetime->isDialogsShown = false;
+                lifetime->isDialogShown = false;
                 if (dialogResult != ContentDialogResult::Primary)
                 {
                     co_return;

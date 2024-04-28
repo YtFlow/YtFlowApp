@@ -74,7 +74,7 @@ namespace winrt::YtFlowApp::implementation
         std::string desc;
         std::string plugin;
         uint16_t plugin_version{0};
-        std::vector<uint8_t> param;
+        nlohmann::json::binary_t param;
 
         static FfiPluginVerifyResult verify(char const *plugin, uint16_t plugin_version, uint8_t const *param,
                                             size_t param_len);
@@ -130,7 +130,7 @@ namespace winrt::YtFlowApp::implementation
         uint32_t id{};
         std::string name;
         int32_t order_num{};
-        std::vector<uint8_t> proxy;
+        nlohmann::json::binary_t proxy;
         uint16_t proxy_version{0};
     };
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(FfiDataProxy, id, name, order_num, proxy, proxy_version)
@@ -210,6 +210,40 @@ namespace winrt::YtFlowApp::implementation
         }
     }
 
+    struct FfiParsedTomlPlugin
+    {
+        FfiPlugin plugin;
+        bool is_entry = false;
+    };
+    inline void from_json(nlohmann::json const &json, FfiParsedTomlPlugin &r)
+    {
+        json.get_to(r.plugin);
+        json.at("is_entry").get_to(r.is_entry);
+    }
+    struct FfiParsedTomlProfile
+    {
+        std::optional<std::string> name;
+        std::optional<std::string> locale;
+        std::optional<std::string> created_at;
+        std::vector<FfiParsedTomlPlugin> plugins;
+    };
+    inline void from_json(nlohmann::json const &json, FfiParsedTomlProfile &r)
+    {
+        if (nlohmann::json const nameDoc = json.value("name", nlohmann::json()); nameDoc != nullptr)
+        {
+            r.name = {nameDoc.get<std::string>()};
+        }
+        if (nlohmann::json const localeDoc = json.value("locale", nlohmann::json()); localeDoc != nullptr)
+        {
+            r.locale = {localeDoc.get<std::string>()};
+        }
+        if (nlohmann::json const createdAtDoc = json.value("created_at", nlohmann::json()); createdAtDoc != nullptr)
+        {
+            r.created_at = {createdAtDoc.get<std::string>()};
+        }
+        json.at("plugins").get_to(r.plugins);
+    }
+
     struct FfiConn final
     {
         FfiConn(ytflow_core::ytflow_connection *conn) noexcept : conn_ptr(conn)
@@ -223,6 +257,8 @@ namespace winrt::YtFlowApp::implementation
         void DeleteProfile(uint32_t id) &;
         uint32_t CreateProfile(const char *name, const char *locale) &;
         void UpdateProfile(uint32_t id, const char *name, const char *locale) &;
+        std::string ExportProfileToml(uint32_t id) &;
+        FfiParsedTomlProfile ParseProfileToml(uint8_t const *toml, size_t tomlLen) &;
         std::vector<FfiPlugin> GetPluginsByProfile(uint32_t profileId) &;
         std::vector<FfiPlugin> GetEntryPluginsByProfile(uint32_t profileId) &;
         void SetPluginAsEntry(uint32_t pluginId, uint32_t profileId) &;

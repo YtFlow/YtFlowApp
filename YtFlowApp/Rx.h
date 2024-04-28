@@ -30,7 +30,7 @@ namespace winrt::YtFlowApp::implementation
         static auto observe_awaitable(I &&awaitable)
         {
             return rxcpp::observable<>::create<R>([awaitable = std::forward<I>(awaitable)](rxcpp::subscriber<R> s) {
-                auto cb = [](auto awaitable, auto s) -> concurrency::task<void> {
+                auto cb = [](auto awaitable, auto s) mutable -> concurrency::task<void> {
                     try
                     {
                         s.on_next(co_await std::move(awaitable));
@@ -50,7 +50,7 @@ namespace winrt::YtFlowApp::implementation
         static auto observe_awaitable(I &&awaitable)
         {
             return rxcpp::observable<>::create<R>([awaitable = std::forward<I>(awaitable)](rxcpp::subscriber<R> s) {
-                auto cb = [](auto awaitable, auto s) -> concurrency::task<void> {
+                auto cb = [](auto awaitable, auto s) mutable -> concurrency::task<void> {
                     try
                     {
                         s.on_next(co_await std::move(awaitable));

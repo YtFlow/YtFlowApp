@@ -109,6 +109,15 @@ namespace winrt::YtFlowApp::implementation
         std::lock_guard _guard(conn_mu);
         unwrap_ffi_result<FfiNoop>(ytflow_profile_update(id, name, locale, conn_ptr));
     }
+    std::string FfiConn::ExportProfileToml(uint32_t id) &
+    {
+        std::lock_guard _guard(conn_mu);
+        return unwrap_ffi_string(ytflow_profile_export_toml(id, conn_ptr));
+    }
+    FfiParsedTomlProfile FfiConn::ParseProfileToml(uint8_t const *toml, size_t tomlLen) &
+    {
+        return unwrap_ffi_buffer<FfiParsedTomlProfile>(ytflow_core::ytflow_profile_parse_toml(toml, tomlLen));
+    }
     std::vector<FfiPlugin> FfiConn::GetEntryPluginsByProfile(uint32_t profileId) &
     {
         std::lock_guard _guard(conn_mu);

@@ -26,15 +26,21 @@ namespace winrt::YtFlowApp::implementation
         void OnNavigatedFrom(Windows::UI::Xaml::Navigation::NavigationEventArgs const &args);
         static Windows::Foundation::IAsyncAction EnsureDatabase();
 
-        void OnConnectRequested(Windows::Foundation::IInspectable const &sender, HomeProfileControl const &control);
-        void OnEditRequested(Windows::Foundation::IInspectable const &sender, HomeProfileControl const &control);
+        void OnConnectRequested(Windows::Foundation::IInspectable const &sender,
+                                YtFlowApp::HomeProfileControl const &control);
+        void OnEditRequested(Windows::Foundation::IInspectable const &sender,
+                             YtFlowApp::HomeProfileControl const &control);
+        fire_and_forget OnExportRequested(Windows::Foundation::IInspectable const &sender,
+                                          YtFlowApp::HomeProfileControl const &e);
         fire_and_forget OnDeleteRequested(Windows::Foundation::IInspectable const &sender,
-                                          HomeProfileControl const &control);
+                                          YtFlowApp::HomeProfileControl const &control);
         void ConnectCancelButton_Click(Windows::Foundation::IInspectable const &sender,
                                        Windows::UI::Xaml::RoutedEventArgs const &e);
         void DisconnectButton_Click(Windows::Foundation::IInspectable const &sender,
                                     Windows::UI::Xaml::RoutedEventArgs const &e);
         void CreateProfileButton_Click(Windows::Foundation::IInspectable const &sender,
+                                       Windows::UI::Xaml::RoutedEventArgs const &e);
+        fire_and_forget ImportProfileButton_Click(Windows::Foundation::IInspectable const &sender,
                                        Windows::UI::Xaml::RoutedEventArgs const &e);
 
         Collections::IObservableVector<YtFlowApp::ProfileModel> Profiles() const;
@@ -55,6 +61,7 @@ namespace winrt::YtFlowApp::implementation
         Collections::IObservableVector<YtFlowApp::ProfileModel> m_profiles{nullptr};
         IAsyncAction m_vpnTask{nullptr};
         std::atomic<std::shared_ptr<CoreRpc>> m_rpc;
+        bool isDialogShown{false};
     };
 }
 

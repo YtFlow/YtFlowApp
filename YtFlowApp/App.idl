@@ -183,6 +183,7 @@ namespace YtFlowApp
 
         event Windows.Foundation.EventHandler<HomeProfileControl> ConnectRequested;
         event Windows.Foundation.EventHandler<HomeProfileControl> EditRequested;
+        event Windows.Foundation.EventHandler<HomeProfileControl> ExportRequested;
         event Windows.Foundation.EventHandler<HomeProfileControl> DeleteRequested;
     }
 

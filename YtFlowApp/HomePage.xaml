@@ -5,6 +5,8 @@
     xmlns:local="using:YtFlowApp"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:contract7Present="http://schemas.microsoft.com/winfx/2006/xaml/presentation?IsApiContractPresent(Windows.Foundation.UniversalApiContract,7)"
+    xmlns:contract7NotPresent="http://schemas.microsoft.com/winfx/2006/xaml/presentation?IsApiContractNotPresent(Windows.Foundation.UniversalApiContract,7)"
     mc:Ignorable="d"
     NavigationCacheMode="Required">
 
@@ -122,6 +124,7 @@
                                 Profile="{x:Bind}"
                                 ConnectRequested="OnConnectRequested"
                                 EditRequested="OnEditRequested"
+                                ExportRequested="OnExportRequested"
                                 DeleteRequested="OnDeleteRequested"
                             />
                         </DataTemplate>
@@ -154,7 +157,7 @@
                             </TextBlock>
                         </StackPanel>
                     </Button>
-                    <Button HorizontalAlignment="Stretch" Height="48" Margin="0, 10, 0, 0" IsEnabled="False">
+                    <Button HorizontalAlignment="Stretch" Height="48" Margin="0, 10, 0, 0" Click="ImportProfileButton_Click">
                         <StackPanel Orientation="Horizontal">
                             <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE7B8;" />
                             <TextBlock Margin="8, 0, 0, 0">
@@ -185,6 +188,37 @@
                         </TextBlock>
                     </DataTemplate>
                 </ContentDialog.ContentTemplate>
+            </ContentDialog>
+            <ContentDialog
+                x:Name="ConfirmProfileImportDialog"
+                Title="Confirm Profile Import"
+                PrimaryButtonText="Import"
+                contract7NotPresent:SecondaryButtonText="Cancel"
+                DefaultButton="Primary"
+            >
+                <contract7Present:ContentDialog.SecondaryButtonCommand>
+                    <contract7Present:StandardUICommand Kind="Close"/>
+                </contract7Present:ContentDialog.SecondaryButtonCommand>
+                <ContentDialog.Content>
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock TextWrapping="Wrap" MaxLines="2">
+                            Importing a profile with
+                            <Run x:Name="ConfirmProfileImportDialogPluginCountText" />
+                            plugins named
+                            <Run x:Name="ConfirmProfileImportDialogProfileNameText" FontFamily="Consolas" />
+                            .
+                            <LineBreak />
+                        </TextBlock>
+                        <TextBlock TextWrapping="Wrap">
+                            A malicious profile can harm your system software and hardware, leading to data losses and
+                            security breaches. Only import profiles from trusted sources and carefully review the
+                            profile contents.
+                            <LineBreak />
+                            <LineBreak />
+                            Continue?
+                        </TextBlock>
+                    </StackPanel>
+                </ContentDialog.Content>
             </ContentDialog>
 
         </StackPanel>

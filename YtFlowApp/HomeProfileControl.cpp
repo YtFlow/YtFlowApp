@@ -44,6 +44,16 @@ namespace winrt::YtFlowApp::implementation
         m_editRequested.remove(token);
     }
 
+    event_token HomeProfileControl::ExportRequested(
+        Windows::Foundation::EventHandler<YtFlowApp::HomeProfileControl> const &handler)
+    {
+        return m_exportRequested.add(handler);
+    }
+    void HomeProfileControl::ExportRequested(event_token const &token) noexcept
+    {
+        m_exportRequested.remove(token);
+    }
+
     event_token HomeProfileControl::DeleteRequested(
         Windows::Foundation::EventHandler<YtFlowApp::HomeProfileControl> const &handler)
     {
@@ -54,8 +64,7 @@ namespace winrt::YtFlowApp::implementation
         m_deleteRequested.remove(token);
     }
 
-    void HomeProfileControl::ConnectButton_Click(IInspectable const & /* sender */,
-                                                 RoutedEventArgs const & /* e */)
+    void HomeProfileControl::ConnectButton_Click(IInspectable const & /* sender */, RoutedEventArgs const & /* e */)
     {
         m_connectRequested(*this, *this);
     }
@@ -64,13 +73,15 @@ namespace winrt::YtFlowApp::implementation
     {
         m_editRequested(*this, *this);
     }
-    void HomeProfileControl::EditButton_Click(IInspectable const & /* sender */,
-                                              RoutedEventArgs const & /* e */)
+    void HomeProfileControl::EditButton_Click(IInspectable const & /* sender */, RoutedEventArgs const & /* e */)
     {
         m_editRequested(*this, *this);
     }
-    void HomeProfileControl::DeleteButton_Click(IInspectable const & /* sender */,
-                                                RoutedEventArgs const & /* e */)
+    void HomeProfileControl::ExportButton_Click(IInspectable const & /* sender */, RoutedEventArgs const & /* e */)
+    {
+        m_exportRequested(*this, *this);
+    }
+    void HomeProfileControl::DeleteButton_Click(IInspectable const & /* sender */, RoutedEventArgs const & /* e */)
     {
         m_deleteRequested(*this, *this);
     }

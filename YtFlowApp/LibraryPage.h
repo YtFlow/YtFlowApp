@@ -86,7 +86,7 @@ namespace winrt::YtFlowApp::implementation
         void PopulateProxyGroupItemsForMenu();
 
         com_ptr<AssetModel> m_model = make_self<AssetModel>();
-        bool isDialogsShown{false};
+        bool isDialogShown{false};
         bool isDetailedViewShown{false};
         rxcpp::subjects::subject<int32_t> ProxySubscriptionUpdatesRunning$;
     };

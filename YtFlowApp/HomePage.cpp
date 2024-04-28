@@ -4,11 +4,15 @@
 #include "HomePage.g.cpp"
 #endif
 
+#include <winrt/Windows.Storage.Pickers.h>
+
 using namespace concurrency;
 
 #include "ConnectionState.h"
 #include "CoreFfi.h"
 #include "EditProfilePage.h"
+#include "HomeProfileControl.h"
+#include "ProfileModel.h"
 #include "UI.h"
 
 using namespace winrt;
@@ -44,7 +48,7 @@ namespace winrt::YtFlowApp::implementation
         hstring const dbPath = dbFolder.Path() + L"\\main.db";
         appData.LocalSettings().Values().Insert(L"YTFLOW_DB_PATH", box_value(dbPath));
 
-        FfiDbInstance = std::move(FfiDb::Open(dbPath));
+        FfiDbInstance = FfiDb::Open(dbPath);
     }
 
     HomePage::RequestSender HomePage::MakeRequestSender(uint32_t pluginId)
@@ -67,7 +71,7 @@ namespace winrt::YtFlowApp::implementation
     }
 
     void HomePage::OnConnectRequested(Windows::Foundation::IInspectable const & /* sender */,
-                                      HomeProfileControl const &control)
+                                      YtFlowApp::HomeProfileControl const &control)
     {
         try
         {
@@ -75,7 +79,8 @@ namespace winrt::YtFlowApp::implementation
             {
                 m_vpnTask.Cancel();
             }
-            m_vpnTask = connectToProfile(control.Profile().Id());
+            m_vpnTask =
+                connectToProfile(get_self<ProfileModel>(get_self<HomeProfileControl>(control)->Profile())->Id());
         }
         catch (...)
         {
@@ -83,26 +88,72 @@ namespace winrt::YtFlowApp::implementation
         }
     }
     void HomePage::OnEditRequested(Windows::Foundation::IInspectable const & /* sender */,
-                                   HomeProfileControl const &control)
+                                   YtFlowApp::HomeProfileControl const &control)
     {
-        Frame().Navigate(xaml_typename<YtFlowApp::EditProfilePage>(), control.Profile(),
+        Frame().Navigate(xaml_typename<YtFlowApp::EditProfilePage>(), get_self<HomeProfileControl>(control)->Profile(),
                          Media::Animation::DrillInNavigationTransitionInfo{});
     }
-    fire_and_forget HomePage::OnDeleteRequested(Windows::Foundation::IInspectable const & /* sender */,
-                                                HomeProfileControl const &control)
+    fire_and_forget HomePage::OnExportRequested(IInspectable const &, YtFlowApp::HomeProfileControl const &control)
     {
         try
         {
-            static bool deleting = false;
-            if (deleting)
+            auto const lifetime{get_strong()};
+
+            auto const profile = get_self<ProfileModel>(get_self<HomeProfileControl>(control)->Profile());
+            static Windows::Storage::Pickers::FileSavePicker picker = nullptr;
+            if (picker == nullptr)
+            {
+                picker = Windows::Storage::Pickers::FileSavePicker();
+                picker.SuggestedStartLocation(Windows::Storage::Pickers::PickerLocationId::Downloads);
+                picker.FileTypeChoices().Insert(L"YtFlow TOML Profile", single_threaded_vector<hstring>({L".toml"}));
+            }
+            picker.SuggestedFileName(profile->Name() + L".ytp");
+            auto const file = co_await picker.PickSaveFileAsync();
+            if (file == nullptr)
             {
                 co_return;
             }
-            deleting = true;
+            auto const profileId = profile->Id();
+
+            co_await resume_background();
+            auto conn{FfiDbInstance.Connect()};
+            auto const data{conn.ExportProfileToml(profileId)};
+            Windows::Storage::CachedFileManager::DeferUpdates(file);
+            co_await Windows::Storage::FileIO::WriteBytesAsync(
+                file, array_view<uint8_t const>(reinterpret_cast<uint8_t const *>(data.data()),
+                                                static_cast<uint32_t>(data.size())));
+            co_await Windows::Storage::CachedFileManager::CompleteUpdatesAsync(file); // TODO: sync result
+
+            co_await resume_foreground(lifetime->Dispatcher());
+            NotifyUser(L"Profile exported successfully. Make sure sensitive information inside is removed before "
+                       L"sharing this profile.",
+                       L"Export Profile");
+        }
+        catch (...)
+        {
+            NotifyException(L"Exporting profile");
+        }
+    }
+    fire_and_forget HomePage::OnDeleteRequested(Windows::Foundation::IInspectable const & /* sender */,
+                                                YtFlowApp::HomeProfileControl const &control)
+    {
+        static bool deleting = false;
+        try
+        {
+            if (std::exchange(deleting, true))
+            {
+                co_return;
+            }
             auto const lifetime{get_strong()};
-            auto const profile = control.Profile();
+            auto const profile = get_self<HomeProfileControl>(control)->Profile();
             ConfirmProfileDeleteDialog().Content(profile);
+            if (std::exchange(isDialogShown, true))
+            {
+                deleting = false;
+                co_return;
+            }
             auto const ret{co_await ConfirmProfileDeleteDialog().ShowAsync()};
+            isDialogShown = false;
             if (ret != ContentDialogResult::Primary)
             {
                 deleting = false;
@@ -125,6 +176,8 @@ namespace winrt::YtFlowApp::implementation
         {
             NotifyException(L"Deleting profile");
         }
+        co_await resume_foreground(Dispatcher());
+        deleting = false;
     }
     IAsyncAction HomePage::connectToProfile(uint32_t id)
     {
@@ -154,8 +207,7 @@ namespace winrt::YtFlowApp::implementation
         }
     }
 
-    void HomePage::ConnectCancelButton_Click(IInspectable const & /* sender */,
-                                             RoutedEventArgs const & /* e */)
+    void HomePage::ConnectCancelButton_Click(IInspectable const & /* sender */, RoutedEventArgs const & /* e */)
     {
         if (m_vpnTask != nullptr)
         {
@@ -164,8 +216,7 @@ namespace winrt::YtFlowApp::implementation
         }
     }
 
-    void HomePage::DisconnectButton_Click(IInspectable const & /* sender */,
-                                          RoutedEventArgs const & /* e */)
+    void HomePage::DisconnectButton_Click(IInspectable const & /* sender */, RoutedEventArgs const & /* e */)
     {
         if (m_vpnTask != nullptr)
         {
@@ -173,9 +224,88 @@ namespace winrt::YtFlowApp::implementation
         }
         m_vpnTask = []() -> IAsyncAction { co_await ConnectionState::Instance->Disconnect(); }();
     }
-    void HomePage::CreateProfileButton_Click(IInspectable const & /* sender */,
-                                             RoutedEventArgs const & /* e */)
+    void HomePage::CreateProfileButton_Click(IInspectable const & /* sender */, RoutedEventArgs const & /* e */)
     {
         Frame().Navigate(xaml_typename<NewProfilePage>());
+    }
+    fire_and_forget HomePage::ImportProfileButton_Click(Windows::Foundation::IInspectable const &sender,
+                                                        Windows::UI::Xaml::RoutedEventArgs const &e)
+    {
+        auto const lifetime{get_strong()};
+        try
+        {
+            static Windows::Storage::Pickers::FileOpenPicker picker = nullptr;
+            if (picker == nullptr)
+            {
+                picker = Windows::Storage::Pickers::FileOpenPicker();
+                picker.SuggestedStartLocation(Windows::Storage::Pickers::PickerLocationId::Downloads);
+                picker.FileTypeFilter().Append(L".toml");
+            }
+            auto const file = co_await picker.PickSingleFileAsync();
+            if (file == nullptr)
+            {
+                co_return;
+            }
+            auto const data = co_await Windows::Storage::FileIO::ReadBufferAsync(file);
+
+            co_await resume_background();
+            FfiParsedTomlProfile profile;
+            {
+                auto conn{FfiDbInstance.Connect()};
+                profile = conn.ParseProfileToml(data.data(), data.Length());
+            }
+
+            co_await resume_foreground(lifetime->Dispatcher());
+            if (std::exchange(isDialogShown, true))
+            {
+                co_return;
+            }
+            ConfirmProfileImportDialogPluginCountText().Text(to_hstring(profile.plugins.size()));
+            ConfirmProfileImportDialogProfileNameText().Text(to_hstring(profile.name.value_or("Unnamed Profile")));
+            auto const ret = co_await ConfirmProfileImportDialog().ShowAsync();
+            isDialogShown = false;
+            if (ret != ContentDialogResult::Primary)
+            {
+                co_return;
+            }
+
+            co_await resume_background();
+            auto conn = FfiDbInstance.Connect();
+            auto const existingProfiles = conn.GetProfiles();
+            auto const baseProfileName = std::move(profile.name).value_or("Unnamed Profile");
+            auto newProfileName = baseProfileName;
+            auto newProfileSuffix = 0;
+
+            using std::ranges::find_if;
+            while (find_if(existingProfiles, [&](auto const &p) { return p.name == newProfileName; }) !=
+                   existingProfiles.end())
+            {
+                newProfileName = baseProfileName + " " + std::to_string(++newProfileSuffix);
+            }
+
+            auto locale = profile.locale.value_or("en-US");
+            auto const newProfileId = conn.CreateProfile(newProfileName.c_str(), locale.c_str());
+            for (auto &&plugin : profile.plugins)
+            {
+                auto const pluginId = conn.CreatePlugin(
+                    newProfileId, plugin.plugin.name.c_str(), plugin.plugin.desc.c_str(), plugin.plugin.plugin.c_str(),
+                    plugin.plugin.plugin_version, plugin.plugin.param.data(), plugin.plugin.param.size());
+                if (plugin.is_entry)
+                {
+                    conn.SetPluginAsEntry(pluginId, newProfileId);
+                }
+            }
+
+            co_await resume_foreground(lifetime->Dispatcher());
+            m_profiles.Append(make<ProfileModel>(FfiProfile{
+                .id = newProfileId,
+                .name = std::move(newProfileName),
+                .locale = std::move(locale),
+            }));
+        }
+        catch (...)
+        {
+            NotifyException(L"Importing profile");
+        }
     }
 }

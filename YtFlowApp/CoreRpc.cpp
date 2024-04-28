@@ -134,7 +134,7 @@ namespace winrt::YtFlowApp::implementation
     {
         auto const pluginId = pluginIdParam;
         auto const func = funcParam;
-        auto const params = std::move(paramsParam);
+        auto params = std::move(paramsParam);
 
         auto const writeStream{m_socket.OutputStream()};
         auto readStream{m_socket.InputStream()};

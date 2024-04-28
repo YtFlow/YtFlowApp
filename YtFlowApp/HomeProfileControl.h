@@ -14,6 +14,8 @@ namespace winrt::YtFlowApp::implementation
         void ConnectRequested(event_token const &token) noexcept;
         event_token EditRequested(Windows::Foundation::EventHandler<YtFlowApp::HomeProfileControl> const &handler);
         void EditRequested(event_token const &token) noexcept;
+        event_token ExportRequested(Windows::Foundation::EventHandler<YtFlowApp::HomeProfileControl> const &handler);
+        void ExportRequested(event_token const &token) noexcept;
         event_token DeleteRequested(Windows::Foundation::EventHandler<YtFlowApp::HomeProfileControl> const &handler);
         void DeleteRequested(event_token const &token) noexcept;
 
@@ -23,6 +25,8 @@ namespace winrt::YtFlowApp::implementation
                               Microsoft::UI::Xaml::Controls::SplitButtonClickEventArgs const &e);
         void EditButton_Click(Windows::Foundation::IInspectable const &sender,
                               Windows::UI::Xaml::RoutedEventArgs const &e);
+        void ExportButton_Click(Windows::Foundation::IInspectable const &sender,
+                                Windows::UI::Xaml::RoutedEventArgs const &e);
         void DeleteButton_Click(Windows::Foundation::IInspectable const &sender,
                                 Windows::UI::Xaml::RoutedEventArgs const &e);
 
@@ -30,6 +34,7 @@ namespace winrt::YtFlowApp::implementation
         YtFlowApp::ProfileModel m_profile;
         event<Windows::Foundation::EventHandler<YtFlowApp::HomeProfileControl>> m_connectRequested;
         event<Windows::Foundation::EventHandler<YtFlowApp::HomeProfileControl>> m_editRequested;
+        event<Windows::Foundation::EventHandler<YtFlowApp::HomeProfileControl>> m_exportRequested;
         event<Windows::Foundation::EventHandler<YtFlowApp::HomeProfileControl>> m_deleteRequested;
     };
 }

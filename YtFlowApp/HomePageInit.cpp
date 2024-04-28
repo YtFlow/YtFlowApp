@@ -19,7 +19,7 @@ namespace winrt::YtFlowApp::implementation
             static IAsyncAction loadDbTask = {nullptr};
             if (loadDbTask == nullptr)
             {
-                loadDbTask = std::move(EnsureDatabase());
+                loadDbTask = EnsureDatabase();
             }
             const auto lifetime{get_strong()};
 
@@ -45,11 +45,11 @@ namespace winrt::YtFlowApp::implementation
             }
             auto conn = FfiDbInstance.Connect();
             auto profiles = conn.GetProfiles();
+            co_await resume_foreground(Dispatcher());
             std::vector<YtFlowApp::ProfileModel> profileModels;
             profileModels.reserve(profiles.size());
             std::transform(profiles.begin(), profiles.end(), std::back_inserter(profileModels),
                            [](auto const &p) { return winrt::make<ProfileModel>(p); });
-            co_await resume_foreground(Dispatcher());
             if (profileModels.empty() &&
                 Frame().CurrentSourcePageType().Name == xaml_typename<YtFlowApp::HomePage>().Name)
             {
