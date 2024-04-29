@@ -4,6 +4,13 @@
 
 namespace winrt::YtFlowApp::implementation
 {
+    template <typename F, typename R>
+    concept ppl_task_creator = requires(F f) {
+        {
+            f()
+        } -> std::same_as<concurrency::task<R>>;
+    };
+
     struct Rx
     {
 
@@ -26,42 +33,29 @@ namespace winrt::YtFlowApp::implementation
                 });
         }
 
-        template <typename I, typename R = decltype(std::declval<I>().get())>
-        static auto observe_awaitable(I &&awaitable)
+        template <typename F, typename R = decltype(std::declval<F>()())::result_type>
+        static auto observe_ppl_task(F factory)
+            requires ppl_task_creator<F, R>
         {
-            return rxcpp::observable<>::create<R>([awaitable = std::forward<I>(awaitable)](rxcpp::subscriber<R> s) {
-                auto cb = [](auto awaitable, auto s) mutable -> concurrency::task<void> {
-                    try
-                    {
-                        s.on_next(co_await std::move(awaitable));
-                        s.on_completed();
-                    }
-                    catch (...)
-                    {
-                        s.on_error(std::current_exception());
-                    }
-                };
-                cb(awaitable, s);
-            });
-        }
-
-        template <typename I, typename R = decltype(std::declval<I>().get())>
-            requires std::is_void_v<R>
-        static auto observe_awaitable(I &&awaitable)
-        {
-            return rxcpp::observable<>::create<R>([awaitable = std::forward<I>(awaitable)](rxcpp::subscriber<R> s) {
-                auto cb = [](auto awaitable, auto s) mutable -> concurrency::task<void> {
-                    try
-                    {
-                        s.on_next(co_await std::move(awaitable));
-                        s.on_completed();
-                    }
-                    catch (...)
-                    {
-                        s.on_error(std::current_exception());
-                    }
-                };
-                cb(awaitable, s);
+            return rxcpp::observable<>::create<R>([factory = std::move(factory)](rxcpp::subscriber<R> subscriber) {
+                try
+                {
+                    factory().then([subscriber](concurrency::task<R> const &task) {
+                        try
+                        {
+                            subscriber.on_next(task.get());
+                            subscriber.on_completed();
+                        }
+                        catch (...)
+                        {
+                            subscriber.on_error(std::current_exception());
+                        }
+                    });
+                }
+                catch (...)
+                {
+                    subscriber.on_error(std::current_exception());
+                }
             });
         }
     };

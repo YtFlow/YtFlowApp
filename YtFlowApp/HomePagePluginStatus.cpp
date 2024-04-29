@@ -36,6 +36,7 @@ namespace winrt::YtFlowApp::implementation
                 }(std::move(s), weak);
             })
                 .flat_map([weak{get_weak()}](auto rpc) {
+                    // TODO: do not connect when background
                     auto const focus${ObserveApplicationLeavingBackground()};
                     auto const unfocus${ObserveApplicationEnteredBackground()};
                     auto hashcodes{std::make_shared<std::map<uint32_t, uint32_t>>()};
@@ -48,14 +49,15 @@ namespace winrt::YtFlowApp::implementation
                         return rxcpp::observable<>::interval(1s)
                             .map([](auto) { return true; })
                             .merge(self->m_triggerInfoUpdate$.get_observable())
-                            .concat_map(
-                                [=](auto) { return Rx::observe_awaitable(rpc.CollectAllPluginInfo(hashcodes)); })
-                            .map([=](auto const &&info) {
+                            .concat_map([=](auto) {
+                                return Rx::observe_ppl_task([=]() { return rpc.CollectAllPluginInfo(hashcodes); });
+                            })
+                            .map([=](auto &&info) {
                                 for (auto const &p : info)
                                 {
                                     (*hashcodes)[p.id] = p.hashcode;
                                 }
-                                return std ::move(info);
+                                return info;
                             })
                             .tap([](auto const &) {},
                                  [](auto ex) {

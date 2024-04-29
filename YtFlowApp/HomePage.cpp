@@ -250,9 +250,15 @@ namespace winrt::YtFlowApp::implementation
 
             co_await resume_background();
             FfiParsedTomlProfile profile;
+            try
             {
                 auto conn{FfiDbInstance.Connect()};
                 profile = conn.ParseProfileToml(data.data(), data.Length());
+            }
+            catch (FfiException const &e)
+            {
+                NotifyUser(to_hstring(e.what()), L"Invalid Profile");
+                co_return;
             }
 
             co_await resume_foreground(lifetime->Dispatcher());
