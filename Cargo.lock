@@ -382,7 +382,7 @@ dependencies = [
  "serde_json",
  "syn 1.0.109",
  "tempfile",
- "toml 0.5.11",
+ "toml",
 ]
 
 [[package]]
@@ -745,9 +745,9 @@ dependencies = [
 
 [[package]]
 name = "fallible-iterator"
-version = "0.2.0"
+version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4443176a9f2c162692bd3d352d745ef9413eec5782a80d8fd6f8a1ac692a07f7"
+checksum = "2acce4a10f12dc2fb14a218589d4f1f62ef011b2d0cc4b3cb1bba8e94da14649"
 
 [[package]]
 name = "fallible-streaming-iterator"
@@ -1024,9 +1024,9 @@ dependencies = [
 
 [[package]]
 name = "hashlink"
-version = "0.8.4"
+version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e8094feaf31ff591f651a2664fb9cfd92bba7a60ce3197265e9482ebe753c8f7"
+checksum = "692eaaf7f7607518dd3cef090f1474b61edc5301d8012f09579920df68b725ee"
 dependencies = [
  "hashbrown 0.14.3",
 ]
@@ -1308,8 +1308,8 @@ checksum = "13e3bf6590cbc649f4d1a3eefc9d5d6eb746f5200ffb04e5e142700b8faa56e7"
 
 [[package]]
 name = "libsqlite3-sys"
-version = "0.25.2"
-source = "git+https://github.com/YtFlow/rusqlite#3ef9040907438d551b621e23a47a1b67480e9e63"
+version = "0.28.0"
+source = "git+https://github.com/YtFlow/rusqlite?branch=winsqlite-0.31#dee8cf6a3bf6b29017b161ed1fe054d302bdb6d7"
 dependencies = [
  "pkg-config",
  "vcpkg",
@@ -1903,21 +1903,18 @@ dependencies = [
 
 [[package]]
 name = "refinery-core"
-version = "0.8.11"
+version = "0.8.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e895cb870cf06e92318cbbeb701f274d022d5ca87a16fa8244e291cd035ef954"
+checksum = "9bf253999e1899ae476c910b994959e341d84c4389ba9533d3dacbe06df04825"
 dependencies = [
  "async-trait",
  "cfg-if 1.0.0",
- "lazy_static",
  "log",
  "regex",
  "rusqlite",
- "serde",
  "siphasher",
  "thiserror",
  "time",
- "toml 0.7.8",
  "url",
  "walkdir",
 ]
@@ -1984,11 +1981,10 @@ dependencies = [
 
 [[package]]
 name = "rusqlite"
-version = "0.28.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "01e213bc3ecb39ac32e81e51ebe31fd888a940515173e3a18a35f8c6e896422a"
+version = "0.31.0"
+source = "git+https://github.com/YtFlow/rusqlite?branch=winsqlite-0.31#dee8cf6a3bf6b29017b161ed1fe054d302bdb6d7"
 dependencies = [
- "bitflags 1.3.2",
+ "bitflags 2.4.1",
  "chrono",
  "fallible-iterator",
  "fallible-streaming-iterator",
@@ -2094,15 +2090,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.48",
-]
-
-[[package]]
-name = "serde_spanned"
-version = "0.6.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "eb3622f419d1296904700073ea6cc23ad690adbd66f13ea683df73298736f0c1"
-dependencies = [
- "serde",
 ]
 
 [[package]]
@@ -2396,25 +2383,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "toml"
-version = "0.7.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dd79e69d3b627db300ff956027cc6c3798cef26d22526befdfcd12feeb6d2257"
-dependencies = [
- "serde",
- "serde_spanned",
- "toml_datetime",
- "toml_edit 0.19.15",
-]
-
-[[package]]
 name = "toml_datetime"
 version = "0.6.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3550f4e9685620ac18a50ed434eb3aec30db8ba93b0287467bca5826ea25baf1"
-dependencies = [
- "serde",
-]
 
 [[package]]
 name = "toml_edit"
@@ -2423,8 +2395,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1b5bb770da30e5cbfde35a2d7b9b8a2c4b8ef89548a7a6aeab5c9a576e3e7421"
 dependencies = [
  "indexmap 2.1.0",
- "serde",
- "serde_spanned",
  "toml_datetime",
  "winnow 0.5.34",
 ]
@@ -2958,7 +2928,7 @@ dependencies = [
 
 [[package]]
 name = "ytflow"
-version = "0.7.1"
+version = "0.7.2"
 dependencies = [
  "aes-gcm",
  "aho-corasick",
@@ -3029,7 +2999,7 @@ dependencies = [
 
 [[package]]
 name = "ytflow-app-util"
-version = "0.7.1"
+version = "0.7.2"
 dependencies = [
  "base64",
  "cbindgen",
