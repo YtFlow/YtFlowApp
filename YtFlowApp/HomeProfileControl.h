@@ -19,6 +19,8 @@ namespace winrt::YtFlowApp::implementation
         event_token DeleteRequested(Windows::Foundation::EventHandler<YtFlowApp::HomeProfileControl> const &handler);
         void DeleteRequested(event_token const &token) noexcept;
 
+        void UserControl_Loaded(Windows::Foundation::IInspectable const &sender,
+                                Windows::UI::Xaml::RoutedEventArgs const &e);
         void ConnectButton_Click(Windows::Foundation::IInspectable const &sender,
                                  Windows::UI::Xaml::RoutedEventArgs const &e);
         void EditButton_Click(Windows::Foundation::IInspectable const &sender,

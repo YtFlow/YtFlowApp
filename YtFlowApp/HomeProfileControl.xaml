@@ -6,7 +6,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
-    mc:Ignorable="d">
+    mc:Ignorable="d"
+    Loaded="UserControl_Loaded">
 
     <Grid
         Background="{ThemeResource LayerFillColorDefaultBrush}"
@@ -81,7 +82,7 @@
             <muxc:SplitButton.Flyout>
                 <MenuFlyout x:Name="MoreActionsFlyout" Placement="Bottom">
                     <MenuFlyoutItem Icon="Edit" Text="Edit" Click="EditButton_Click" />
-                    <MenuFlyoutItem Icon="Share" Text="Export" Click="ExportButton_Click" />
+                    <MenuFlyoutItem x:Name="ExportButton" Text="Export" Click="ExportButton_Click" />
                     <MenuFlyoutItem Icon="Delete" Text="Delete" Click="DeleteButton_Click" />
                 </MenuFlyout>
             </muxc:SplitButton.Flyout>

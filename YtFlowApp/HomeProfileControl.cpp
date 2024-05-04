@@ -6,12 +6,14 @@
 
 using namespace winrt;
 using namespace Windows::UI::Xaml;
+using Windows::Foundation::Metadata::ApiInformation;
+using Windows::UI::Xaml::Controls::Symbol;
+using Windows::UI::Xaml::Controls::SymbolIcon;
 
 namespace winrt::YtFlowApp::implementation
 {
     HomeProfileControl::HomeProfileControl()
     {
-        InitializeComponent();
     }
 
     ProfileModel HomeProfileControl::Profile()
@@ -62,6 +64,15 @@ namespace winrt::YtFlowApp::implementation
     void HomeProfileControl::DeleteRequested(event_token const &token) noexcept
     {
         m_deleteRequested.remove(token);
+    }
+
+    void HomeProfileControl::UserControl_Loaded(Windows::Foundation::IInspectable const &,
+                                                Windows::UI::Xaml::RoutedEventArgs const &)
+    {
+        if (ApiInformation::IsEnumNamedValuePresent(L"Windows.UI.Xaml.Controls.Symbol", L"Share"))
+        {
+            ExportButton().Icon(SymbolIcon(Symbol::Share));
+        }
     }
 
     void HomeProfileControl::ConnectButton_Click(IInspectable const & /* sender */, RoutedEventArgs const & /* e */)
