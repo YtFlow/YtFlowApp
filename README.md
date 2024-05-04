@@ -5,7 +5,7 @@
 
 YtFlow is a network debug tool running on Universal Windows Platform that forwards any network traffic through certain types of tunnels, powered by [YtFlowCore](https://github.com/YtFlow/YtFlowCore).
 
-[Join the Beta Testing program](https://forms.office.com/Pages/ResponsePage.aspx?id=DQSIkWdsW0yxEjajBLZtrQAAAAAAAAAAAAZAAJskVm9UMThNRlZRR1E5Q1dBMjM1MjFXVEk0UDlTMS4u) to keep updated with the latest YtFlow (next). For YtFlow (Legacy), please check out the [master](https://github.com/YtFlow/YtFlowApp/tree/master) branch.
+[Join the Beta Testing program](https://forms.office.com/Pages/ResponsePage.aspx?id=DQSIkWdsW0yxEjajBLZtrQAAAAAAAAAAAAZAAJskVm9UMThNRlZRR1E5Q1dBMjM1MjFXVEk0UDlTMS4u) to keep updated with the latest YtFlow Beta versions.
 
 ## Supported Features
 
