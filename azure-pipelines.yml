@@ -5,8 +5,7 @@
 # https://aka.ms/yaml
 
 trigger:
-  - next
-  - next-ci
+  - main-ci
   - main
 
 jobs:
