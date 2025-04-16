@@ -21,7 +21,7 @@ jobs:
       buildConfiguration: "Release"
       appxPackageDir: '$(build.artifactStagingDirectory)\AppxPackages\\'
       NUGET_PACKAGES: $(Pipeline.Workspace)/.nuget/packages
-      vcpkgGitCommitId: 8d3649ba34aab36914ddd897958599aa0a91b08e
+      vcpkgGitCommitId: 711466ff1cfc1239e93bf8010503eb161671be4b
       cleanBuild: false
 
     steps:
