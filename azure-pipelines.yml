@@ -78,12 +78,13 @@ jobs:
           path: "$(Build.BinariesDirectory)/vcpkg"
         displayName: Cache vcpkg for YtFlowCore
 
-      - task: run-vcpkg@0
+      - task: run-vcpkg@11
         name: runVcpkg
         displayName: "Run vcpkg for YtFlowCore"
         inputs:
-          vcpkgArguments: "openssl:x64-uwp openssl:arm-uwp"
-          vcpkgGitCommitId: $(vcpkgGitCommitId)
+          runVcpkgInstall: true
+          runVcpkgFormatString: "install --clean-after-build openssl:x64-uwp openssl:arm-uwp"
+          doNotUpdateVcpkg: true
 
       - task: CmdLine@2
         inputs:
